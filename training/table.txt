@@ -1,0 +1,57 @@
+INFO: Loading trajectories from trajectories_10k.json...
+INFO:   2000 validation trajectories (11 arc types)
+INFO:   Model: epoch 4, val_loss=0.5030
+INFO: Loading sentence transformer: sentence-transformers/all-MiniLM-L6-v2
+INFO: Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 98565.67it/s]
+INFO:   Model loaded. Embedding dim: 384, device: cpu
+INFO: Encoding val sessions...
+INFO:   Encoding 9692 unique sessions...
+INFO:   Done in 50.7s
+INFO: Extracting baseline vectors (last-session embedding)...
+INFO: Extracting model vectors (full transition model)...
+INFO: Computing separation metrics...
+INFO: Computing PC1 / polarity correlation...
+
+========================================================================
+  Table 1: Transition Model Validation  (n_val = 2000)
+========================================================================
+  Metric                               Baseline        Model
+  (last-session embedding)                        (full traj)
+------------------------------------------------------------------------
+  ARC SEPARATION
+  Within-arc cosine dist                 0.7243       0.0105 <-- better
+  Between-arc cosine dist                0.7584       0.0328
+  Separation ratio (B/W)                 1.0471       3.1111 <-- better
+  Within pairs evaluated                 22,000       22,000
+  Between pairs evaluated               110,000      110,000
+------------------------------------------------------------------------
+  PC1 / VALENCE POLARITY CORRELATION
+  Point-biserial r_pb                    0.4018       0.7493 <-- better
+  p-value                               < 0.001      < 0.001
+  95% CI lower                           0.3644       0.7295
+  95% CI upper                           0.4379       0.7679
+  PC1 variance explained (%)                6.3         82.6
+  n_positive arcs                          1018         1018
+  n_negative arcs                           982          982
+------------------------------------------------------------------------
+  WITHIN-ARC DISTANCE BY ARC TYPE
+  Arc                              Baseline        Model      Delta
+------------------------------------------------------------------------
+  acute_stress_stabilization         0.7431       0.0165    -0.7266 v  (-)
+  chronic_low_grade_anxiety          0.7397       0.0112    -0.7285 v  (-)
+  gradual_decline                    0.6726       0.0115    -0.6611 v  (-)
+  grief_arc                          0.7255       0.0158    -0.7097 v  (-)
+  post_traumatic_growth              0.7029       0.0055    -0.6974 v  (+)
+  relapse_dip                        0.7423       0.0093    -0.7330 v  (+)
+  slow_recovery                      0.7290       0.0093    -0.7197 v  (+)
+  social_confidence_growth           0.7406       0.0053    -0.7353 v  (+)
+  stable_negative                    0.7157       0.0104    -0.7052 v  (-)
+  stable_positive                    0.7283       0.0090    -0.7193 v  (+)
+  weekend_oscillation                0.7278       0.0121    -0.7157 v  (+)
+------------------------------------------------------------------------
+  INTERPRETATION NOTES
+  Separation ratio > 1.0 means between-arc > within-arc (desired).
+  Model improves separation ratio by 197.1% over baseline.
+  PC1 / polarity correlation is significant (p < 0.001).
+========================================================================

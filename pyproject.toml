@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "kokoro"
+version = "0.1.0"
+description = "Pluggable emotional trajectory memory layer for AI companions"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+
+dependencies = [
+    "sentence-transformers>=2.7.0",
+    "torch>=2.2.0",
+    "numpy>=1.26.0",
+    "datasets>=2.19.0",
+    "chromadb>=0.5.0",
+    "tqdm>=4.66.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "black>=24.0",
+    "ruff>=0.4.0",
+]
+eval = [
+    "groq>=0.4.0",
+    "python-dotenv>=1.0.0",
+]
+training = [
+    "transformers>=4.40.0",
+    "accelerate>=0.30.0",
+    "scikit-learn>=1.4.0",
+    "matplotlib>=3.8.0",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
