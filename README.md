@@ -40,11 +40,17 @@ The difference in practice: a lookup system knows you were anxious on April 18. 
 
 ---
 
-## Quickstart
+## Installation
 
 ```bash
-pip install kokoro
+git clone https://github.com/DhruvaMyakeri/kokoro
+cd kokoro
+pip install -r requirements.txt
 ```
+
+> PyPI package coming soon. For now clone the repo and install dependencies directly.
+
+## Quickstart
 
 ```python
 from kokoro import WorldMemory
@@ -159,13 +165,15 @@ Key results:
 
 ---
 
-## Requirements
+## Dependencies
 
 - Python 3.10+
 - `torch >= 2.2.0`
 - `sentence-transformers >= 2.7.0`
 - `numpy >= 1.26.0`
 - `chromadb >= 0.5.0`
+- `datasets >= 2.19.0`
+- `tqdm >= 4.66.0`
 
 Optional:
 
