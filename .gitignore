@@ -1,3 +1,8 @@
+# Project-specific excludes
+hehe.txt
+report.txt
+research_critique.txt
+
 # Secrets
 .env
 *.env
