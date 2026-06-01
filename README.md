@@ -137,7 +137,7 @@ Your function receives both the query embedding (semantic axis) and the current 
 
 ---
 
-## Research
+## Research [@Kokoro_Research_Paper.docx]
 
 Kokoro is based on a research project investigating continuous emotional state tracking for AI companions. The transition model is grounded in Russell's circumplex model of affect (1980) and trained on synthetic multi-session trajectories derived from EmpatheticDialogues (Rashkin et al., 2019).
 
@@ -147,8 +147,6 @@ Key results:
 - **r = 0.765** valence decodability from state vectors via linear probe
 - **Generalizes to real data** — validated on the Multi-Session Chat dataset (Xu et al., 2022), never seen during training
 - **Emotional retrieval surfaces different memories** than semantic-only retrieval in the majority of tested scenarios
-
-The probe is validated on synthetic data. Downstream evaluation on naturalistic companion conversations is ongoing. A companion paper is in preparation.
 
 ---
 
