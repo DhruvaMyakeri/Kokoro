@@ -1,3 +1,6 @@
+# Claude Code project config
+.claude/
+
 # Project-specific excludes
 hehe.txt
 report.txt
