@@ -6,7 +6,7 @@ Converts a user's state vector and arc_history into a structured context dict
 that can be injected directly into an LLM system prompt.
 
 Pipeline:
-  state_vector (384-dim, L2-normalised)
+  state_vector (384-dim, raw transition model output)
       └─► linear probe (384 → 2)
               └─► (valence, arousal)  ← current emotional position
 
@@ -21,9 +21,9 @@ Pipeline:
 The decoder is stateless once loaded — it holds only the probe weights.
 It never writes to disk; all persistence is handled by StateStore.
 
-Thresholds (tunable):
-  valence:   > 0.30 → positive,   < -0.30 → negative,   else neutral
-  arousal:   > 0.30 → activated,  < -0.10 → low-energy,  else moderate
+Thresholds (tunable, calibrated from val-set probe predictions):
+  valence:   > -0.005 → positive,  < -0.367 → negative,  else neutral
+  arousal:   >  0.302 → activated, <  0.024 → low-energy, else moderate
   slope:     > 0.02 → improving,  < -0.02 → declining,   else stable
   MIN_SESSIONS = 3   — minimum sessions to produce a summary
 
@@ -53,10 +53,10 @@ _DEFAULT_PROBE = _PKG_ROOT / "checkpoints" / "valence_arousal_probe.pt"
 _MIN_SESSIONS: int   = 3      # sessions required before summary is produced
 _MIN_TREND_ENTRIES   = 3      # arc_history entries required to compute slope
 
-_VALENCE_POS:  float = -0.121  # valence > this → "positive"   (top third of observed -0.144…-0.110)
-_VALENCE_NEG:  float = -0.133  # valence < this → "negative"  (bottom third of observed range)
-_AROUSAL_HIGH: float =  0.30   # arousal > this → "activated / energised"
-_AROUSAL_LOW:  float = -0.10   # arousal < this → "low energy"
+_VALENCE_POS:  float = 0.007  # 67th pct of val-set predictions
+_VALENCE_NEG:  float = -0.349  # 33rd pct of val-set predictions
+_AROUSAL_HIGH: float =  0.306  # 75th pct of val-set predictions
+_AROUSAL_LOW:  float =  0.017  # 25th pct of val-set predictions
 _SLOPE_IMP:    float =  0.02   # slope > this   → "improving"
 _SLOPE_DEC:    float = -0.02   # slope < this   → "declining"
 
@@ -320,7 +320,8 @@ class StateDecoder:
 
         Args:
             state_vector:  1-D float32 numpy array of shape (state_dim,).
-                           Must be the L2-normalised output of the transition model.
+                           Raw output of the transition model (NOT required to be
+                           L2-normalised — the probe handles arbitrary magnitude).
             arc_history:   List of [valence, arousal] pairs from StateStore,
                            oldest first.  May be empty.
             session_count: Total number of sessions recorded for this user
