@@ -2,41 +2,33 @@
 
 **Emotional trajectory memory for AI companions.**
 
-Kokoro is a memory layer that tracks how a user has been feeling across conversations — not just what they said. It gives your AI companion a sense of the person's emotional history, so responses feel like they come from something that actually knows them.
+Kokoro is a memory layer that tracks how a user has been feeling across conversations — not just what they said. It gives your AI companion a sense of the person's emotional history so responses feel like they come from something that actually knows them.
 
 Most companion systems remember facts. Kokoro remembers how someone has been doing.
 
 ---
 
-![Kokoro — emotional trajectory moving through circumplex space](figures/kokoro_demo.gif)
-
-_A user's emotional state vector moving through Russell's circumplex space across five sessions of gradual burnout. Each dot is a session. The trail is the trajectory Kokoro tracks._
-
----
-
 ## The problem
 
-Every AI companion today resets emotionally at the start of each conversation. It might remember that you have a dog named Bruno or that you work in finance. It does not know that you have been grinding through burnout for three weeks, that last Tuesday felt like a turning point, or that your message today — "still here lol" — carries more weight than it looks like.
-
----
-
-## A different approach
-
-Every existing system treats emotional memory as a lookup problem. You have a conversation, you extract emotional facts, you store them, you retrieve them when relevant. The emotion is a label attached to a memory.
-
-Kokoro treats emotional state as an environment that evolves according to dynamics. The transition model does not ask "what emotion did the user express today." It asks "given the current state of this user's emotional world and what just happened, what is the new state." That is a fundamentally different question.
-
-The difference in practice: a lookup system knows you were anxious on April 18. A world model knows you have been in a high-arousal negative state for three weeks and the trajectory suggests you are slowly moving toward lower arousal — which is either recovery or depression depending on valence. That is not stored anywhere. It emerges from the learned dynamics.
+Every AI companion today resets emotionally at the start of each conversation. It might remember that you have a dog named Bruno or that you work in finance. It does not know that you have been grinding through burnout for three weeks, that last Tuesday felt like a turning point, or that your message today — *"still here lol"* — carries more weight than it looks like.
 
 ---
 
 ## How it works
 
-- **Each session gets encoded.** When a conversation ends, Kokoro encodes the full session into a 384-dimensional embedding and runs it through a learned transition model that updates a continuous state vector — a compressed representation of the user's recent emotional trajectory.
+**Each session gets encoded.** When a conversation ends, Kokoro encodes the full session into an embedding and runs it through a learned transition model that updates a continuous state vector — a compressed representation of the user's recent emotional trajectory.
 
-- **The state is decoded into emotional coordinates.** A linear probe maps the state vector to valence (positive/negative affect) and arousal (activated/calm), then generates a plain-English summary of the trajectory — stable, improving, declining, and why.
+**The state is decoded into emotional coordinates.** A linear probe maps the state vector to valence and arousal (Russell's circumplex model), then generates a plain-English summary of the trajectory.
 
-- **Retrieval is emotionally weighted.** When the user sends a new message, Kokoro retrieves relevant past sessions using a hybrid of semantic similarity (what matches the topic) and emotional similarity (what matches how they are feeling now). The default blend is 60% semantic / 40% emotional.
+**Retrieval is emotionally weighted.** When the user sends a new message, Kokoro retrieves relevant past sessions using a hybrid score:
+
+```
+score_i = α · semantic(query, session_i) + (1 - α) · emotional(state, session_i)
+```
+
+The emotional axis uses VAD-coordinate L2 distance — comparing the user's current decoded (valence, arousal) against each stored session's coordinates. Default blend: α = 0.6 (60% semantic, 40% emotional).
+
+**The LLM receives both.** The state summary is injected into the system prompt; the retrieved memories provide session-level context.
 
 ---
 
@@ -48,7 +40,7 @@ cd kokoro
 pip install -r requirements.txt
 ```
 
-> PyPI package coming soon. For now clone the repo and install dependencies directly.
+---
 
 ## Quickstart
 
@@ -71,7 +63,7 @@ response = llm(
 )
 ```
 
-`session_turns` is a list of `{"role": "user"|"assistant", "content": "..."}` dicts — the same format as OpenAI and Anthropic chat messages.
+`session_turns` is a list of `{"role": "user"|"assistant", "content": "..."}` dicts.
 
 ---
 
@@ -86,82 +78,104 @@ context = memory.get_context("still here lol")
     "relevant_memories":  [
         "finished the sprint but honestly just feel empty. not relieved, just empty. "
         "i used to love coding. now i just stare at the screen.",
-        "missed a deadline for the first time in like two years. just couldn't focus. "
-        "kept starting things and not finishing. my brain feels scattered.",
+        "missed a deadline for the first time in like two years. just couldn't focus.",
         "snapped at a junior dev today for something stupid. felt awful after.",
     ],
-    "valence":            -0.134,
-    "arousal":            -0.008,
+    "valence":            -0.336,
+    "arousal":            -0.118,
     "trend":              "declining",
-    "trend_strength":     0.031,
     "session_count":      5,
     "ready":              True,
 }
 ```
 
-You inject `state_summary` and `relevant_memories` into your system prompt. The LLM does the rest.
+---
 
-> **Note:** `state_summary` is `None` for the first two sessions (warm-up period) and its quality depends on conversation style — it is more reliable for emotionally expressive conversations than short or technical ones.
+## Architecture
+
+| Component | What it does |
+|-----------|-------------|
+| `SessionEncoder` | Encodes a conversation session using `all-MiniLM-L6-v2` + optional Warriner VAD lexicon features → 384 or 387-dim output |
+| `TransitionModel` | MLP with split LayerNorm. Takes (state, session_emb) → next state. Trained on 10,000 synthetic trajectories across 14 emotional arc types. Trained with VICReg loss (variance + invariance + covariance) to prevent dimensional collapse. |
+| `StateDecoder` | Linear probe (384→2) mapping state vector to (valence, arousal). Generates plain-English trend summary. |
+| `MemoryStore` | ChromaDB. Stores session embeddings + decoded (valence, arousal) per session. Hybrid retrieval: semantic cosine + VAD-coordinate L2 emotional distance. |
+| `WorldMemory` | Public API. Orchestrates encode → transition → decode → store → retrieve. |
 
 ---
 
-## Examples
+## Key results
 
-| File                                                                   | What it shows                                                                                    |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| [examples/basic_usage.py](examples/basic_usage.py)                     | Full end-to-end example with no API key — mock LLM response, all steps commented                 |
-| [examples/with_openai.py](examples/with_openai.py)                     | Real integration with OpenAI or any OpenAI-compatible API (Groq, Together, etc.)                 |
-| [examples/with_custom_retrieval.py](examples/with_custom_retrieval.py) | Pluggable `retrieval_fn` — replace ChromaDB with Pinecone, pgvector, Qdrant, or any vector store |
+| Metric | Value |
+|--------|-------|
+| Participation Ratio (state space spread) | **339.7 / 384** (baseline: 1.4 / 384) |
+| Probe valence r | **0.698** (baseline: ~0) |
+| Probe arousal r | **0.542** (baseline: ~0) |
+| Arc separation ratio | **3.111** vs 1.047 baseline (+197%) |
+| Retrieval eval — standard (20 scenarios, 4–5 sessions) | **50% win rate** vs semantic-only |
+| Retrieval eval — long-history (6 scenarios, 10–12 sessions) | **83.3% win rate** vs semantic-only |
+
+The long-history win rate (83.3%) reflects the core mechanism: when enough sessions exist to span an emotional phase shift, hybrid retrieval pulls phase-matched memories while semantic-only retrieval pulls topically-matched but emotionally-stale ones.
 
 ---
 
-## Bring your own vector database
+## Evaluation
 
-If you already have a vector store, replace Kokoro's built-in ChromaDB retrieval entirely. Kokoro still handles state tracking, transition, and decoding. You handle storage and retrieval.
+Two retrieval conditions were compared:
 
-```python
-def my_retrieval(user_id, query_embedding, state_vector, top_k):
-    results = my_vector_db.search(query_embedding, top_k)
-    return [{"session_text": r.text, "session_id": r.id} for r in results]
+- **Condition A (baseline):** α=1.0 — semantic-only retrieval, no state summary
+- **Condition B (Kokoro):** α=0.6 — hybrid retrieval + emotional state summary in system prompt
 
-memory = WorldMemory(user_id="alice", retrieval_fn=my_retrieval)
+An LLM judge (`llama-3.3-70b-versatile`, blind to condition labels) rated which response showed more emotional awareness. Standard set: 20 scenarios, 4–5 sessions each. Long-history set: 6 scenarios, 10–12 sessions with explicit emotional phase shifts between early and late sessions.
+
+Full results: [`experiments/eval_report.md`](experiments/eval_report.md) and [`experiments/eval_report_long.md`](experiments/eval_report_long.md).  
+Full technical and empirical report: [`research_report.md`](research_report.md).
+
+---
+
+## Training
+
+The transition model was trained on 10,000 synthetic emotional arc trajectories using VICReg loss:
+
+```
+L = 25·L_sim + 25·L_var + 1·L_cov
 ```
 
-Your function receives both the query embedding (semantic axis) and the current emotional state vector (emotional axis), so you can implement your own hybrid scoring if you want to.
+Sessions are sourced from EmpatheticDialogues (Rashkin et al., 2019) and selected to follow 14 arc types (gradual decline, slow recovery, grief arc, burnout, post-traumatic growth, etc.).
+
+Three training runs resolved a severe dimensional collapse in the original model (PR: 1.4 → 22.1 → 339.7):
+
+1. **Run 1** — VICReg with MSE similarity term: val loss stuck at 0.9609 (MSE recreated the unit-sphere constraint that was blocking variance)
+2. **Run 2** — VICReg with cosine similarity term: val loss 0.5059, PR 22.1
+3. **Run 3** — Split LayerNorm + arousal-primary arc templates: val loss 0.5087, PR 339.7
+
+To retrain:
+
+```bash
+python -m training.train
+python -m training.train_probe
+```
 
 ---
 
-## Under the hood
+## Diagnostics
 
-| Component         | What it does                                                                                                                                                                      |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SessionEncoder`  | Encodes a conversation session into a 384-dim vector using `all-MiniLM-L6-v2`. User turns are weighted 2× over assistant turns.                                                   |
-| `TransitionModel` | A 591k-parameter MLP that takes the current state vector and the session embedding and outputs a new L2-normalized state. Trained on 10,000 synthetic emotional arc trajectories. |
-| `StateDecoder`    | A linear probe that maps the state vector to valence and arousal, computes trend from arc history slope, and generates a plain-English summary.                                   |
-| `StateStore`      | SQLite. Persists the state vector, valence, arousal, and arc history per user. Fast, local, zero configuration.                                                                   |
-| `MemoryStore`     | ChromaDB. Stores session embeddings. Retrieval blends semantic similarity on the query embedding and emotional similarity on the state vector.                                    |
-
----
-
-## Research [@Kokoro_Research_Paper.docx]
-
-Kokoro is based on a research project investigating continuous emotional state tracking for AI companions. The transition model is grounded in Russell's circumplex model of affect (1980) and trained on synthetic multi-session trajectories derived from EmpatheticDialogues (Rashkin et al., 2019).
-
-Key results:
-
-- **197% improvement** in arc separation over a last-session embedding baseline
-- **r = 0.765** valence decodability from state vectors via linear probe
-- **Generalizes to real data** — validated on the Multi-Session Chat dataset (Xu et al., 2022), never seen during training
-- **Emotional retrieval surfaces different memories** than semantic-only retrieval in the majority of tested scenarios
+```bash
+python -m diagnostics.arc_separation      # arc clustering metric (current: 3.111)
+python -m diagnostics.probe_generalization # probe on naturalistic conversations
+python -m diagnostics.per_arc_val_loss    # per-arc validation loss
+python -m diagnostics.state_ablation      # state contribution check
+python -m diagnostics.norm_drift          # state vector norm stability
+python -m diagnostics.topic_leakage       # semantic/emotional axis separation
+```
 
 ---
 
 ## Limitations
 
-- **Warm-up period.** Emotional context is not injected until 3 sessions have been logged. New users start cold.
-- **State space is primarily valence-tracking.** The model is better at detecting sustained negative or positive states than precise arousal levels or nuanced emotional distinctions.
-- **Probe accuracy depends on conversation style.** Very short sessions, non-emotional topics, or conversations dominated by assistant turns produce weaker signal.
-- **Local storage only.** State is stored in SQLite and ChromaDB on disk. No built-in cloud sync — use `retrieval_fn` to connect an external store.
+- **Arousal coverage.** Ground-truth arousal in EmpatheticDialogues only spans [−0.30, +0.80]. The model cannot reliably decode very low arousal states (depressed, exhausted) until the session pool is extended with genuinely low-energy content.
+- **Warm-up period.** State summary is `None` for the first two sessions.
+- **Synthetic training data.** The model is trained on arc templates, not real multi-session user histories. Val loss plateaued at ~0.508 — a data ceiling, not an architecture ceiling.
+- **MLP, not LSTM.** The transition model processes sessions one at a time; long-range sequential dependencies are only captured via the accumulated state vector.
 
 ---
 
@@ -175,10 +189,8 @@ Key results:
 - `datasets >= 2.19.0`
 - `tqdm >= 4.66.0`
 
-Optional:
-
-- `openai >= 1.0.0` — for `examples/with_openai.py`
-- `groq >= 0.4.0` — for running the downstream evaluation experiment
+Optional for evaluation:
+- `groq >= 0.4.0`
 
 ---
 
