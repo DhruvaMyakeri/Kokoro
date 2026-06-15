@@ -75,19 +75,31 @@ def decode_parlai_artifacts(text: str) -> str:
 
 class SessionEncoder:
     """
-    Encodes a conversation session into a 384-dim embedding.
+    Encodes a conversation session into a 384-dim (or 387-dim) embedding.
 
     Usage:
         encoder = SessionEncoder()
         embedding = encoder.encode(session_turns)
         # embedding.shape == (384,), dtype float32
 
+        # With VAD features appended:
+        encoder = SessionEncoder(use_vad_features=True)
+        embedding = encoder.encode(session_turns)
+        # embedding.shape == (387,), dtype float32
+        # Last 3 dims: [valence, arousal, dominance] from Warriner lexicon
+
     Args:
-        model_name: sentence-transformers model identifier.
-                    Defaults to all-MiniLM-L6-v2.
-        user_weight: Relative weight for user turns during mean pooling.
-                     Assistant turn weight is always 1.0.
-        device:     "cpu", "cuda", or None (auto-detect).
+        model_name:       sentence-transformers model identifier.
+                          Defaults to all-MiniLM-L6-v2.
+        user_weight:      Relative weight for user turns during mean pooling.
+                          Assistant turn weight is always 1.0.
+        device:           "cpu", "cuda", or None (auto-detect).
+        use_vad_features: If True, append 3 explicit VAD lexicon features to
+                          each session embedding, producing a 387-dim output.
+                          Provides an explicit arousal channel the transition
+                          model can route into a dedicated state dimension,
+                          bypassing the ~0.112 arousal ceiling of MiniLM.
+                          Default False for backwards compatibility.
     """
 
     MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
@@ -98,11 +110,14 @@ class SessionEncoder:
         model_name: str = MODEL_NAME,
         user_weight: float = 2.0,
         device: str | None = None,
+        use_vad_features: bool = False,
     ) -> None:
         self._model_name = model_name
         self._user_weight = user_weight
         self._device = device
+        self._use_vad_features = use_vad_features
         self._model = None  # lazy load
+        self._vad: "VADLexicon | None" = None  # lazy load
 
     def _load_model(self) -> None:
         try:
@@ -128,6 +143,17 @@ class SessionEncoder:
             self._load_model()
         return self._model
 
+    @property
+    def output_dim(self) -> int:
+        """Dimension of encode() output: 384 normally, 387 with VAD features."""
+        return self.EMBEDDING_DIM + (3 if self._use_vad_features else 0)
+
+    def _get_vad(self) -> "VADLexicon":
+        if self._vad is None:
+            from kokoro.vad import VADLexicon
+            self._vad = VADLexicon()
+        return self._vad
+
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -137,14 +163,16 @@ class SessionEncoder:
         turns: Sequence[dict[str, str]],
     ) -> np.ndarray:
         """
-        Encode a session (list of turns) into a single 384-dim embedding.
+        Encode a session (list of turns) into a single embedding.
 
         Args:
             turns: List of {"role": "user"|"assistant", "content": "..."} dicts.
                    At least one turn must have non-empty content.
 
         Returns:
-            np.ndarray of shape (384,), dtype float32.
+            np.ndarray of shape (384,) normally, or (387,) with use_vad_features=True.
+            dtype float32. The last 3 dims when VAD is enabled are
+            [valence, arousal, dominance] in [-1, 1] from the Warriner lexicon.
 
         Raises:
             ValueError: if turns is empty or all content is blank after cleaning.
@@ -171,8 +199,15 @@ class SessionEncoder:
         weights_arr = np.array(weights, dtype=np.float32)  # (n_turns,)
         weights_arr /= weights_arr.sum()                    # normalise to sum=1
         pooled = (embeddings * weights_arr[:, np.newaxis]).sum(axis=0)  # (384,)
+        pooled = pooled.astype(np.float32)
 
-        return pooled.astype(np.float32)
+        if not self._use_vad_features:
+            return pooled
+
+        # Append explicit VAD features from the Warriner/NRC lexicon.
+        # Aggregated over user turns only — consistent with user_weight emphasis.
+        vad_features = self._get_vad().score_turns(turns, user_only=True)  # (3,)
+        return np.concatenate([pooled, vad_features], axis=0)  # (387,)
 
     def encode_text(self, text: str) -> np.ndarray:
         """
