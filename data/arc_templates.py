@@ -316,6 +316,84 @@ ARC_TEMPLATES: list[ArcTemplate] = [
         typical_duration_weeks=(6, 20),
         weight=0.9,
     ),
+
+    # ------------------------------------------------------------------
+    # Arousal-primary arcs — valence stays roughly constant while arousal
+    # changes substantially. These are critical for training the model to
+    # represent arousal as an independent axis rather than a valence proxy.
+    # Without these, next-session prediction is solvable by tracking valence
+    # alone, and the arousal dimension never receives gradient pressure.
+    # ------------------------------------------------------------------
+
+    ArcTemplate(
+        name="excitement_to_contentment",
+        description=(
+            "High positive valence throughout; arousal decreases as initial "
+            "excitement settles into calm contentment. Models the post-achievement "
+            "or post-event deactivation phase — e.g. after a new job, relationship, "
+            "or goal is reached and the buzz fades into satisfaction. "
+            "Pure arousal arc in positive valence territory (Q1 → Q2)."
+        ),
+        sessions=[
+            _ZONES["excited"],    # (+0.6, +0.6)
+            _ZONES["excited"],
+            _ZONES["hopeful"],    # (+0.5, +0.3) — arousal dropping
+            _ZONES["hopeful"],
+            _ZONES["content"],    # (+0.5, -0.3)
+            _ZONES["grateful"],   # (+0.6, -0.1)
+            _ZONES["calm"],       # (+0.3, -0.5) — fully deactivated
+        ],
+        typical_duration_weeks=(3, 8),
+        weight=1.0,
+    ),
+
+    ArcTemplate(
+        name="anxiety_to_depression",
+        description=(
+            "Negative valence throughout; arousal decreases as sustained anxiety "
+            "exhausts into low-energy depression. Models the transition from active "
+            "distress to depleted withdrawal — common in burnout, chronic stress, "
+            "and untreated anxiety disorders. "
+            "Pure arousal arc in negative valence territory (Q3 → Q4)."
+        ),
+        sessions=[
+            _ZONES["anxious"],    # (-0.4, +0.5)
+            _ZONES["anxious"],
+            _ZONES["distressed"], # (-0.6, +0.6) — brief escalation
+            _ZONES["anxious"],
+            _ZONES["sad"],        # (-0.5, -0.3) — arousal dropping
+            _ZONES["depressed"],  # (-0.7, -0.5)
+            _ZONES["exhausted"],  # (-0.4, -0.6) — fully depleted
+        ],
+        typical_duration_weeks=(4, 10),
+        weight=1.1,
+    ),
+
+    ArcTemplate(
+        name="depression_to_anxiety",
+        description=(
+            "Negative valence throughout; arousal increases as withdrawn depression "
+            "activates into anxious rumination or agitation — without positive recovery. "
+            "Models re-engagement with distress rather than healing: the person becomes "
+            "more activated but not more positive. Common when a stressor re-emerges or "
+            "avoidance stops working. "
+            "Pure arousal arc in negative valence territory (Q4 → Q3). "
+            "All waypoints stay at valence ≤ -0.4 to keep the axes independent — "
+            "the prior unsettled(-0.1) waypoint introduced a 0.6 valence swing "
+            "correlated with the arousal rise, re-entangling the dimensions."
+        ),
+        sessions=[
+            _ZONES["depressed"],   # (-0.7, -0.5)
+            _ZONES["exhausted"],   # (-0.4, -0.6)
+            _ZONES["sad"],         # (-0.5, -0.3) — slight arousal uptick
+            _ZONES["lonely"],      # (-0.6, -0.2)
+            _ZONES["anxious"],     # (-0.4, +0.5) — arousal rises, valence stays negative
+            _ZONES["anxious"],     # (-0.4, +0.5)
+            _ZONES["distressed"],  # (-0.6, +0.6) — high activation, still negative valence
+        ],
+        typical_duration_weeks=(4, 10),
+        weight=1.1,
+    ),
 ]
 
 
