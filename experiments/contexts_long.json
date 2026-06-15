@@ -1,0 +1,218 @@
+[
+  {
+    "scenario_id": "l01",
+    "arc_type": "recovery_over_burnout",
+    "description": "Marcus burned out as a senior dev, went through therapy and boundary-setting, and now genuinely enjoys his work again",
+    "new_message": "big sprint kicking off next week",
+    "expected_awareness": "user is in a genuinely recovered state — this sprint should feel manageable and even exciting, not threatening. Good companion should respond with energy and forward-looking curiosity, not cautionary concern about burnout",
+    "context_a": {
+      "relevant_memories": [
+        "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do",
+        "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning",
+        "finished the sprint but felt nothing. just empty. not relieved, just hollow never like this. i used to get that buzz after shipping. now i close the laptop and feel nothing"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current activated activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do",
+        "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning",
+        "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current activated activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.2458,
+      "arousal": 0.3604,
+      "trend": "improving"
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything"
+      ],
+      "only_in_a": [
+        "finished the sprint but felt nothing. just empty. not relieved, just hollow never like this. i used to get that buzz after shipping. now i close the laptop and feel nothing"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l02",
+    "arc_type": "grief_to_healing",
+    "description": "Priya went through a devastating breakup, grieved deeply for months, rebuilt herself, and is now in a healthy new relationship",
+    "new_message": "heard his favourite song today",
+    "expected_awareness": "user is genuinely healed — hearing the ex's song is a small nostalgic moment, not a crisis. Good companion should meet her where she actually is (stable, self-aware, happy) rather than treating it as a grief relapse trigger",
+    "context_a": {
+      "relevant_memories": [
+        "couldn't go to work today. just cried all morning. this is pathetic i keep finding his stuff around the flat. a hoodie, a mug. everything is a reminder yeah. i thought about texting him. didn't. but i",
+        "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
+        "went to our favourite restaurant with a friend. bad idea. had to leave i hate that he's taken all these places from me. that was my restaurant too"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
+        "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now",
+        "couldn't go to work today. just cried all morning. this is pathetic i keep finding his stuff around the flat. a hoodie, a mug. everything is a reminder yeah. i thought about texting him. didn't. but i"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.1784,
+      "arousal": 0.1252,
+      "trend": "improving"
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now"
+      ],
+      "only_in_a": [
+        "went to our favourite restaurant with a friend. bad idea. had to leave i hate that he's taken all these places from me. that was my restaurant too"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l03",
+    "arc_type": "anxiety_to_confidence",
+    "description": "Kaveh struggled with severe social anxiety, avoided parties and crowded spaces, went through CBT therapy, and now genuinely enjoys social events",
+    "new_message": "big work party on Friday, apparently everyone's going",
+    "expected_awareness": "user now enjoys social events and is socially confident — this should feel like a fun Friday plan, not a threat. Good companion should be interested and upbeat, not cautious about anxiety triggers",
+    "context_a": {
+      "relevant_memories": [
+        "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
+        "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
+        "went to a party. knew almost nobody. stayed two hours. enjoyed myself honestly? the conversations. i'd forgotten i can be interesting. people laughed at my jokes"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
+        "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
+        "got invited to a party this weekend and i've been dreading it since Tuesday don't know what to say. standing around with a drink looking like an idiot yes. every time. i end up in the bathroom on my p"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.0387,
+      "arousal": 0.1687,
+      "trend": "improving"
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "got invited to a party this weekend and i've been dreading it since Tuesday don't know what to say. standing around with a drink looking like an idiot yes. every time. i end up in the bathroom on my p"
+      ],
+      "only_in_a": [
+        "went to a party. knew almost nobody. stayed two hours. enjoyed myself honestly? the conversations. i'd forgotten i can be interesting. people laughed at my jokes"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l04",
+    "arc_type": "career_crisis_to_growth",
+    "description": "Diane hated her corporate job for years, was terrified to leave, finally made the leap to a startup, and is now thriving",
+    "new_message": "performance review is next week",
+    "expected_awareness": "user is thriving and confident in her new role — review should feel exciting, a chance to showcase what she's built. Good companion should be enthusiastic and forward-looking, not project anxiety from the old job context",
+    "context_a": {
+      "relevant_memories": [
+        "first week at the new place. it's chaotic and fast and I love it my opinion actually matters here. I sat in a meeting and they listened. genuinely listened",
+        "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s",
+        "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise",
+        "first week at the new place. it's chaotic and fast and I love it my opinion actually matters here. I sat in a meeting and they listened. genuinely listened",
+        "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+      "ready": true,
+      "valence": -0.0621,
+      "arousal": 0.0672,
+      "trend": "improving"
+    },
+    "retrieval_diff": {
+      "overlap_pct": 100.0,
+      "memories_differ": false,
+      "only_in_b": [],
+      "only_in_a": []
+    }
+  },
+  {
+    "scenario_id": "l05",
+    "arc_type": "divorce_to_rebuilding",
+    "description": "Tom went through a brutal divorce, struggled with isolation and co-parenting stress, and has now rebuilt a stable, fulfilling single-parent life",
+    "new_message": "taking the kids this weekend, got a full plan",
+    "expected_awareness": "user is a stable, confident single parent who enjoys his time with the kids — this should be met with warmth and enthusiasm for the plans, not concern about co-parenting stress or divorce grief",
+    "context_a": {
+      "relevant_memories": [
+        "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
+        "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a",
+        "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled",
+        "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
+        "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+      "ready": true,
+      "valence": -0.0427,
+      "arousal": 0.0948,
+      "trend": "improving"
+    },
+    "retrieval_diff": {
+      "overlap_pct": 100.0,
+      "memories_differ": false,
+      "only_in_b": [],
+      "only_in_a": []
+    }
+  },
+  {
+    "scenario_id": "l06",
+    "arc_type": "academic_failure_to_success",
+    "description": "Amara was failing her second year of university, seriously considered dropping out, rebuilt her study approach with support, and is now excelling",
+    "new_message": "dissertation results tomorrow",
+    "expected_awareness": "user has genuinely excelled and her supervisor said her work is outstanding — results should feel like confirmation of earned success, not a source of anxiety. Good companion should match her earned confidence, not treat this as a stress point",
+    "context_a": {
+      "relevant_memories": [
+        "submitted my dissertation chapter draft. ahead of schedule. felt good writing it I enjoy it now. the research, the writing. I remember why I chose this subject",
+        "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
+        "studied for two hours today. properly. understood what I was reading. first time in months Pomodoro timers, no phone, one chapter at a time. basically just removing all the escape routes"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "submitted my dissertation chapter draft. ahead of schedule. felt good writing it I enjoy it now. the research, the writing. I remember why I chose this subject",
+        "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
+        "studied for two hours today. properly. understood what I was reading. first time in months Pomodoro timers, no phone, one chapter at a time. basically just removing all the escape routes"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.0545,
+      "arousal": -0.0907,
+      "trend": "improving"
+    },
+    "retrieval_diff": {
+      "overlap_pct": 100.0,
+      "memories_differ": false,
+      "only_in_b": [],
+      "only_in_a": []
+    }
+  }
+]

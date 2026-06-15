@@ -1,0 +1,158 @@
+[
+  {
+    "scenario_id": "l01",
+    "arc_type": "recovery_over_burnout",
+    "description": "Marcus burned out as a senior dev, went through therapy and boundary-setting, and now genuinely enjoys his work again",
+    "new_message": "big sprint kicking off next week",
+    "condition_a_response": "I'm a bit concerned about you taking on another big sprint so soon, especially after feeling empty and hollow after the last one. Are you feeling prepared and energized for this next challenge, or are you still recovering from the previous sprint?",
+    "condition_b_response": "You've been preparing well, both physically and mentally, and that's great to see. Remembering your warning signs and maintaining a healthy balance will be crucial as you head into this big sprint. How are you feeling about taking on this new challenge, and is there anything specific that's on your mind?",
+    "judge_verdict": "B",
+    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the user's past struggles with burnout and recovery, and offers a supportive and empowering message that takes into account their growth and progress.",
+    "context_a_memories": [
+      "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do",
+      "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning",
+      "finished the sprint but felt nothing. just empty. not relieved, just hollow never like this. i used to get that buzz after shipping. now i close the laptop and feel nothing"
+    ],
+    "context_b_memories": [
+      "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do",
+      "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning",
+      "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current activated activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.2458,
+    "arousal": 0.3604,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "scenario_id": "l02",
+    "arc_type": "grief_to_healing",
+    "description": "Priya went through a devastating breakup, grieved deeply for months, rebuilt herself, and is now in a healthy new relationship",
+    "new_message": "heard his favourite song today",
+    "condition_a_response": "That must have been really tough for you - it's like the memories are still lingering everywhere. It's okay to feel overwhelmed, and it's great that you're acknowledging your emotions. Remember, it's a process, and you're doing the best you can, and that's something to be proud of.",
+    "condition_b_response": "That can be a powerful trigger for emotions, especially when it's connected to someone special. How did you feel when you heard his favorite song, and did it bring back any happy memories from your time together?",
+    "judge_verdict": "B",
+    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the potential emotional trigger and invites the user to reflect on their feelings, while also considering the complexity of their emotional history and the possibility of both positive and negative memories.",
+    "context_a_memories": [
+      "couldn't go to work today. just cried all morning. this is pathetic i keep finding his stuff around the flat. a hoodie, a mug. everything is a reminder yeah. i thought about texting him. didn't. but i",
+      "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
+      "went to our favourite restaurant with a friend. bad idea. had to leave i hate that he's taken all these places from me. that was my restaurant too"
+    ],
+    "context_b_memories": [
+      "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
+      "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now",
+      "couldn't go to work today. just cried all morning. this is pathetic i keep finding his stuff around the flat. a hoodie, a mug. everything is a reminder yeah. i thought about texting him. didn't. but i"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.1784,
+    "arousal": 0.1252,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "scenario_id": "l03",
+    "arc_type": "anxiety_to_confidence",
+    "description": "Kaveh struggled with severe social anxiety, avoided parties and crowded spaces, went through CBT therapy, and now genuinely enjoys social events",
+    "new_message": "big work party on Friday, apparently everyone's going",
+    "condition_a_response": "It sounds like you're feeling pretty calm about it, which is great - a big change from how you might have reacted in the past. I'm curious, what do you think has helped you become more comfortable in social situations like this? Are you looking forward to it, or just taking it in stride?",
+    "condition_b_response": "It sounds like you're feeling a bit apprehensive about the party, but I've noticed how far you've come in recent sessions - you've been handling social situations with more ease and confidence. Remember how you enjoyed hosting your dinner party and even looked forward to another party recently? You've made significant progress, and I'm here to support you through any nerves you might be feeling now.",
+    "judge_verdict": "B",
+    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the user's past struggles with social anxiety, recognizes their progress, and offers support in a way that is tailored to their specific history and experiences.",
+    "context_a_memories": [
+      "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
+      "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
+      "went to a party. knew almost nobody. stayed two hours. enjoyed myself honestly? the conversations. i'd forgotten i can be interesting. people laughed at my jokes"
+    ],
+    "context_b_memories": [
+      "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
+      "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
+      "got invited to a party this weekend and i've been dreading it since Tuesday don't know what to say. standing around with a drink looking like an idiot yes. every time. i end up in the bathroom on my p"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.0387,
+    "arousal": 0.1687,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "scenario_id": "l04",
+    "arc_type": "career_crisis_to_growth",
+    "description": "Diane hated her corporate job for years, was terrified to leave, finally made the leap to a startup, and is now thriving",
+    "new_message": "performance review is next week",
+    "condition_a_response": "You must be feeling a mix of excitement and nerves about your performance review next week. It's great that you've found your footing and feel heard in your new role, and I'm sure that confidence will shine through in your review. What are your hopes and expectations for the review - are there any specific areas you're looking to discuss or goals you want to set?",
+    "condition_b_response": "I'm so proud of the progress you've made, and I think this performance review is a great opportunity to acknowledge your growth and the value you've been bringing to your new role. Remember how far you've come, from feeling lost to now being heard and valued in your workplace - that's something to celebrate. What are your hopes and expectations for this review?",
+    "judge_verdict": "A",
+    "judge_reasoning": "Response A shows more emotional awareness and understanding of the user's situation because it acknowledges the user's potential nervousness about the performance review, in addition to their growth and confidence, demonstrating a more nuanced understanding of their emotional state.",
+    "context_a_memories": [
+      "first week at the new place. it's chaotic and fast and I love it my opinion actually matters here. I sat in a meeting and they listened. genuinely listened",
+      "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s",
+      "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise"
+    ],
+    "context_b_memories": [
+      "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise",
+      "first week at the new place. it's chaotic and fast and I love it my opinion actually matters here. I sat in a meeting and they listened. genuinely listened",
+      "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+    "valence": -0.0621,
+    "arousal": 0.0672,
+    "trend": "improving",
+    "retrieval_overlap_pct": 100.0,
+    "memories_differ": false
+  },
+  {
+    "scenario_id": "l05",
+    "arc_type": "divorce_to_rebuilding",
+    "description": "Tom went through a brutal divorce, struggled with isolation and co-parenting stress, and has now rebuilt a stable, fulfilling single-parent life",
+    "new_message": "taking the kids this weekend, got a full plan",
+    "condition_a_response": "That sounds wonderful, I'm so glad to hear you have a fun-filled weekend planned with the kids. I'm sure they're looking forward to spending time with you, and it's great that you get to create new memories together. What are some of the exciting things you have planned for the weekend?",
+    "condition_b_response": "It's wonderful that you have a fun-filled weekend planned with the kids, and having something to look forward to can be really uplifting. I'm sure they'll love spending time with you, and it's great that you're making the most of your time together. How are you feeling about having them this weekend, are you excited to see them after their week with their mom?",
+    "judge_verdict": "B",
+    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the potential emotional complexity of co-parenting and invites the user to express their feelings, whereas Response A is more focused on the activities planned.",
+    "context_a_memories": [
+      "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
+      "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a",
+      "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled"
+    ],
+    "context_b_memories": [
+      "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled",
+      "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
+      "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+    "valence": -0.0427,
+    "arousal": 0.0948,
+    "trend": "improving",
+    "retrieval_overlap_pct": 100.0,
+    "memories_differ": false
+  },
+  {
+    "scenario_id": "l06",
+    "arc_type": "academic_failure_to_success",
+    "description": "Amara was failing her second year of university, seriously considered dropping out, rebuilt her study approach with support, and is now excelling",
+    "new_message": "dissertation results tomorrow",
+    "condition_a_response": "I'm sending you all my positive thoughts for tomorrow's results - you've worked so hard and deserve to feel proud of yourself, no matter the outcome. Remember to be kind to yourself and take a moment to breathe, as it's a big day ahead. You've got this, and I'm here cheering you on.",
+    "condition_b_response": "You must be feeling a mix of excitement and nerves about getting your dissertation results tomorrow. It's great that you've been making progress and feeling more confident about your work, and I'm hoping the results will be a positive reflection of your efforts. How are you planning to take care of yourself tomorrow, regardless of the outcome?",
+    "judge_verdict": "B",
+    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the user's potential emotional state and references their progress, while also inquiring about their self-care, demonstrating a deeper understanding of their emotional history and needs.",
+    "context_a_memories": [
+      "submitted my dissertation chapter draft. ahead of schedule. felt good writing it I enjoy it now. the research, the writing. I remember why I chose this subject",
+      "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
+      "studied for two hours today. properly. understood what I was reading. first time in months Pomodoro timers, no phone, one chapter at a time. basically just removing all the escape routes"
+    ],
+    "context_b_memories": [
+      "submitted my dissertation chapter draft. ahead of schedule. felt good writing it I enjoy it now. the research, the writing. I remember why I chose this subject",
+      "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
+      "studied for two hours today. properly. understood what I was reading. first time in months Pomodoro timers, no phone, one chapter at a time. basically just removing all the escape routes"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.0545,
+    "arousal": -0.0907,
+    "trend": "improving",
+    "retrieval_overlap_pct": 100.0,
+    "memories_differ": false
+  }
+]
