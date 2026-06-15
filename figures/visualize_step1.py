@@ -465,16 +465,11 @@ if __name__ == "__main__":
     print(f"  {len(sessions)} sessions loaded")
 
     print("Loading trajectories...")
-    traj_path = Path(__file__).parent.parent / "data" / "trajectories_sample.json"
+    traj_path = Path(__file__).parent.parent / "data" / "trajectories_10k.json"
     if not traj_path.exists():
-        print(f"  {traj_path} not found — generating 500 trajectories...")
-        from data.construct_trajectories import construct_trajectories, save_trajectories
-        trajs_obj = construct_trajectories(sessions, n_trajectories=500)
-        save_trajectories(trajs_obj, traj_path)
-        trajectories = [t.to_dict() for t in trajs_obj]
-    else:
-        with open(traj_path) as f:
-            trajectories = json.load(f)
+        traj_path = Path(__file__).parent.parent / "data" / "trajectories_sample.json"
+    with open(traj_path) as f:
+        trajectories = json.load(f)
     print(f"  {len(trajectories)} trajectories loaded")
 
     print("\nFigure 1: Circumplex scatter")

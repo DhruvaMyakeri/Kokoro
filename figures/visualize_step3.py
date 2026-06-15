@@ -69,22 +69,30 @@ encoder = SessionEncoder(device="cpu")
 _ = encoder.model   # trigger sentence transformer download/load NOW, before anything else
 logger.info("  Encoder loaded")
 
-ckpt_300_path = PROJECT_ROOT / "checkpoints" / "transition_v1.pt"
-ckpt_10k_path = PROJECT_ROOT / "checkpoints" / "transition_v1_10k.pt"
-hist_300_path = ckpt_300_path.with_suffix(".history.json")
-hist_10k_path = ckpt_10k_path.with_suffix(".history.json")
-traj_10k_path = PROJECT_ROOT / "data" / "trajectories_10k.json"
+# Current model: split-LN + VAD + VICReg (PR=339.7, best epoch 24)
+ckpt_current_path = PROJECT_ROOT / "checkpoints" / "transition_v1.pt"
+hist_current_path = ckpt_current_path.with_suffix(".history.json")
+# Old model: joint-LN, no VAD, no VICReg (PR=1.4, best epoch 4) — kept for fig6 comparison
+ckpt_old_path     = PROJECT_ROOT / "checkpoints" / "transition_v1_10k.pt"
+hist_old_path     = ckpt_old_path.with_suffix(".history.json")
+traj_10k_path     = PROJECT_ROOT / "data" / "trajectories_10k.json"
 
-for p in [ckpt_300_path, ckpt_10k_path, hist_300_path, hist_10k_path, traj_10k_path]:
+for p in [ckpt_current_path, hist_current_path, traj_10k_path]:
     if not p.exists():
         sys.exit(f"Required file missing: {p}\nRun training steps first.")
 
-ckpt_10k = torch.load(ckpt_10k_path, map_location="cpu", weights_only=True)
-cfg = ckpt_10k.get("model_config", {"state_dim": 384, "hidden_dim": 512})
-model = TransitionModel(**cfg)
-model.load_state_dict(ckpt_10k["model_state_dict"])
+# Use current (fixed) model for fig7 and fig8
+ckpt_current = torch.load(ckpt_current_path, map_location="cpu", weights_only=False)
+cfg = ckpt_current.get("model_config", {"state_dim": 384, "hidden_dim": 512})
+model = TransitionModel(**{k: v for k, v in cfg.items() if k in ("state_dim", "session_dim", "hidden_dim")})
+model.load_state_dict(ckpt_current["model_state_dict"])
 model.eval()
-logger.info(f"  Transition model loaded (epoch {ckpt_10k['epoch']}, val_loss={ckpt_10k['val_loss']:.4f})")
+use_vad = cfg.get("session_dim", 384) > 384
+logger.info(f"  Current model loaded (epoch {ckpt_current['epoch']}, val_loss={ckpt_current['val_loss']:.4f}, use_vad={use_vad})")
+# Override encoder to use VAD if needed
+if use_vad:
+    encoder = SessionEncoder(device="cpu", use_vad_features=True)
+    _ = encoder.model
 
 
 # ===========================================================================
@@ -93,13 +101,16 @@ logger.info(f"  Transition model loaded (epoch {ckpt_10k['epoch']}, val_loss={ck
 
 logger.info("Phase 2: loading data")
 
-with open(hist_300_path) as f:
-    history_300 = json.load(f)
-with open(hist_10k_path) as f:
-    history_10k = json.load(f)
+with open(hist_current_path) as f:
+    history_current = json.load(f)
+# Load old history if available (for architecture comparison in fig6)
+history_old = None
+if hist_old_path.exists():
+    with open(hist_old_path) as f:
+        history_old = json.load(f)
 logger.info(
-    f"  Histories: 300-traj ({len(history_300['train_loss'])} epochs), "
-    f"10k-traj ({len(history_10k['train_loss'])} epochs)"
+    f"  Current history: {len(history_current['train_loss'])} epochs, "
+    f"best epoch {history_current.get('best_epoch')}, PR={history_current.get('participation_ratio', '?'):.1f}"
 )
 
 logger.info("  Loading 10k trajectories...")
@@ -163,7 +174,13 @@ def encode_unique_sessions(
             s, e = slices[i]
             w = np.array(weights_all[i], dtype=np.float32)
             w /= w.sum()
-            cache[conv_id] = (embs[s:e] * w[:, np.newaxis]).sum(axis=0).astype(np.float32)
+            pooled = (embs[s:e] * w[:, np.newaxis]).sum(axis=0).astype(np.float32)
+            if use_vad:
+                from kokoro.vad import VADLexicon
+                _vad = encoder._get_vad()
+                vad_scores = _vad.score_turns(unique[conv_id])
+                pooled = np.concatenate([pooled, vad_scores])
+            cache[conv_id] = pooled
 
         logger.info(f"    {min(start + chunk_size, n)}/{n} sessions encoded")
 
@@ -171,7 +188,15 @@ def encode_unique_sessions(
     return cache
 
 
-emb_cache = encode_unique_sessions(trajectories)
+# Use val split only (same as training evaluation) — speeds up embedding step
+import random
+random.seed(42)
+_trajs_shuffled = list(trajectories)
+random.shuffle(_trajs_shuffled)
+n_val = int(len(_trajs_shuffled) * 0.2)
+val_trajs = _trajs_shuffled[len(_trajs_shuffled) - n_val:]
+logger.info(f"  Using val split: {len(val_trajs)} trajectories for fig7/fig8")
+emb_cache = encode_unique_sessions(val_trajs)
 
 
 # ===========================================================================
@@ -199,10 +224,11 @@ def run_trajectory(traj: dict) -> np.ndarray:
     return np.stack(rows, axis=0)   # (n+1, 384)
 
 
-# Find the longest trajectory of each target arc type
+# Find the longest trajectory of each target arc type (from val set only)
 by_arc: dict[str, list[dict]] = defaultdict(list)
-for t in trajectories:
-    by_arc[t["arc_name"]].append(t)
+for t in val_trajs:
+    if all(s["conv_id"] in emb_cache for s in t["sessions"]):
+        by_arc[t["arc_name"]].append(t)
 
 traj_examples: dict[str, dict] = {}
 for arc in TARGET_ARCS:
@@ -332,57 +358,107 @@ apply_style()
 # ---------------------------------------------------------------------------
 
 def draw_fig6() -> plt.Figure:
-    fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+    """
+    Left panel:  old architecture (joint-LN, no VICReg) training curves
+    Right panel: current architecture (split-LN + VAD + VICReg) training curves
 
-    panels = [
-        (axes[0], history_300, "300 Trajectories, 50 Epochs\n(Overfitting)"),
-        (axes[1], history_10k, "10,000 Trajectories, 100 Epochs\n(Generalization)"),
-    ]
+    If old history is unavailable, right panel fills the full width.
+    """
+    n_panels = 2 if history_old is not None else 1
+    fig, axes_raw = plt.subplots(1, n_panels, figsize=(13 if n_panels == 2 else 8, 5))
+    axes = [axes_raw] if n_panels == 1 else list(axes_raw)
 
-    for ax, hist, title in panels:
-        n_epochs = len(hist["train_loss"])
-        epochs = list(range(1, n_epochs + 1))
+    panels = []
+    if history_old is not None:
+        panels.append((
+            axes[0], history_old,
+            "Original Architecture\n(Joint LayerNorm, no VICReg, no VAD)",
+            "#888888", False,
+        ))
+    panels.append((
+        axes[-1], history_current,
+        "Current Architecture\n(Split LayerNorm + VICReg + VAD)",
+        "#2980B9", True,
+    ))
 
-        ax.plot(epochs, hist["train_loss"], color="#2980B9", linewidth=1.8,
-                label="Train", zorder=3)
-        ax.plot(epochs, hist["val_loss"],   color="#C0392B", linewidth=1.8,
-                linestyle="--", label="Validation", zorder=3)
+    for ax, hist, title, train_color, is_current in panels:
+        n_epochs  = len(hist["train_loss"])
+        epochs    = list(range(1, n_epochs + 1))
+        train_arr = np.array(hist["train_loss"])
+        val_arr   = np.array(hist["val_loss"])
 
-        best_ep  = int(np.argmin(hist["val_loss"])) + 1
-        best_val = hist["val_loss"][best_ep - 1]
+        # Detect incompatible scales (VICReg train loss >> cosine val loss)
+        dual_scale = is_current and (train_arr.min() > val_arr.max() * 3)
+
+        if dual_scale:
+            # Left axis: val loss (cosine).  Right axis: train loss (VICReg total)
+            ax2 = ax.twinx()
+
+            ax2.plot(epochs, train_arr, color=train_color, linewidth=1.8,
+                     label="Train (total, incl. VICReg)", zorder=3, alpha=0.75)
+            ax2.set_ylabel("Total train loss  (cosine + std + cov)", color=train_color,
+                           labelpad=8, fontsize=9)
+            ax2.tick_params(axis="y", labelcolor=train_color)
+            tr_lo = train_arr.min() - 0.5
+            tr_hi = train_arr.max() + 0.5
+            ax2.set_ylim(tr_lo, tr_hi)
+
+            ax.plot(epochs, val_arr, color="#C0392B", linewidth=1.8,
+                    linestyle="--", label="Val cosine loss", zorder=4)
+            ax.set_ylabel("Val cosine loss  (1 − cos sim)", labelpad=8)
+
+            # Combine legends
+            h1, l1 = ax.get_legend_handles_labels()
+            h2, l2 = ax2.get_legend_handles_labels()
+            ax.legend(h1 + h2, l1 + l2, loc="upper right", fontsize=8)
+        else:
+            ax.plot(epochs, train_arr, color=train_color, linewidth=1.8,
+                    label="Train", zorder=3)
+            ax.plot(epochs, val_arr, color="#C0392B", linewidth=1.8,
+                    linestyle="--", label="Validation", zorder=3)
+            ax.set_ylabel("Val cosine prediction loss  (1 − cos sim)", labelpad=8)
+            ax.legend(loc="upper right")
+
+        best_ep  = int(np.argmin(val_arr)) + 1
+        best_val = val_arr[best_ep - 1]
         ax.axvline(best_ep, color="#C0392B", linewidth=0.9, linestyle=":",
                    alpha=0.6, zorder=2)
         ax.scatter([best_ep], [best_val], color="#C0392B", s=55, zorder=5,
                    edgecolors="white", linewidths=1.2)
         ax.text(
-            best_ep + n_epochs * 0.02, best_val,
+            best_ep + max(n_epochs * 0.02, 0.8), best_val,
             f"best val {best_val:.3f}\n(epoch {best_ep})",
             fontsize=8, color="#C0392B", va="center",
             path_effects=[pe.withStroke(linewidth=2, foreground="white")],
         )
 
-        # Shade region where val diverges from train
-        train_arr = np.array(hist["train_loss"])
-        val_arr   = np.array(hist["val_loss"])
-        gap = val_arr - train_arr
-        overfit_start = next((i for i in range(len(gap)) if gap[i] > 0.05), None)
-        if overfit_start is not None:
-            ax.axvspan(overfit_start + 1, n_epochs,
-                       color="#C0392B", alpha=0.06, zorder=1,
-                       label=f"Overfit region (ep {overfit_start+1}+)")
+        # Shade overfit region if on same scale (val diverges > 0.05 from train)
+        if not dual_scale:
+            gap = val_arr - train_arr
+            overfit_start = next((i for i in range(len(gap)) if gap[i] > 0.05), None)
+            if overfit_start is not None:
+                ax.axvspan(overfit_start + 1, n_epochs, color="#C0392B", alpha=0.06,
+                           zorder=1, label=f"Overfit region (ep {overfit_start+1}+)")
 
-        lo = max(0.0, min(min(hist["train_loss"]), min(hist["val_loss"])) - 0.04)
-        hi = min(2.0, max(max(hist["train_loss"]), max(hist["val_loss"])) + 0.08)
+        # Annotate PR on current model
+        if is_current:
+            pr = hist.get("participation_ratio")
+            if pr:
+                ax.text(0.97, 0.06, f"Final PR = {pr:.0f} / 384",
+                        transform=ax.transAxes, fontsize=9, ha="right", va="bottom",
+                        color="#27AE60", fontweight="bold",
+                        bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                                  edgecolor="#cccccc", alpha=0.9))
 
+        val_lo = max(0.0, val_arr.min() - 0.04)
+        val_hi = val_arr.max() + 0.06
         ax.set_xlim(1, n_epochs)
-        ax.set_ylim(lo, hi)
+        ax.set_ylim(val_lo, val_hi)
         ax.set_xlabel("Epoch", labelpad=8)
-        ax.set_ylabel("Mean cosine prediction loss  (1 − cos sim)", labelpad=8)
         ax.set_title(title, pad=10)
-        ax.legend(loc="upper right")
 
     fig.suptitle(
-        "Transition Model Training: Data Quantity Resolves Overfitting",
+        "Transition Model Training: Architecture Comparison",
         fontsize=13, fontweight="bold", y=1.01,
     )
     fig.tight_layout(w_pad=3.5)
@@ -497,11 +573,13 @@ def draw_fig8() -> plt.Figure:
         )
 
     v1, v2 = pca_sep.explained_variance_ratio_ * 100
-    ax.set_xlabel(f"PC1  ({v1:.1f}% variance explained)", labelpad=8)
-    ax.set_ylabel(f"PC2  ({v2:.1f}% variance explained)", labelpad=8)
+    pr_val = history_current.get("participation_ratio", None)
+    pr_str = f"  |  PR = {pr_val:.0f}" if pr_val else ""
+    ax.set_xlabel(f"PC1  ({v1:.1f}% var. explained)", labelpad=8)
+    ax.set_ylabel(f"PC2  ({v2:.1f}% var. explained)", labelpad=8)
     ax.set_title(
-        f"Final State Vectors by Arc Type  ({SAMPLES_PER_ARC} samples each)\n"
-        "Separable clusters = model learned arc-specific emotional trajectories",
+        f"Final State Vectors by Arc Type  ({SAMPLES_PER_ARC} samples each){pr_str}\n"
+        "Current model (PR=339.7): arc info distributed across 340 dims — low PC1/PC2 variance expected",
         pad=12,
     )
     ax.axhline(0, color="#dddddd", linewidth=0.6, zorder=1)
