@@ -4,21 +4,29 @@ Transition model for Kokoro.
 Implements the "world model" core: given the current user state vector and
 the embedding of a new conversation session, produce an updated state vector.
 
-Architecture (current): 2-layer MLP
-  Input:  concat(state_vector, session_embedding) → 768-dim
-  Layer 1: Linear(768→512) → LayerNorm(512) → ReLU → Dropout(0.1)
-  Layer 2: Linear(512→384) → L2-normalize
-  Output: updated state vector on the unit hypersphere, 384-dim
+Architecture (current): 3-layer MLP with split input normalization
+  state  → LayerNorm(384) ─┐
+                            ├─ concat → 768-dim
+  emb    → LayerNorm(384) ─┘
+  Layer 1: Linear(768→512) → LayerNorm(512) → GELU → Dropout(0.1)
+  Layer 2: Linear(512→512) → LayerNorm(512) → GELU → Dropout(0.1)
+  Layer 3: Linear(512→384)
+  Output: updated state vector, 384-dim (NOT L2-normalized)
 
-The output lives on the unit hypersphere (‖z‖₂ = 1) because:
-  - Prevents state magnitude drift across unbounded session sequences
-  - Makes cosine similarity a well-defined, symmetric training objective
-  - All state comparisons (retrieval, similarity) are scale-invariant
-  - The hypersphere is a natural latent space for directional representations
+Split input normalization: state and session embedding are normalized
+independently before concatenation. A joint LayerNorm on the concatenated
+input would let the state (norm ~19 post-VICReg) dominate the session
+embedding (norm ~1), causing sluggish updates.
+
+The output is NOT forced onto the unit hypersphere. L2 normalization was
+removed to allow VICReg variance regularization to work:
+  - VICReg's variance term requires unconstrained per-dimension std
+  - Unit-sphere constraint caps std by construction, fighting the regularizer
+  - Retrieval (kokoro/retrieval.py) normalizes independently before cosine ops
+  - StateDecoder probe operates on raw vectors; retrain probe after retraining model
 
 Initial state for a new user is the zero vector. On the first update, the
 model receives [0...0 | e_0] as input and produces the first non-trivial state.
-After that, all states are on the unit hypersphere.
 
 ------------------------------------------------------------------------------
 UPGRADE PATH: Swapping MLP for LSTM
@@ -114,15 +122,18 @@ class TransitionModel(nn.Module):
     """
     MLP transition model.
 
-    Maps (current_state, new_session_embedding) → updated_state,
-    where all state vectors live on the 384-dim unit hypersphere.
+    Maps (current_state, new_session_embedding) → updated_state.
+    Output is NOT L2-normalized — VICReg training controls the output
+    distribution via variance and covariance regularization terms.
 
     Args:
-        state_dim:    Dimensionality of state and session embeddings. Must match
-                      the sentence transformer's output dimension (384 for
-                      all-MiniLM-L6-v2). Do not change without retraining.
-        hidden_dim:   Width of the intermediate layer (default 512).
-        dropout:      Dropout rate applied between the two linear layers.
+        state_dim:    Dimensionality of the state vector and model output (384).
+                      Do not change without retraining.
+        session_dim:  Dimensionality of the session embedding input. 384 for plain
+                      MiniLM; 387 when VAD features are appended
+                      (SessionEncoder(use_vad_features=True)). Defaults to state_dim.
+        hidden_dim:   Width of the intermediate layers (default 512).
+        dropout:      Dropout rate applied after each hidden layer.
     """
 
     STATE_DIM: int = 384
@@ -130,20 +141,35 @@ class TransitionModel(nn.Module):
     def __init__(
         self,
         state_dim: int = 384,
+        session_dim: int | None = None,
         hidden_dim: int = 512,
         dropout: float = 0.1,
     ) -> None:
         super().__init__()
-        self.state_dim = state_dim
-        self.hidden_dim = hidden_dim
+        self.state_dim   = state_dim
+        self.session_dim = session_dim if session_dim is not None else state_dim
+        self.hidden_dim  = hidden_dim
+
+        # Separate LayerNorms for state and session embedding applied before
+        # concatenation. A joint LayerNorm on [state; emb] would let the
+        # state (post-VICReg norm ~19) dominate the session embedding (norm ~1),
+        # making new observations ~20x smaller than accumulated state and causing
+        # sluggish updates. Independent norms equalise both inputs first.
+        self.state_norm = nn.LayerNorm(state_dim)
+        self.emb_norm   = nn.LayerNorm(self.session_dim)
 
         self.net = nn.Sequential(
-            # Layer 1: expand concatenated input
-            nn.Linear(state_dim * 2, hidden_dim),
+            # Layer 1
+            nn.Linear(state_dim + self.session_dim, hidden_dim),
             nn.LayerNorm(hidden_dim),
-            nn.ReLU(),
+            nn.GELU(),
             nn.Dropout(dropout),
-            # Layer 2: compress back to state dimension
+            # Layer 2
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.LayerNorm(hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            # Layer 3: project to state dimension, no activation
             nn.Linear(hidden_dim, state_dim),
         )
 
@@ -183,12 +209,15 @@ class TransitionModel(nn.Module):
                          Produced by kokoro.encoder.SessionEncoder.encode().
 
         Returns:
-            Updated state vector, shape (..., state_dim), L2-normalized
-            (‖output‖₂ = 1.0).
+            Updated state vector, shape (..., state_dim). NOT L2-normalized —
+            magnitude is unconstrained and controlled by VICReg during training.
         """
-        x = torch.cat([state, session_emb], dim=-1)   # (..., state_dim * 2)
-        x = self.net(x)                                # (..., state_dim)
-        return F.normalize(x, dim=-1)                  # onto unit hypersphere
+        # Normalise state and session embedding independently before concat.
+        # This prevents accumulated state magnitude from drowning out new input.
+        s = self.state_norm(state)
+        e = self.emb_norm(session_emb)
+        x = torch.cat([s, e], dim=-1)                 # (..., state_dim * 2)
+        return self.net(x)                             # (..., state_dim)
 
     # ------------------------------------------------------------------
     # State management
@@ -204,7 +233,7 @@ class TransitionModel(nn.Module):
 
         The zero vector is the cold-start state. On the first call to forward(),
         the model receives [0...0 | e_0] and produces the first non-trivial
-        state on the unit hypersphere. The model must learn to bootstrap from
+        state vector. The model must learn to bootstrap from
         this cold start — which it does naturally during training because every
         trajectory begins from the same zero initial state.
 
@@ -254,12 +283,12 @@ if __name__ == "__main__":
     print(f"  Output shape: {tuple(new_state.shape)}  PASS\n")
 
     # ------------------------------------------------------------------
-    # Test 2: L2-normalized output
+    # Test 2: output is NOT L2-normalized (VICReg controls magnitude)
     # ------------------------------------------------------------------
-    print("Test 2: L2-normalized output (norm ~= 1.0)")
+    print("Test 2: output is NOT L2-normalized (norm unconstrained)")
     norm = new_state.norm().item()
-    assert abs(norm - 1.0) < 1e-5, f"Expected norm ≈ 1.0, got {norm:.6f}"
-    print(f"  Output norm: {norm:.6f}  PASS\n")
+    assert norm > 0, f"Expected non-zero output, got norm={norm:.6f}"
+    print(f"  Output norm: {norm:.6f}  (unconstrained, expected != 1.0)  PASS\n")
 
     # ------------------------------------------------------------------
     # Test 3: output changes when input changes
@@ -287,8 +316,8 @@ if __name__ == "__main__":
     assert batch_output.shape == (4, TransitionModel.STATE_DIM), \
         f"Expected (4, 384), got {batch_output.shape}"
     batch_norms = batch_output.norm(dim=-1)
-    assert torch.allclose(batch_norms, torch.ones(4), atol=1e-5), \
-        f"Batch outputs not normalized: {batch_norms}"
+    assert (batch_norms > 0).all(), \
+        f"Batch outputs must be non-zero: {batch_norms}"
     print(f"  Batch output shape: {tuple(batch_output.shape)}  PASS\n")
 
     # ------------------------------------------------------------------
@@ -325,5 +354,5 @@ if __name__ == "__main__":
         prev_state = new_state.clone()
         state = new_state
 
-    print(f"\n  All state norms = 1.0 (L2 constraint holds throughout sequence)\n")
+    print(f"\n  State norms are unconstrained (L2 norm removed; VICReg controls distribution)\n")
     print("=== All tests passed ===")
