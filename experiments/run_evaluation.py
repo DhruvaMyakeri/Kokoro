@@ -96,6 +96,7 @@ class _InMemoryStore:
         session_id: str,
         session_text: str,
         session_embedding: np.ndarray,
+        state_vector: np.ndarray,
         valence: float,
         arousal: float,
     ) -> None:
@@ -104,6 +105,7 @@ class _InMemoryStore:
             "session_id":   session_id,
             "session_text": session_text,
             "embedding":    session_embedding.astype(np.float32).copy(),
+            "state_vector": state_vector.astype(np.float32).copy(),
             "valence":      float(valence),
             "arousal":      float(arousal),
         })
@@ -115,12 +117,15 @@ class _InMemoryStore:
         state_vector: np.ndarray,
         top_k: int = 5,
         alpha: float = 0.6,
+        current_valence: float | None = None,
+        current_arousal: float | None = None,
     ) -> list[dict]:
         user_sess = [s for s in self._sessions if s["user_id"] == user_id]
         if not user_sess:
             return []
 
-        stored = np.array([s["embedding"] for s in user_sess], dtype=np.float32)
+        stored_embs   = np.array([s["embedding"]    for s in user_sess], dtype=np.float32)
+        stored_states = np.array([s["state_vector"] for s in user_sess], dtype=np.float32)
 
         def _cosine(q: np.ndarray, S: np.ndarray) -> np.ndarray:
             q = q.astype(np.float32)
@@ -129,8 +134,16 @@ class _InMemoryStore:
             norms = np.where(norms < 1e-12, 1.0, norms)
             return (S / norms) @ q_norm
 
-        sem      = _cosine(query_embedding, stored)
-        emo      = _cosine(state_vector, stored)
+        sem = _cosine(query_embedding, stored_embs)
+
+        if current_valence is not None and current_arousal is not None:
+            va_cur    = np.array([current_valence, current_arousal], dtype=np.float32)
+            va_stored = np.array([[s["valence"], s["arousal"]] for s in user_sess], dtype=np.float32)
+            dists     = np.linalg.norm(va_stored - va_cur, axis=1)
+            emo       = 1.0 - dists / float(np.sqrt(8))
+        else:
+            emo = _cosine(state_vector, stored_states)
+
         combined = alpha * sem + (1.0 - alpha) * emo
 
         k       = min(top_k, len(user_sess))
@@ -138,13 +151,13 @@ class _InMemoryStore:
 
         return [
             {
-                "session_text":   user_sess[i]["session_text"],
-                "session_id":     user_sess[i]["session_id"],
-                "semantic_score": float(sem[i]),
+                "session_text":    user_sess[i]["session_text"],
+                "session_id":      user_sess[i]["session_id"],
+                "semantic_score":  float(sem[i]),
                 "emotional_score": float(emo[i]),
-                "combined_score": float(combined[i]),
-                "valence":        user_sess[i]["valence"],
-                "arousal":        user_sess[i]["arousal"],
+                "combined_score":  float(combined[i]),
+                "valence":         user_sess[i]["valence"],
+                "arousal":         user_sess[i]["arousal"],
             }
             for i in top_idx
         ]
