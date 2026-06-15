@@ -6,10 +6,22 @@ Retrieves sessions that are emotionally relevant to the current user state,
 not just topically relevant to the current message. This is the second novel
 contribution of Kokoro.
 
+Retrieval score
+---------------
+  score = α × semantic_score + (1-α) × emotional_score
+
+  semantic_score:  cosine_sim(current_message_embedding, stored_session_embedding)
+                   — topical relevance; uses MiniLM embeddings on both sides
+
+  emotional_score: cosine_sim(current_state_vector, stored_state_vector)
+                   — emotional relevance; both sides are transition model outputs,
+                     so they live in the same learned emotional space.
+                     This is the correct comparison: state-to-state, not state-to-MiniLM.
+
 Public API
 ----------
 MemoryStore(collection_name="kokoro", persist_dir=None)
-store.add_session(user_id, session_id, session_text, session_embedding, valence, arousal)
+store.add_session(user_id, session_id, session_text, session_embedding, state_vector, valence, arousal)
 store.retrieve(user_id, query_embedding, state_vector, top_k=5, alpha=0.6)
 store.get_user_sessions(user_id)
 store.delete_user(user_id)
@@ -18,6 +30,7 @@ store.delete_user(user_id)
 from __future__ import annotations
 
 import hashlib
+import json
 import sys
 import time
 from pathlib import Path
@@ -135,6 +148,7 @@ class MemoryStore:
         session_id: str,
         session_text: str,
         session_embedding: np.ndarray,
+        state_vector: np.ndarray,
         valence: float,
         arousal: float,
     ) -> None:
@@ -145,11 +159,17 @@ class MemoryStore:
         user_id:           Unique identifier for the user.
         session_id:        Unique identifier for this session.
         session_text:      Human-readable summary of the session.
-        session_embedding: 384-dim encoder output for this session.
+        session_embedding: 384-dim MiniLM encoder output — used for semantic axis.
+        state_vector:      384-dim transition model output at this session — used
+                           for emotional axis. Stored alongside the session so that
+                           emotional_score = cosine_sim(current_state, stored_state),
+                           keeping both sides of the emotional comparison in the same
+                           learned emotional space.
         valence:           Predicted valence in [-1, 1].
         arousal:           Predicted arousal in [-1, 1].
         """
         emb = _validate_embedding(session_embedding, "session_embedding")
+        sv  = _validate_embedding(state_vector, "state_vector")
         valence = float(valence)
         arousal = float(arousal)
 
@@ -159,11 +179,12 @@ class MemoryStore:
             embeddings=[emb.tolist()],
             documents=[session_text],
             metadatas=[{
-                "user_id":    user_id,
-                "session_id": session_id,
-                "valence":    valence,
-                "arousal":    arousal,
-                "timestamp":  time.time(),
+                "user_id":      user_id,
+                "session_id":   session_id,
+                "valence":      valence,
+                "arousal":      arousal,
+                "timestamp":    time.time(),
+                "state_vector": json.dumps(sv.tolist()),
             }],
         )
 
@@ -174,17 +195,26 @@ class MemoryStore:
         state_vector: np.ndarray,
         top_k: int = 5,
         alpha: float = 0.6,
+        current_valence: float | None = None,
+        current_arousal: float | None = None,
     ) -> list[dict[str, Any]]:
         """Retrieve the top-k sessions by hybrid semantic + emotional score.
 
         Parameters
         ----------
-        user_id:         Only sessions belonging to this user are considered.
-        query_embedding: 384-dim embedding of the current query message.
-        state_vector:    384-dim emotional state vector from the transition model.
-        top_k:           Maximum number of results to return.
-        alpha:           Weight for semantic score; (1-alpha) weights emotional.
-                         Must be in [0, 1].
+        user_id:          Only sessions belonging to this user are considered.
+        query_embedding:  384-dim embedding of the current query message.
+        state_vector:     384-dim emotional state vector from the transition model.
+        top_k:            Maximum number of results to return.
+        alpha:            Weight for semantic score; (1-alpha) weights emotional.
+                          Must be in [0, 1].
+        current_valence:  Decoded valence of the current state in [-1, 1].
+        current_arousal:  Decoded arousal of the current state in [-1, 1].
+                          When both are provided, the emotional axis uses
+                          L2 distance in (valence, arousal) space, which is far
+                          more discriminative than state-to-state cosine similarity
+                          (cosine concentrates at ~0.98 regardless of emotional phase).
+                          Falls back to cosine if not provided.
 
         Returns
         -------
@@ -216,8 +246,35 @@ class MemoryStore:
         documents   = result["documents"]
         metadatas   = result["metadatas"]
 
-        semantic_scores  = _cosine_sim_batch(q_emb, stored_embs)
-        emotional_scores = _cosine_sim_batch(s_vec, stored_embs)
+        # Semantic axis: current message embedding vs stored session embeddings (MiniLM)
+        semantic_scores = _cosine_sim_batch(q_emb, stored_embs)
+
+        # Emotional axis.
+        # Preferred: L2 distance in (valence, arousal) space.
+        #   State-to-state cosine similarity clusters at ~0.98 for all sessions
+        #   regardless of emotional phase (all state vectors lie in a tight angular
+        #   cone).  VAD-coordinate distance is far more discriminative: a burned-out
+        #   session (v=-0.76) is clearly distant from a recovered state (v=+0.25).
+        # Fallback: state-to-state cosine (used when VAD coords not provided).
+        if current_valence is not None and current_arousal is not None:
+            va_cur    = np.array([current_valence, current_arousal], dtype=np.float64)
+            va_stored = np.array(
+                [[float(m["valence"]), float(m["arousal"])] for m in metadatas],
+                dtype=np.float64,
+            )
+            dists           = np.linalg.norm(va_stored - va_cur, axis=1)
+            max_dist        = float(np.sqrt(8))   # max L2 in [-1, 1]^2
+            emotional_scores = 1.0 - dists / max_dist
+        else:
+            stored_states = []
+            for i, meta in enumerate(metadatas):
+                if "state_vector" in meta:
+                    stored_states.append(np.array(json.loads(meta["state_vector"]), dtype=np.float32))
+                else:
+                    stored_states.append(stored_embs[i])
+            stored_states_arr = np.stack(stored_states)
+            emotional_scores  = _cosine_sim_batch(s_vec, stored_states_arr)
+
         combined_scores  = alpha * semantic_scores + (1.0 - alpha) * emotional_scores
 
         k = min(top_k, len(ids))
@@ -364,6 +421,8 @@ if __name__ == "__main__":
             return v / np.linalg.norm(v)
 
         # Store Cluster A (work / stress)
+        # State vectors for cluster A are near base_A (same direction as session embeddings
+        # in this test — in production they come from the transition model, not MiniLM)
         for i, text in enumerate(cluster_A_texts):
             valence = -0.60 + i * 0.05   # -0.60 .. -0.40
             store.add_session(
@@ -371,6 +430,7 @@ if __name__ == "__main__":
                 session_id=f"work_{i}",
                 session_text=text,
                 session_embedding=make_cluster_emb(base_A),
+                state_vector=make_cluster_emb(base_A),
                 valence=valence,
                 arousal=0.5,
             )
@@ -383,6 +443,7 @@ if __name__ == "__main__":
                 session_id=f"joy_{i}",
                 session_text=text,
                 session_embedding=make_cluster_emb(base_B),
+                state_vector=make_cluster_emb(base_B),
                 valence=valence,
                 arousal=0.3,
             )
@@ -483,6 +544,7 @@ if __name__ == "__main__":
             session_id="bob_0",
             session_text="Bob's only session.",
             session_embedding=make_cluster_emb(base_A),
+            state_vector=make_cluster_emb(base_A),
             valence=0.1,
             arousal=0.0,
         )
