@@ -6,7 +6,7 @@ This is the single class that developers touch. It wires together every
 internal component into one clean interface:
 
     SessionEncoder    -- text -> 384-dim embedding
-    TransitionModel   -- (state, session_emb) -> updated state (unit sphere)
+    TransitionModel   -- (state, session_emb) -> updated state (unconstrained magnitude)
     StateDecoder      -- state + arc_history -> natural-language summary
     StateStore        -- SQLite: persist per-user state + arc history
     MemoryStore       -- ChromaDB: hybrid semantic + emotional retrieval
@@ -175,7 +175,15 @@ class WorldMemory:
         # -- Load components (lazy encoder; model on CPU) -------------------
         logger.info(f"WorldMemory: initialising for user={user_id!r}")
 
-        self._encoder     = SessionEncoder()
+        # Determine whether the checkpoint was trained with VAD features
+        # (session_dim=387) or without (session_dim=384), so the encoder
+        # matches the transition model's expected input dimension.
+        import torch as _torch
+        _ckpt_cfg = _torch.load(str(ckpt_path), map_location="cpu",
+                                weights_only=False).get("model_config", {})
+        _use_vad  = _ckpt_cfg.get("session_dim", 384) > 384
+
+        self._encoder     = SessionEncoder(use_vad_features=_use_vad)
         self._transition  = self._load_transition(ckpt_path)
         self._decoder     = StateDecoder(probe_path=probe_path_)
         self._state_store = StateStore(db_path=db_path)
@@ -195,8 +203,9 @@ class WorldMemory:
         ckpt   = torch.load(str(path), map_location="cpu", weights_only=False)
         cfg    = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
         model  = TransitionModel(
-            state_dim  = cfg.get("state_dim",  384),
-            hidden_dim = cfg.get("hidden_dim", 512),
+            state_dim   = cfg.get("state_dim",   384),
+            session_dim = cfg.get("session_dim", None),
+            hidden_dim  = cfg.get("hidden_dim",  512),
         )
         model.load_state_dict(ckpt["model_state_dict"])
         model.eval()
@@ -225,6 +234,7 @@ class WorldMemory:
         query_emb: np.ndarray,
         state_vec: np.ndarray,
         alpha: float,
+        decoded: dict | None = None,
     ) -> list[dict]:
         """
         Dispatch retrieval to either the pluggable function or the built-in
@@ -237,12 +247,19 @@ class WorldMemory:
                 state_vec,
                 self._top_k,
             )
+        # Pass decoded VAD coordinates so MemoryStore can use the more
+        # discriminative L2 distance in (valence, arousal) space instead
+        # of state-to-state cosine similarity.
+        v = decoded["valence"] if decoded else None
+        a = decoded["arousal"] if decoded else None
         return self._mem_store.retrieve(
-            user_id         = self.user_id,
-            query_embedding = query_emb,
-            state_vector    = state_vec,
-            top_k           = self._top_k,
-            alpha           = alpha,
+            user_id          = self.user_id,
+            query_embedding  = query_emb,
+            state_vector     = state_vec,
+            top_k            = self._top_k,
+            alpha            = alpha,
+            current_valence  = v,
+            current_arousal  = a,
         )
 
     # ------------------------------------------------------------------
@@ -317,11 +334,17 @@ class WorldMemory:
         session_id = f"session_{info_after['session_count']}"
         summary    = self._session_summary(session_turns)
 
+        # MemoryStore uses 384-dim MiniLM embeddings for the semantic axis.
+        # When the encoder appends VAD features (387-dim), strip them here —
+        # the extra 3 dims are only needed as transition model input.
+        session_emb_384 = session_emb[:384]
+
         self._mem_store.add_session(
             user_id           = self.user_id,
             session_id        = session_id,
             session_text      = summary,
-            session_embedding = session_emb,
+            session_embedding = session_emb_384,
+            state_vector      = new_state,
             valence           = valence,
             arousal           = arousal,
         )
@@ -409,7 +432,7 @@ class WorldMemory:
                 # message is available — still meaningful for emotional axis
                 query_emb = state_vec.copy()
 
-            results = self._retrieve(query_emb, state_vec, effective_alpha)
+            results = self._retrieve(query_emb, state_vec, effective_alpha, decoded=decoded)
             relevant_memories = [r["session_text"] for r in results]
 
         return {
@@ -420,6 +443,67 @@ class WorldMemory:
             "trend":             decoded["trend"],
             "session_count":     session_count,
             "ready":             ready,
+        }
+
+    def predict_next(self) -> dict[str, Any]:
+        """
+        Predict the emotional direction of the user's *next* session.
+
+        The transition model is trained with a next-session prediction objective:
+        state_t is oriented toward e_{t+1} by the VICReg similarity loss.
+        Decoding the current state therefore gives an estimate of where the
+        user is emotionally headed, not just where they are now.
+
+        Returns
+        -------
+        dict with keys:
+            predicted_valence  (float)        -- predicted valence for next session
+            predicted_arousal  (float)        -- predicted arousal for next session
+            predicted_quadrant (str)          -- e.g. "high-valence / high-arousal"
+            session_count      (int)          -- sessions seen so far
+            ready              (bool)         -- False if insufficient history
+
+        Note: the probe used for decoding was trained on (state_t, v_t, a_t)
+        pairs — current-session supervision.  Because consecutive sessions tend
+        to share emotional tone, the decoded values correlate with the next
+        session, but this is an approximation.  Prediction accuracy is quantified
+        separately in diagnostics/eval_worldmodel.py.
+        """
+        state_vec = self._get_current_state()
+        info      = self._state_store.get_info(self.user_id)
+
+        if info is None:
+            return {
+                "predicted_valence":  0.0,
+                "predicted_arousal":  0.0,
+                "predicted_quadrant": "unknown",
+                "session_count":      0,
+                "ready":              False,
+            }
+
+        session_count = info["session_count"]
+        ready = session_count >= self._min_sessions
+
+        # Decode current state — oriented toward next session by training objective
+        decoded = self._decoder.decode(
+            state_vector  = state_vec,
+            arc_history   = [],          # no trend; prediction is single-step
+            session_count = session_count,
+        )
+
+        v = decoded["valence"]
+        a = decoded["arousal"]
+
+        # Map to quadrant label
+        v_label = "high-valence" if v > 0 else "low-valence"
+        a_label = "high-arousal" if a > 0 else "low-arousal"
+
+        return {
+            "predicted_valence":  v,
+            "predicted_arousal":  a,
+            "predicted_quadrant": f"{v_label} / {a_label}",
+            "session_count":      session_count,
+            "ready":              ready,
         }
 
     def reset(self) -> None:
@@ -545,9 +629,9 @@ if __name__ == "__main__":
         ctx_emo     = memory.get_context(query, alpha=0.0)    # purely emotional
 
         print(f"  query: {query!r}")
-        print(f"  default (α=0.6) top memory: {ctx_default['relevant_memories'][0][:70]!r}")
-        print(f"  semantic (α=1.0) top memory: {ctx_sem['relevant_memories'][0][:70]!r}")
-        print(f"  emotional (α=0.0) top memory: {ctx_emo['relevant_memories'][0][:70]!r}")
+        print(f"  default (a=0.6) top memory: {ctx_default['relevant_memories'][0][:70]!r}")
+        print(f"  semantic (a=1.0) top memory: {ctx_sem['relevant_memories'][0][:70]!r}")
+        print(f"  emotional (a=0.0) top memory: {ctx_emo['relevant_memories'][0][:70]!r}")
 
         check("alpha=None uses instance default (returns list)",
               isinstance(ctx_default["relevant_memories"], list))
@@ -555,6 +639,8 @@ if __name__ == "__main__":
               isinstance(ctx_sem["relevant_memories"], list))
         check("alpha=0.0 override returns list",
               isinstance(ctx_emo["relevant_memories"], list))
+
+        mem_custom = None   # ensure defined before pluggable retrieval block
         check("semantic and emotional may return different orderings",
               True)   # not always guaranteed to differ on 4 sessions; just document it
 
