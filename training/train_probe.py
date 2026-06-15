@@ -119,11 +119,17 @@ def precompute_embeddings(
             texts_all, batch_size=256, convert_to_numpy=True,
             show_progress_bar=False, normalize_embeddings=False,
         )
+        use_vad = encoder.output_dim > 384
+        vad_lexicon = encoder._get_vad() if use_vad else None
+
         for i, conv_id in enumerate(chunk_ids):
             s, e = slices[i]
             w = np.array(weights_all[i], dtype=np.float32)
             w /= w.sum()
             pooled = (embs[s:e] * w[:, np.newaxis]).sum(axis=0).astype(np.float32)
+            if use_vad:
+                vad = vad_lexicon.score_turns(unique[conv_id])
+                pooled = np.concatenate([pooled, vad])
             cache[conv_id] = torch.tensor(pooled, device=device)
 
         done = min(start + chunk_size, n)
@@ -162,7 +168,7 @@ def build_probe_dataset(
     transition_model.eval()
     with torch.no_grad():
         for traj in trajectories:
-            state = TransitionModel.initial_state(device=device)  # (384,)
+            state = torch.zeros(TransitionModel.STATE_DIM, device=device)  # (384,)
             for sess in traj["sessions"]:
                 emb   = emb_cache[sess["conv_id"]]
                 state = transition_model(state, emb)              # (384,)
@@ -458,6 +464,82 @@ def sanity_check(
 
 
 # ---------------------------------------------------------------------------
+# Decoder threshold recalibration
+# ---------------------------------------------------------------------------
+
+def recalibrate_decoder(
+    probe: ValenceArousalProbe,
+    X_val: torch.Tensor,
+    decoder_path: Path,
+    device: torch.device,
+) -> None:
+    """
+    Compute percentile thresholds from val-set probe predictions and
+    patch the 4 threshold constants in kokoro/decoder.py in-place.
+
+    Thresholds:
+      _VALENCE_POS  = 67th percentile  (top third → "positive")
+      _VALENCE_NEG  = 33rd percentile  (bottom third → "negative")
+      _AROUSAL_HIGH = 75th percentile  (top quarter → "activated")
+      _AROUSAL_LOW  = 25th percentile  (bottom quarter → "low-energy")
+    """
+    import re
+
+    probe.eval()
+    with torch.no_grad():
+        preds = probe(X_val.to(device)).cpu().numpy()   # (N, 2)
+
+    v_preds = preds[:, 0]
+    a_preds = preds[:, 1]
+
+    new = {
+        "_VALENCE_POS":  float(np.percentile(v_preds, 67)),
+        "_VALENCE_NEG":  float(np.percentile(v_preds, 33)),
+        "_AROUSAL_HIGH": float(np.percentile(a_preds, 75)),
+        "_AROUSAL_LOW":  float(np.percentile(a_preds, 25)),
+    }
+    comment_map = {
+        "_VALENCE_POS":  "67th pct of val-set predictions",
+        "_VALENCE_NEG":  "33rd pct of val-set predictions",
+        "_AROUSAL_HIGH": "75th pct of val-set predictions",
+        "_AROUSAL_LOW":  "25th pct of val-set predictions",
+    }
+
+    text = decoder_path.read_text(encoding="utf-8")
+
+    # Read old values for the report
+    old: dict[str, float] = {}
+    for name in new:
+        m = re.search(rf"^{name}:\s*float\s*=\s*([+-]?\d+\.\d+)", text, re.MULTILINE)
+        if m:
+            old[name] = float(m.group(1))
+
+    # Patch each constant line
+    for name, val in new.items():
+        text = re.sub(
+            rf"^({re.escape(name)}:\s*float\s*=\s*)[+-]?\d+\.\d+(\s*#.*)?$",
+            rf"\g<1>{val:.3f}  # {comment_map[name]}",
+            text,
+            flags=re.MULTILINE,
+        )
+
+    decoder_path.write_text(text, encoding="utf-8")
+
+    W = 66
+    print()
+    print("=" * W)
+    print("  Decoder threshold recalibration")
+    print("=" * W)
+    print(f"  {'Constant':<16}  {'Old':>8}  {'New':>8}  Basis")
+    print("-" * W)
+    for name, val in new.items():
+        old_v = old.get(name, float("nan"))
+        print(f"  {name:<16}  {old_v:>8.3f}  {val:>8.3f}  {comment_map[name]}")
+    print("=" * W)
+    logger.info(f"  Patched: {decoder_path}")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -474,7 +556,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--checkpoint", type=str,
-        default=str(Path(__file__).parent.parent / "checkpoints" / "transition_v1_10k.pt"),
+        default=str(Path(__file__).parent.parent / "checkpoints" / "transition_v1.pt"),
         help="Transition model checkpoint",
     )
     parser.add_argument(
@@ -512,10 +594,37 @@ if __name__ == "__main__":
     logger.info("Loading transition model...")
     from kokoro.transition import TransitionModel
 
-    ckpt  = torch.load(ckpt_path, map_location="cpu", weights_only=True)
-    cfg   = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
-    model = TransitionModel(**cfg)
-    model.load_state_dict(ckpt["model_state_dict"])
+    ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+    cfg  = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
+    sd   = ckpt["model_state_dict"]
+
+    # Detect architecture from state dict: old checkpoints have a joint
+    # LayerNorm(768) at net.0 (shape [768]); new ones have split LayerNorms
+    # (state_norm / emb_norm) and net.0 is a Linear (shape [hidden, 768]).
+    if "net.0.weight" in sd and sd["net.0.weight"].shape == (cfg.get("state_dim", 384) * 2,):
+        # Old joint-LayerNorm architecture — define inline for compatibility
+        import torch.nn as _nn
+        class _TransitionModelOld(_nn.Module):
+            STATE_DIM = 384
+            def __init__(self, state_dim=384, hidden_dim=512, **_):
+                super().__init__()
+                self.net = _nn.Sequential(
+                    _nn.LayerNorm(state_dim * 2),
+                    _nn.Linear(state_dim * 2, hidden_dim),
+                    _nn.LayerNorm(hidden_dim), _nn.GELU(), _nn.Dropout(0.1),
+                    _nn.Linear(hidden_dim, hidden_dim),
+                    _nn.LayerNorm(hidden_dim), _nn.GELU(), _nn.Dropout(0.1),
+                    _nn.Linear(hidden_dim, state_dim),
+                )
+            def forward(self, state, emb):
+                return self.net(torch.cat([state, emb], dim=-1))
+        model = _TransitionModelOld(**{k: v for k, v in cfg.items() if k in ("state_dim", "hidden_dim")})
+        logger.info("  Detected old joint-LayerNorm architecture")
+    else:
+        model = TransitionModel(**{k: v for k, v in cfg.items() if k in ("state_dim", "session_dim", "hidden_dim")})
+        logger.info("  Detected new split-LayerNorm architecture")
+
+    model.load_state_dict(sd)
     model.eval()
     state_dim = cfg.get("state_dim", 384)
     logger.info(f"  Epoch {ckpt['epoch']}, val_loss={ckpt['val_loss']:.4f}, state_dim={state_dim}")
@@ -526,7 +635,8 @@ if __name__ == "__main__":
     logger.info("Loading session encoder...")
     from kokoro.encoder import SessionEncoder
 
-    encoder = SessionEncoder(device="cpu")
+    use_vad = cfg.get("session_dim", 384) > 384
+    encoder = SessionEncoder(device="cpu", use_vad_features=use_vad)
     _ = encoder.model   # trigger lazy load
 
     # ------------------------------------------------------------------ #
@@ -637,3 +747,13 @@ if __name__ == "__main__":
         transition_model  = model,
         device            = device,
     )
+
+    # ------------------------------------------------------------------ #
+    # Recalibrate decoder thresholds                                       #
+    # ------------------------------------------------------------------ #
+    decoder_path = Path(__file__).parent.parent / "kokoro" / "decoder.py"
+    if decoder_path.exists():
+        logger.info("Recalibrating decoder thresholds...")
+        recalibrate_decoder(probe, X_val, decoder_path, device)
+    else:
+        logger.warning(f"decoder.py not found at {decoder_path}, skipping recalibration")
