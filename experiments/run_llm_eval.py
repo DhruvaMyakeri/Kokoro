@@ -34,8 +34,9 @@ except ImportError:
 
 from groq import Groq
 
-CONTEXTS_PATH = Path(__file__).parent / "contexts.json"
-RESULTS_PATH  = Path(__file__).parent / "results.json"
+_LONG_MODE    = "--long" in sys.argv
+CONTEXTS_PATH = Path(__file__).parent / ("contexts_long.json" if _LONG_MODE else "contexts.json")
+RESULTS_PATH  = Path(__file__).parent / ("results_long.json"  if _LONG_MODE else "results.json")
 MODEL         = "llama-3.3-70b-versatile"
 
 BASE_SYSTEM_PROMPT = (
@@ -56,6 +57,7 @@ def _format_memories(memories: list[str]) -> str:
 
 
 def build_system_a(memories: list[str]) -> str:
+    """Condition A: semantic memories only — no emotional state context."""
     return (
         f"{BASE_SYSTEM_PROMPT}\n\n"
         f"Relevant context from past conversations:\n"
@@ -63,12 +65,16 @@ def build_system_a(memories: list[str]) -> str:
     )
 
 
-def build_system_b(memories: list[str]) -> str:
-    return (
-        f"{BASE_SYSTEM_PROMPT}\n\n"
-        f"Relevant context from past conversations:\n"
+def build_system_b(state_summary: str | None, memories: list[str]) -> str:
+    """Condition B: hybrid memories + emotional state summary injected into system prompt."""
+    parts = [BASE_SYSTEM_PROMPT]
+    if state_summary:
+        parts.append(f"\n{state_summary}")
+    parts.append(
+        f"\nRelevant context from past conversations:\n"
         f"{_format_memories(memories)}"
     )
+    return "\n".join(parts)
 
 
 # ---------------------------------------------------------------------------
@@ -174,7 +180,7 @@ def run_scenario(client: Groq, entry: dict) -> dict:
     ctx_b       = entry["context_b"]
 
     system_a = build_system_a(ctx_a["relevant_memories"])
-    system_b = build_system_b(ctx_b["relevant_memories"])
+    system_b = build_system_b(ctx_b.get("state_summary"), ctx_b["relevant_memories"])
 
     response_a = generate_response(client, system_a, new_message)
     response_b = generate_response(client, system_b, new_message)
@@ -182,6 +188,12 @@ def run_scenario(client: Groq, entry: dict) -> dict:
     verdict, reasoning = run_judge(
         client, arc_type, description, new_message, response_a, response_b
     )
+
+    mems_a_set  = set(ctx_a["relevant_memories"])
+    mems_b_set  = set(ctx_b["relevant_memories"])
+    overlap     = len(mems_a_set & mems_b_set)
+    total       = max(len(mems_a_set), len(mems_b_set), 1)
+    overlap_pct = round(overlap / total * 100, 1)
 
     return {
         "scenario_id":          sid,
@@ -194,10 +206,12 @@ def run_scenario(client: Groq, entry: dict) -> dict:
         "judge_reasoning":      reasoning,
         "context_a_memories":   ctx_a["relevant_memories"],
         "context_b_memories":   ctx_b["relevant_memories"],
-        "context_b_summary":    ctx_b["state_summary"],
+        "context_b_summary":    ctx_b.get("state_summary"),
         "valence":              ctx_b.get("valence", 0.0),
         "arousal":              ctx_b.get("arousal", 0.0),
         "trend":                ctx_b.get("trend", "unknown"),
+        "retrieval_overlap_pct": overlap_pct,
+        "memories_differ":       overlap_pct < 100.0,
     }
 
 
@@ -266,9 +280,18 @@ def main() -> None:
     total = counts["A"] + counts["B"] + counts["TIE"]
     kokoro_rate = (counts["B"] / total * 100) if total else 0.0
 
+    # Retrieval divergence stats (only for completed scenarios)
+    completed = [r for r in results if "retrieval_overlap_pct" in r]
+    differ_count = sum(1 for r in completed if r["memories_differ"])
+    avg_overlap  = (sum(r["retrieval_overlap_pct"] for r in completed) / len(completed)
+                    if completed else 0.0)
+
     print(f"\n{'='*60}")
     print(f"  FINAL: A wins={counts['A']}  B wins={counts['B']}  TIE={counts['TIE']}")
     print(f"  Kokoro (B) win rate: {counts['B']}/{total} = {kokoro_rate:.1f}%")
+    print(f"\n  Retrieval divergence:")
+    print(f"    Scenarios where A!=B memories: {differ_count}/{len(completed)}")
+    print(f"    Average memory overlap:        {avg_overlap:.1f}%")
 
     arc_verdicts: dict[str, list[str]] = {}
     for r in results:
