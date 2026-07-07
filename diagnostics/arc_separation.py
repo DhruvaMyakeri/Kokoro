@@ -364,8 +364,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     parser = argparse.ArgumentParser(description="Arc separation analysis")
-    parser.add_argument("--data",       type=str, default="data/trajectories_10k.json")
-    parser.add_argument("--checkpoint", type=str, default="checkpoints/transition_v1.pt")
+    parser.add_argument("--data",       type=str, default="data/trajectories_10k_v2_val.json")
+    parser.add_argument("--checkpoint", type=str, default="checkpoints/transition_v2.pt")
     parser.add_argument("--val-split",  type=float, default=0.2)
     parser.add_argument("--seed",       type=int,   default=42)
     parser.add_argument("--n-shuffles", type=int,   default=10,
@@ -388,15 +388,11 @@ if __name__ == "__main__":
 
     # Load model
     logger.info("Loading transition model...")
-    from kokoro.transition import TransitionModel
-    ckpt   = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-    cfg    = ckpt.get("model_config", {})
-    model  = TransitionModel(**{k: v for k, v in cfg.items() if k in ("state_dim", "session_dim", "hidden_dim")})
-    model.load_state_dict(ckpt["model_state_dict"])
-    model.eval()
+    from kokoro.transition import load_transition_checkpoint
+    model, cfg = load_transition_checkpoint(ckpt_path)
     state_dim  = model.STATE_DIM
     use_vad    = cfg.get("session_dim", 384) > 384
-    logger.info(f"  Epoch {ckpt['epoch']}, val_loss={ckpt['val_loss']:.4f}, use_vad={use_vad}")
+    logger.info(f"  arch={cfg.get('arch', 'mlp')}, use_vad={use_vad}")
 
     # Load encoder
     logger.info("Loading encoder...")

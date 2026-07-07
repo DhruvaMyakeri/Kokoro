@@ -18,7 +18,7 @@ Train/val split is at the trajectory level (not the sample level) to prevent
 leakage: all samples from a given trajectory appear in exactly one split.
 
 Saves:
-  checkpoints/valence_arousal_probe.pt
+  checkpoints/valence_arousal_probe_v2.pt
 
 Run from project root:
     python -m training.train_probe
@@ -467,36 +467,55 @@ def sanity_check(
 # Decoder threshold recalibration
 # ---------------------------------------------------------------------------
 
-def recalibrate_decoder(
+def compute_thresholds(
     probe: ValenceArousalProbe,
     X_val: torch.Tensor,
-    decoder_path: Path,
     device: torch.device,
-) -> None:
+) -> dict[str, float]:
     """
-    Compute percentile thresholds from val-set probe predictions and
-    patch the 4 threshold constants in kokoro/decoder.py in-place.
+    Compute the decoder classification thresholds as percentiles of the
+    val-set probe prediction distribution.
 
-    Thresholds:
-      _VALENCE_POS  = 67th percentile  (top third → "positive")
-      _VALENCE_NEG  = 33rd percentile  (bottom third → "negative")
-      _AROUSAL_HIGH = 75th percentile  (top quarter → "activated")
-      _AROUSAL_LOW  = 25th percentile  (bottom quarter → "low-energy")
+    These are saved INTO the probe checkpoint ('thresholds' key) so the
+    decoder always classifies against the distribution of the probe it is
+    actually running — a retrain can no longer silently invalidate them.
+
+      valence_pos  = 67th percentile  (top third → "positive")
+      valence_neg  = 33rd percentile  (bottom third → "negative")
+      arousal_high = 75th percentile  (top quarter → "activated")
+      arousal_low  = 25th percentile  (bottom quarter → "low-energy")
     """
-    import re
-
     probe.eval()
     with torch.no_grad():
         preds = probe(X_val.to(device)).cpu().numpy()   # (N, 2)
+    v_preds, a_preds = preds[:, 0], preds[:, 1]
+    return {
+        "valence_pos":  float(np.percentile(v_preds, 67)),
+        "valence_neg":  float(np.percentile(v_preds, 33)),
+        "arousal_high": float(np.percentile(a_preds, 75)),
+        "arousal_low":  float(np.percentile(a_preds, 25)),
+    }
 
-    v_preds = preds[:, 0]
-    a_preds = preds[:, 1]
+
+def recalibrate_decoder(
+    thresholds: dict[str, float],
+    decoder_path: Path,
+) -> None:
+    """
+    Patch the 4 fallback threshold constants in kokoro/decoder.py in-place.
+
+    The authoritative copy of the thresholds lives in the probe checkpoint
+    (see compute_thresholds); this source patch only keeps the module-level
+    fallback constants (used by legacy checkpoints without a 'thresholds'
+    key) in sync.
+    """
+    import re
 
     new = {
-        "_VALENCE_POS":  float(np.percentile(v_preds, 67)),
-        "_VALENCE_NEG":  float(np.percentile(v_preds, 33)),
-        "_AROUSAL_HIGH": float(np.percentile(a_preds, 75)),
-        "_AROUSAL_LOW":  float(np.percentile(a_preds, 25)),
+        "_VALENCE_POS":  thresholds["valence_pos"],
+        "_VALENCE_NEG":  thresholds["valence_neg"],
+        "_AROUSAL_HIGH": thresholds["arousal_high"],
+        "_AROUSAL_LOW":  thresholds["arousal_low"],
     }
     comment_map = {
         "_VALENCE_POS":  "67th pct of val-set predictions",
@@ -556,12 +575,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--checkpoint", type=str,
-        default=str(Path(__file__).parent.parent / "checkpoints" / "transition_v1.pt"),
+        default=str(Path(__file__).parent.parent / "checkpoints" / "transition_v2.pt"),
         help="Transition model checkpoint",
     )
     parser.add_argument(
         "--out-probe", type=str,
-        default=str(Path(__file__).parent.parent / "checkpoints" / "valence_arousal_probe.pt"),
+        default=str(Path(__file__).parent.parent / "checkpoints" / "valence_arousal_probe_v2.pt"),
         help="Output path for probe checkpoint",
     )
     parser.add_argument("--epochs",     type=int,   default=100)
@@ -571,6 +590,14 @@ if __name__ == "__main__":
                         help="Fraction of trajectories for validation")
     parser.add_argument("--log-every",  type=int,   default=10)
     parser.add_argument("--seed",       type=int,   default=42)
+    parser.add_argument("--allow-leaky-split", action="store_true",
+                        help="Reproduce the legacy trajectory-level split without "
+                             "conversation-level disjointness (biased val metrics; "
+                             "only for comparison with old runs).")
+    parser.add_argument("--val-data", type=str, default=None,
+                        help="Optional separate validation trajectory file (the "
+                             "conversation-disjoint *_val.json). When given, --data "
+                             "is used entirely for training.")
     args = parser.parse_args()
 
     data_path   = Path(args.data)
@@ -592,42 +619,12 @@ if __name__ == "__main__":
     # Load transition model                                                #
     # ------------------------------------------------------------------ #
     logger.info("Loading transition model...")
-    from kokoro.transition import TransitionModel
+    from kokoro.transition import load_transition_checkpoint
 
-    ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-    cfg  = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
-    sd   = ckpt["model_state_dict"]
-
-    # Detect architecture from state dict: old checkpoints have a joint
-    # LayerNorm(768) at net.0 (shape [768]); new ones have split LayerNorms
-    # (state_norm / emb_norm) and net.0 is a Linear (shape [hidden, 768]).
-    if "net.0.weight" in sd and sd["net.0.weight"].shape == (cfg.get("state_dim", 384) * 2,):
-        # Old joint-LayerNorm architecture — define inline for compatibility
-        import torch.nn as _nn
-        class _TransitionModelOld(_nn.Module):
-            STATE_DIM = 384
-            def __init__(self, state_dim=384, hidden_dim=512, **_):
-                super().__init__()
-                self.net = _nn.Sequential(
-                    _nn.LayerNorm(state_dim * 2),
-                    _nn.Linear(state_dim * 2, hidden_dim),
-                    _nn.LayerNorm(hidden_dim), _nn.GELU(), _nn.Dropout(0.1),
-                    _nn.Linear(hidden_dim, hidden_dim),
-                    _nn.LayerNorm(hidden_dim), _nn.GELU(), _nn.Dropout(0.1),
-                    _nn.Linear(hidden_dim, state_dim),
-                )
-            def forward(self, state, emb):
-                return self.net(torch.cat([state, emb], dim=-1))
-        model = _TransitionModelOld(**{k: v for k, v in cfg.items() if k in ("state_dim", "hidden_dim")})
-        logger.info("  Detected old joint-LayerNorm architecture")
-    else:
-        model = TransitionModel(**{k: v for k, v in cfg.items() if k in ("state_dim", "session_dim", "hidden_dim")})
-        logger.info("  Detected new split-LayerNorm architecture")
-
-    model.load_state_dict(sd)
-    model.eval()
+    model, cfg = load_transition_checkpoint(ckpt_path)
     state_dim = cfg.get("state_dim", 384)
-    logger.info(f"  Epoch {ckpt['epoch']}, val_loss={ckpt['val_loss']:.4f}, state_dim={state_dim}")
+    logger.info(f"  arch={cfg.get('arch', 'mlp')}, state_dim={state_dim}, "
+                f"session_dim={cfg.get('session_dim', state_dim)}")
 
     # ------------------------------------------------------------------ #
     # Load encoder                                                         #
@@ -647,19 +644,31 @@ if __name__ == "__main__":
         all_trajectories = json.load(fh)
     logger.info(f"  {len(all_trajectories):,} trajectories loaded")
 
-    # Train / val split at trajectory level
-    rng.shuffle(all_trajectories)
-    n_val   = int(len(all_trajectories) * args.val_split)
-    n_train = len(all_trajectories) - n_val
-    train_trajs = all_trajectories[:n_train]
-    val_trajs   = all_trajectories[n_train:]
-    logger.info(f"  Split: {n_train:,} train / {n_val:,} val trajectories")
+    # Train / val split — conversation-disjoint so probe metrics are honest
+    # (trajectory-level splitting alone leaks shared source conversations).
+    if args.val_data:
+        with open(args.val_data) as fh:
+            val_trajs = json.load(fh)
+        train_trajs = all_trajectories
+        from training.split import leakage_report
+        rep = leakage_report(train_trajs, val_trajs)
+        if rep["n_shared_convs"]:
+            logger.warning(f"  Val file shares {rep['n_shared_convs']} conversations with train!")
+    else:
+        from training.split import conv_disjoint_split
+        train_trajs, val_trajs, _split_report = conv_disjoint_split(
+            all_trajectories,
+            val_fraction=args.val_split,
+            seed=args.seed,
+            enforce_disjoint=not args.allow_leaky_split,
+        )
+    logger.info(f"  Split: {len(train_trajs):,} train / {len(val_trajs):,} val trajectories")
 
     # ------------------------------------------------------------------ #
     # Precompute embeddings                                                #
     # ------------------------------------------------------------------ #
     logger.info("Precomputing session embeddings...")
-    emb_cache = precompute_embeddings(all_trajectories, encoder, device)
+    emb_cache = precompute_embeddings(train_trajs + val_trajs, encoder, device)
 
     # ------------------------------------------------------------------ #
     # Build probe datasets                                                 #
@@ -721,10 +730,12 @@ if __name__ == "__main__":
     # ------------------------------------------------------------------ #
     logger.info(f"Saving probe to {probe_path}...")
     probe.eval()
+    thresholds = compute_thresholds(probe, X_val, device)
     torch.save(
         {
             "model_state_dict":  probe.state_dict(),
             "probe_config":      {"state_dim": state_dim},
+            "thresholds":        thresholds,   # decoder classification thresholds
             "transition_ckpt":   ckpt_path.name,
             "val_r_valence":     history["val_r_valence"][-1],
             "val_r_arousal":     history["val_r_arousal"][-1],
@@ -735,7 +746,7 @@ if __name__ == "__main__":
         },
         probe_path,
     )
-    logger.info(f"  Saved: {probe_path}")
+    logger.info(f"  Saved: {probe_path} (thresholds embedded: {thresholds})")
 
     # ------------------------------------------------------------------ #
     # Sanity check                                                         #
@@ -753,7 +764,7 @@ if __name__ == "__main__":
     # ------------------------------------------------------------------ #
     decoder_path = Path(__file__).parent.parent / "kokoro" / "decoder.py"
     if decoder_path.exists():
-        logger.info("Recalibrating decoder thresholds...")
-        recalibrate_decoder(probe, X_val, decoder_path, device)
+        logger.info("Recalibrating decoder fallback thresholds...")
+        recalibrate_decoder(thresholds, decoder_path)
     else:
         logger.warning(f"decoder.py not found at {decoder_path}, skipping recalibration")

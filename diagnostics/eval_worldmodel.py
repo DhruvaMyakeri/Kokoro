@@ -21,7 +21,7 @@ Results are broken down by arc type so you can see where prediction is hard
 
 Run from project root:
     python -m diagnostics.eval_worldmodel
-    python -m diagnostics.eval_worldmodel --checkpoint checkpoints/transition_v1.pt
+    python -m diagnostics.eval_worldmodel --checkpoint checkpoints/transition_v2.pt
 """
 
 from __future__ import annotations
@@ -40,6 +40,8 @@ import torch
 import torch.nn.functional as F
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+from kokoro.transition import predict_from_state
+
 logger = logging.getLogger(__name__)
 
 
@@ -86,8 +88,10 @@ def eval_prediction_accuracy(
             for t in range(len(embs) - 1):
                 state = model(state, embs[t])
 
-                # Model prediction: state_t vs e_{t+1}
-                s_norm = F.normalize(state,          dim=-1)
+                # Model prediction: predict(state_t) vs e_{t+1}
+                # (GRU decouples state from prediction; MLP falls through)
+                z      = predict_from_state(model, state)
+                s_norm = F.normalize(z,              dim=-1)
                 e_norm = F.normalize(embs[t + 1][:state_dim], dim=-1)
                 model_sims.append((s_norm * e_norm).sum().item())
 
@@ -215,11 +219,11 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--data", type=str,
-        default=str(Path(__file__).parent.parent / "data" / "trajectories_10k.json"),
+        default=str(Path(__file__).parent.parent / "data" / "trajectories_10k_v2_val.json"),
     )
     parser.add_argument(
         "--checkpoint", type=str,
-        default=str(Path(__file__).parent.parent / "checkpoints" / "transition_v1.pt"),
+        default=str(Path(__file__).parent.parent / "checkpoints" / "transition_v2.pt"),
     )
     parser.add_argument("--val-split", type=float, default=0.2)
     parser.add_argument("--seed",      type=int,   default=42)
@@ -238,14 +242,9 @@ if __name__ == "__main__":
 
     # Load model
     logger.info("Loading transition model...")
-    from kokoro.transition import TransitionModel
-
-    ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-    cfg  = ckpt.get("model_config", {})
-    model = TransitionModel(**{k: v for k, v in cfg.items() if k in ("state_dim", "session_dim", "hidden_dim")})
-    model.load_state_dict(ckpt["model_state_dict"])
-    model.eval()
-    logger.info(f"  Epoch {ckpt['epoch']}, val_loss={ckpt['val_loss']:.4f}")
+    from kokoro.transition import load_transition_checkpoint
+    model, cfg = load_transition_checkpoint(ckpt_path)
+    logger.info(f"  arch={cfg.get('arch', 'mlp')}, session_dim={cfg.get('session_dim', 384)}")
 
     # Load encoder
     logger.info("Loading encoder...")

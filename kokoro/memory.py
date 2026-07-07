@@ -65,8 +65,8 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 _PKG_ROOT = Path(__file__).parent.parent
-_DEFAULT_CHECKPOINT = _PKG_ROOT / "checkpoints" / "transition_v1.pt"
-_DEFAULT_PROBE      = _PKG_ROOT / "checkpoints" / "valence_arousal_probe.pt"
+_DEFAULT_CHECKPOINT = _PKG_ROOT / "checkpoints" / "transition_v2.pt"
+_DEFAULT_PROBE      = _PKG_ROOT / "checkpoints" / "valence_arousal_probe_v2.pt"
 
 # Type alias for the pluggable retrieval callable.
 RetrievalFn = Callable[
@@ -101,10 +101,10 @@ class WorldMemory:
         Defaults to ~/.kokoro/memories/.
     checkpoint_path:
         Path to the trained TransitionModel checkpoint.
-        Defaults to checkpoints/transition_v1.pt (project root).
+        Defaults to checkpoints/transition_v2.pt (project root).
     probe_path:
         Path to the linear valence/arousal probe checkpoint.
-        Defaults to checkpoints/valence_arousal_probe.pt (project root).
+        Defaults to checkpoints/valence_arousal_probe_v2.pt (project root).
     top_k:
         Number of past sessions to retrieve per query (default 5).
     alpha:
@@ -146,21 +146,27 @@ class WorldMemory:
         min_sessions: int = 3,
         collection_name: str = "kokoro",
         retrieval_fn: Optional[RetrievalFn] = None,
+        recency_weight: float = 0.0,
+        adaptive_alpha: bool = False,
     ) -> None:
         if not user_id or not isinstance(user_id, str):
             raise ValueError("user_id must be a non-empty string")
         if not 0.0 <= alpha <= 1.0:
             raise ValueError(f"alpha must be in [0, 1], got {alpha}")
+        if not 0.0 <= recency_weight <= 1.0:
+            raise ValueError(f"recency_weight must be in [0, 1], got {recency_weight}")
         if top_k < 1:
             raise ValueError(f"top_k must be >= 1, got {top_k}")
         if min_sessions < 1:
             raise ValueError(f"min_sessions must be >= 1, got {min_sessions}")
 
-        self.user_id       = user_id
-        self._top_k        = top_k
-        self._alpha        = alpha
-        self._min_sessions = min_sessions
-        self._retrieval_fn = retrieval_fn
+        self.user_id         = user_id
+        self._top_k          = top_k
+        self._alpha          = alpha
+        self._min_sessions   = min_sessions
+        self._retrieval_fn   = retrieval_fn
+        self._recency_weight = recency_weight
+        self._adaptive_alpha = adaptive_alpha
 
         # -- Resolve paths --------------------------------------------------
         ckpt_path   = Path(checkpoint_path) if checkpoint_path else _DEFAULT_CHECKPOINT
@@ -199,17 +205,10 @@ class WorldMemory:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _load_transition(path: Path) -> TransitionModel:
-        ckpt   = torch.load(str(path), map_location="cpu", weights_only=False)
-        cfg    = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
-        model  = TransitionModel(
-            state_dim   = cfg.get("state_dim",   384),
-            session_dim = cfg.get("session_dim", None),
-            hidden_dim  = cfg.get("hidden_dim",  512),
-        )
-        model.load_state_dict(ckpt["model_state_dict"])
-        model.eval()
-        logger.debug(f"TransitionModel loaded from {path}")
+    def _load_transition(path: Path):
+        from kokoro.transition import load_transition_checkpoint
+        model, _cfg = load_transition_checkpoint(path)
+        logger.debug(f"Transition model loaded from {path}")
         return model
 
     def _get_current_state(self) -> np.ndarray:
@@ -231,7 +230,7 @@ class WorldMemory:
 
     def _retrieve(
         self,
-        query_emb: np.ndarray,
+        query_emb: np.ndarray | None,
         state_vec: np.ndarray,
         alpha: float,
         decoded: dict | None = None,
@@ -260,6 +259,8 @@ class WorldMemory:
             alpha            = alpha,
             current_valence  = v,
             current_arousal  = a,
+            recency_weight   = self._recency_weight,
+            adaptive         = self._adaptive_alpha,
         )
 
     # ------------------------------------------------------------------
@@ -424,13 +425,15 @@ class WorldMemory:
         # Retrieve relevant memories when warmed up
         relevant_memories: list[str] = []
         if ready:
-            # Use current message for semantic axis; current state for emotional axis
+            # Use current message for semantic axis; current state for emotional axis.
+            # With no message, pass None: MemoryStore disables the semantic axis and
+            # ranks by emotional (and recency) proximity alone. The previous fallback
+            # fed the raw state vector in as if it were a MiniLM embedding — two
+            # unrelated vector spaces whose cosine is meaningless.
             if current_message.strip():
                 query_emb = self._encoder.encode_text(current_message)
             else:
-                # Fall back to state vector as the query embedding when no
-                # message is available — still meaningful for emotional axis
-                query_emb = state_vec.copy()
+                query_emb = None
 
             results = self._retrieve(query_emb, state_vec, effective_alpha, decoded=decoded)
             relevant_memories = [r["session_text"] for r in results]

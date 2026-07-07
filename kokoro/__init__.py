@@ -7,7 +7,11 @@ from kokoro.store import StateStore
 from kokoro.decoder import StateDecoder
 from kokoro.retrieval import MemoryStore
 from kokoro.encoder import SessionEncoder
-from kokoro.transition import TransitionModel
+from kokoro.transition import (
+    TransitionModel,
+    TransitionModelGRU,
+    load_transition_checkpoint,
+)
 
 __all__ = [
     "WorldMemory",
@@ -16,4 +20,6 @@ __all__ = [
     "MemoryStore",
     "SessionEncoder",
     "TransitionModel",
+    "TransitionModelGRU",
+    "load_transition_checkpoint",
 ]

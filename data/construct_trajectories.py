@@ -338,6 +338,26 @@ if __name__ == "__main__":
         "--sample", type=int, default=3,
         help="Number of sample trajectories to print (default: 3)",
     )
+    parser.add_argument(
+        "--augment-low-arousal", action="store_true",
+        help="Extend the session pool with synthetic deep-low-arousal sessions "
+             "(data/low_arousal_pool.py). Breaks the EmpatheticDialogues arousal "
+             "floor of ~-0.30 so exhausted/depressed/shutdown/serene zones sample "
+             "genuinely deactivated content instead of falling back.",
+    )
+    parser.add_argument(
+        "--n-low-arousal", type=int, default=600,
+        help="Number of synthetic low-arousal sessions to add (default: 600)",
+    )
+    parser.add_argument(
+        "--holdout-conv-fraction", type=float, default=0.0,
+        help="If > 0, reserve this fraction of source CONVERSATIONS before "
+             "construction and build a separate validation trajectory file "
+             "(<out>_val.json) exclusively from them. This is the "
+             "leakage-free-by-construction alternative to post-hoc splitting: "
+             "train and val trajectories share zero source conversations and "
+             "no generated trajectories are wasted.",
+    )
     args = parser.parse_args()
 
     # Resolve output path
@@ -352,7 +372,24 @@ if __name__ == "__main__":
     print("Loading session pool...")
     from data.prepare import load_empathetic_dialogues, print_pool_statistics
     pool = load_empathetic_dialogues("train")
+    if args.augment_low_arousal:
+        from data.low_arousal_pool import load_low_arousal_sessions
+        extra = load_low_arousal_sessions(n=args.n_low_arousal, seed=args.seed)
+        pool += extra
+        print(f"Augmented pool with {len(extra)} synthetic deep-low-arousal sessions "
+              f"(arousal down to -0.80; ED floor was ~-0.30).")
     print_pool_statistics(pool)
+
+    val_pool: list = []
+    if args.holdout_conv_fraction > 0:
+        rng_split = random.Random(args.seed)
+        shuffled = list(pool)
+        rng_split.shuffle(shuffled)
+        n_val_pool = int(len(shuffled) * args.holdout_conv_fraction)
+        val_pool = shuffled[:n_val_pool]
+        pool     = shuffled[n_val_pool:]
+        print(f"Held out {len(val_pool)} conversations for the val trajectory file "
+              f"({args.holdout_conv_fraction:.0%} of pool); train pool: {len(pool)}")
 
     print(f"\nConstructing {args.n_trajectories} trajectories (seed={args.seed})...")
     trajectories = construct_trajectories(
@@ -363,6 +400,17 @@ if __name__ == "__main__":
     )
     print_trajectory_statistics(trajectories)
 
+    if val_pool:
+        n_val_trajs = max(50, args.n_trajectories // 5)
+        print(f"\nConstructing {n_val_trajs} VAL trajectories from held-out conversations...")
+        val_trajectories = construct_trajectories(
+            val_pool,
+            n_trajectories=n_val_trajs,
+            max_uses_per_conv=args.max_uses,
+            seed=args.seed + 1,
+        )
+        print_trajectory_statistics(val_trajectories)
+
     if args.sample > 0:
         print(f"\n--- {args.sample} sample trajectories ---")
         rng = random.Random(0)
@@ -372,3 +420,8 @@ if __name__ == "__main__":
 
     save_trajectories(trajectories, out, indent=None)   # no indent = smaller file
     print(f"\nSaved to {out}")
+
+    if val_pool:
+        val_out = out.with_name(out.stem + "_val" + out.suffix)
+        save_trajectories(val_trajectories, val_out, indent=None)
+        print(f"Saved conversation-disjoint val trajectories to {val_out}")

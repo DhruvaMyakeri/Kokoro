@@ -1,65 +1,239 @@
 [
   {
+    "recency_baseline": {
+      "condition_c_response": "You must be feeling a mix of excitement and nerves with the big sprint kicking off next week. It's great that you've been taking care of yourself and feeling more solid, which will surely help you tackle the challenges ahead. How are you feeling about the sprint goals and your role in it?",
+      "verdict": "B",
+      "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it explicitly acknowledges the user's past struggles with burnout and expresses pride in their progress, providing a more personalized and supportive tone.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it explicitly acknowledges the user's past struggles with burnout and expresses pride in their progress, providing a more personalized and supportive tone.",
+            "position_consistent": true
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 acknowledges Marcus's history of burnout and recovery by referencing his past progress in managing stress and navigating challenges, while also validating his current capacity to handle the sprint with pride and encouragement.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything",
+        "helped a junior dev through a tough problem today. took the time, didn't rush. felt good i noticed that too. i think i actually enjoy the mentoring part of being senior now",
+        "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning"
+      ]
+    },
     "scenario_id": "l01",
     "arc_type": "recovery_over_burnout",
     "description": "Marcus burned out as a senior dev, went through therapy and boundary-setting, and now genuinely enjoys his work again",
     "new_message": "big sprint kicking off next week",
-    "condition_a_response": "I'm a bit concerned about you taking on another big sprint so soon, especially after feeling empty and hollow after the last one. Are you feeling prepared and energized for this next challenge, or are you still recovering from the previous sprint?",
-    "condition_b_response": "You've been preparing well, both physically and mentally, and that's great to see. Remembering your warning signs and maintaining a healthy balance will be crucial as you head into this big sprint. How are you feeling about taking on this new challenge, and is there anything specific that's on your mind?",
-    "judge_verdict": "B",
-    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the user's past struggles with burnout and recovery, and offers a supportive and empowering message that takes into account their growth and progress.",
+    "condition_a_response": "I'm a bit concerned about you heading into another big sprint so soon, especially after you mentioned feeling empty and hollow after the last one. How are you feeling about this one - is there anything that's giving you a sense of excitement or motivation, or are you just feeling overwhelmed?",
+    "condition_b_response": "You're facing another big sprint, but I'm proud of how you've been taking care of yourself and finding a better balance in your life. Remember that you've successfully navigated challenging sprints before and have made significant progress in managing your stress. How are you feeling about this upcoming sprint, and what strategies do you think will help you stay on track?",
+    "judge_verdict": "TIE",
+    "judge_reasoning": "position-inconsistent (A vs B across orders)",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "B",
+          "reasoning": "This response shows more emotional awareness and understanding because it acknowledges the user's past struggles with burnout and expresses pride in their progress, while also offering a supportive and encouraging tone that is appropriate given the user's history of recovery and growth.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's emotional history of burnout and expresses concern for their well-being, rather than simply focusing on their past successes and resilience.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        }
+      ],
+      "agreement": "none",
+      "counterbalanced": true
+    },
     "context_a_memories": [
       "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do",
       "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning",
       "finished the sprint but felt nothing. just empty. not relieved, just hollow never like this. i used to get that buzz after shipping. now i close the laptop and feel nothing"
     ],
     "context_b_memories": [
-      "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do",
+      "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything",
       "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning",
-      "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything"
+      "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do"
     ],
-    "context_b_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current activated activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
-    "valence": 0.2458,
-    "arousal": 0.3604,
+    "context_b_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.4535,
+    "arousal": -0.1556,
     "trend": "improving",
     "retrieval_overlap_pct": 66.7,
     "memories_differ": true
   },
   {
+    "recency_baseline": {
+      "condition_c_response": "That must have brought a smile to your face, a sweet reminder of him and the connection you're building. It's lovely how these little moments can become special because of the people we care about. Did it feel like a warm, fuzzy coincidence, or just a pleasant surprise?",
+      "verdict": "B",
+      "reasoning": "This response shows more emotional awareness and understanding because it gently inquires about the user's feelings in response to hearing the favorite song, without assuming a specific emotional outcome, which is more suitable given the user's history of grief and healing.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "B",
+            "reasoning": "This response shows more emotional awareness and understanding because it gently inquires about the user's feelings in response to hearing the favorite song, without assuming a specific emotional outcome, which is more suitable given the user's history of grief and healing.",
+            "position_consistent": true
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 is more emotionally aware because it avoids assuming the song's connection to her past or current relationship, instead focusing on her immediate feelings without referencing her history of grief, which is more neutral and respectful of her healing journey.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now",
+        "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
+        "saw his name on a group chat notification and felt... nothing. like genuinely nothing yes! that's exactly it. neutral. i didn't know i could get there"
+      ]
+    },
     "scenario_id": "l02",
     "arc_type": "grief_to_healing",
     "description": "Priya went through a devastating breakup, grieved deeply for months, rebuilt herself, and is now in a healthy new relationship",
     "new_message": "heard his favourite song today",
-    "condition_a_response": "That must have been really tough for you - it's like the memories are still lingering everywhere. It's okay to feel overwhelmed, and it's great that you're acknowledging your emotions. Remember, it's a process, and you're doing the best you can, and that's something to be proud of.",
-    "condition_b_response": "That can be a powerful trigger for emotions, especially when it's connected to someone special. How did you feel when you heard his favorite song, and did it bring back any happy memories from your time together?",
-    "judge_verdict": "B",
-    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the potential emotional trigger and invites the user to reflect on their feelings, while also considering the complexity of their emotional history and the possibility of both positive and negative memories.",
+    "condition_a_response": "That must have been really tough for you, bringing back all those memories. It's like the whole world is filled with reminders of him, isn't it? Remember that you're doing your best to heal, and it's okay to feel overwhelmed sometimes.",
+    "condition_b_response": "That must have been a sweet moment for you, and I'm curious, how did it make you feel to hear his favorite song? Did it bring a smile to your face or remind you of your time together?",
+    "judge_verdict": "A",
+    "judge_reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential pain and overwhelm that the user may experience when reminded of their ex, taking into account their history of grief and healing.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential pain and overwhelm that the user may experience when reminded of their ex, taking into account their history of grief and healing.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 acknowledges the potential emotional weight of the trigger (his favorite song) and validates the user’s possible struggle, aligning with her history of grief and healing. Response 2 assumes a positive reaction (\"sweet moment\") without considering the complexity of her emotional history.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
     "context_a_memories": [
       "couldn't go to work today. just cried all morning. this is pathetic i keep finding his stuff around the flat. a hoodie, a mug. everything is a reminder yeah. i thought about texting him. didn't. but i",
       "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
       "went to our favourite restaurant with a friend. bad idea. had to leave i hate that he's taken all these places from me. that was my restaurant too"
     ],
     "context_b_memories": [
-      "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
       "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now",
-      "couldn't go to work today. just cried all morning. this is pathetic i keep finding his stuff around the flat. a hoodie, a mug. everything is a reminder yeah. i thought about texting him. didn't. but i"
+      "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
+      "saw his name on a group chat notification and felt... nothing. like genuinely nothing yes! that's exactly it. neutral. i didn't know i could get there"
     ],
-    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
-    "valence": 0.1784,
-    "arousal": 0.1252,
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.3759,
+    "arousal": -0.0691,
     "trend": "improving",
-    "retrieval_overlap_pct": 66.7,
+    "retrieval_overlap_pct": 33.3,
     "memories_differ": true
   },
   {
+    "recency_baseline": {
+      "condition_c_response": "That sounds like a great opportunity to connect with your colleagues in a more relaxed setting. I'm glad to see you're not dreading it, which is a big change from how you might have felt in the past - you've come a long way in being more comfortable in social situations. Are you looking forward to letting your personality shine and having some fun?",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "A",
+            "reasoning": "Response 1 explicitly acknowledges the user's past struggles with social anxiety and current progress, validating their emotional journey while encouraging positivity, which aligns more closely with the user's history of overcoming anxiety.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
+        "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
+        "went to a party. knew almost nobody. stayed two hours. enjoyed myself honestly? the conversations. i'd forgotten i can be interesting. people laughed at my jokes"
+      ]
+    },
     "scenario_id": "l03",
     "arc_type": "anxiety_to_confidence",
     "description": "Kaveh struggled with severe social anxiety, avoided parties and crowded spaces, went through CBT therapy, and now genuinely enjoys social events",
     "new_message": "big work party on Friday, apparently everyone's going",
-    "condition_a_response": "It sounds like you're feeling pretty calm about it, which is great - a big change from how you might have reacted in the past. I'm curious, what do you think has helped you become more comfortable in social situations like this? Are you looking forward to it, or just taking it in stride?",
-    "condition_b_response": "It sounds like you're feeling a bit apprehensive about the party, but I've noticed how far you've come in recent sessions - you've been handling social situations with more ease and confidence. Remember how you enjoyed hosting your dinner party and even looked forward to another party recently? You've made significant progress, and I'm here to support you through any nerves you might be feeling now.",
-    "judge_verdict": "B",
-    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the user's past struggles with social anxiety, recognizes their progress, and offers support in a way that is tailored to their specific history and experiences.",
+    "condition_a_response": "It sounds like you're feeling more confident about social gatherings, and that's wonderful. I'm sure your unique perspective and sense of humor will shine through at the party on Friday. Are you looking forward to it, or is there still a bit of nervousness underneath?",
+    "condition_b_response": "It sounds like you're feeling more confident about social gatherings, and that's wonderful to see. I'm excited for you to attend the big work party on Friday and hope you have a great time connecting with your colleagues. How are you feeling about it - are you looking forward to it or just taking it in stride?",
+    "judge_verdict": "A",
+    "judge_reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the possibility of underlying nervousness, which is a sensitive consideration given the user's history of social anxiety.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "A",
+          "reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the possibility of underlying nervousness, which is a sensitive consideration given the user's history of social anxiety.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's emotional history by mentioning \"still a bit of nervousness underneath,\" which suggests that the user's confidence has not completely eliminated their anxiety, and that it's okay to still feel some nervousness.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 acknowledges both the user's progress in overcoming anxiety and the possibility of residual nervousness, showing deeper emotional awareness of their history and current state.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "unanimous",
+      "counterbalanced": true
+    },
     "context_a_memories": [
       "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
       "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
@@ -67,25 +241,83 @@
     ],
     "context_b_memories": [
       "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
-      "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
-      "got invited to a party this weekend and i've been dreading it since Tuesday don't know what to say. standing around with a drink looking like an idiot yes. every time. i end up in the bathroom on my p"
+      "went to a party. knew almost nobody. stayed two hours. enjoyed myself honestly? the conversations. i'd forgotten i can be interesting. people laughed at my jokes",
+      "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay"
     ],
-    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
-    "valence": 0.0387,
-    "arousal": 0.1687,
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.4069,
+    "arousal": -0.102,
     "trend": "improving",
-    "retrieval_overlap_pct": 66.7,
-    "memories_differ": true
+    "retrieval_overlap_pct": 100.0,
+    "memories_differ": false
   },
   {
+    "recency_baseline": {
+      "condition_c_response": "You must be feeling a mix of excitement and nervousness, but it's great that you have so many positive developments to discuss, like the new product initiative and the trust your team has placed in you. This review is an opportunity to showcase your growth and reflect on how far you've come. I'm sending you positive vibes for a successful and empowering conversation.",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "A",
+            "reasoning": "Response 1 acknowledges Diane's emotional history of overcoming fear and transitioning to a fulfilling role, while framing the review as an opportunity to reflect on her growth—a direct nod to her journey from corporate dissatisfaction to thriving in her new position.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise",
+        "my old colleagues asked how it's going. I realised I was smiling the whole time I was talking about it a few of them want to make moves too. I told them the fear is worth it",
+        "got asked to lead the new product initiative. three months in and they trust me with something big like I'm being seen. I forgot what that feels like at work"
+      ]
+    },
     "scenario_id": "l04",
     "arc_type": "career_crisis_to_growth",
     "description": "Diane hated her corporate job for years, was terrified to leave, finally made the leap to a startup, and is now thriving",
     "new_message": "performance review is next week",
-    "condition_a_response": "You must be feeling a mix of excitement and nerves about your performance review next week. It's great that you've found your footing and feel heard in your new role, and I'm sure that confidence will shine through in your review. What are your hopes and expectations for the review - are there any specific areas you're looking to discuss or goals you want to set?",
-    "condition_b_response": "I'm so proud of the progress you've made, and I think this performance review is a great opportunity to acknowledge your growth and the value you've been bringing to your new role. Remember how far you've come, from feeling lost to now being heard and valued in your workplace - that's something to celebrate. What are your hopes and expectations for this review?",
-    "judge_verdict": "A",
-    "judge_reasoning": "Response A shows more emotional awareness and understanding of the user's situation because it acknowledges the user's potential nervousness about the performance review, in addition to their growth and confidence, demonstrating a more nuanced understanding of their emotional state.",
+    "condition_a_response": "You must be feeling a mix of excitement and nervousness about your performance review, especially since you've been enjoying your new role and feeling heard. It's great that you've found your footing and discovered who you are at work, which will likely shine through in your review. What are your hopes and expectations for the outcome of the review?",
+    "condition_b_response": "I can sense a mix of excitement and nervousness about your upcoming performance review. It's great that you've been feeling more confident and valued at work, and I'm sure that will shine through in your review. How are you feeling about discussing your accomplishments and goals with your team?",
+    "judge_verdict": "TIE",
+    "judge_reasoning": "position-inconsistent (A vs B across orders)",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 better acknowledges Diane's emotional history by referencing her journey of discovering her identity at work after leaving a toxic corporate job, tying her current performance review to her broader growth narrative.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
     "context_a_memories": [
       "first week at the new place. it's chaotic and fast and I love it my opinion actually matters here. I sat in a meeting and they listened. genuinely listened",
       "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s",
@@ -94,50 +326,166 @@
     "context_b_memories": [
       "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise",
       "first week at the new place. it's chaotic and fast and I love it my opinion actually matters here. I sat in a meeting and they listened. genuinely listened",
-      "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s"
+      "got asked to lead the new product initiative. three months in and they trust me with something big like I'm being seen. I forgot what that feels like at work"
     ],
-    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
-    "valence": -0.0621,
-    "arousal": 0.0672,
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.2868,
+    "arousal": -0.2209,
     "trend": "improving",
-    "retrieval_overlap_pct": 100.0,
-    "memories_differ": false
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
   },
   {
+    "recency_baseline": {
+      "condition_c_response": "That sounds like so much fun, I'm sure the kids are excited to spend the weekend with you. It's great that you have a plan in place, I'm sure you'll create some amazing memories together. What are some of the activities you have lined up for the weekend?",
+      "verdict": "B",
+      "reasoning": "Response 2 shows more emotional awareness by inquiring about the user's feelings, which is particularly important given Tom's history of struggling with co-parenting stress and isolation after his divorce.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness by inquiring about the user's feelings, which is particularly important given Tom's history of struggling with co-parenting stress and isolation after his divorce.",
+            "position_consistent": true
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's emotional state and asks about their feelings, rather than just focusing on the fun activities, which might be a way to avoid discussing potential underlying emotions related to co-parenting stress.",
+            "position_consistent": true
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 shows greater emotional awareness by acknowledging the effort and thought behind the plan, which aligns with Tom's history of co-parenting stress, and by asking about his feelings, inviting reflection on the emotional significance of quality time with his children.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "looking back at where I was a year ago and it doesn't feel like me anymore. I'm genuinely okay more than okay honestly. I like my life. didn't think I'd say that again",
+        "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
+        "my son told his teacher that his Dad makes the best pasta. she told me at pickup. I nearly cried I'm doing okay as a dad. I wasn't sure for a while. but I think I am"
+      ]
+    },
     "scenario_id": "l05",
     "arc_type": "divorce_to_rebuilding",
     "description": "Tom went through a brutal divorce, struggled with isolation and co-parenting stress, and has now rebuilt a stable, fulfilling single-parent life",
     "new_message": "taking the kids this weekend, got a full plan",
-    "condition_a_response": "That sounds wonderful, I'm so glad to hear you have a fun-filled weekend planned with the kids. I'm sure they're looking forward to spending time with you, and it's great that you get to create new memories together. What are some of the exciting things you have planned for the weekend?",
-    "condition_b_response": "It's wonderful that you have a fun-filled weekend planned with the kids, and having something to look forward to can be really uplifting. I'm sure they'll love spending time with you, and it's great that you're making the most of your time together. How are you feeling about having them this weekend, are you excited to see them after their week with their mom?",
+    "condition_a_response": "That sounds exciting, I'm sure the kids are looking forward to spending time with you. What's on the agenda for this weekend, anything fun or special planned?",
+    "condition_b_response": "That sounds like a fun weekend ahead with the kids. It's great that you have a plan in place, I'm sure they'll appreciate the thought and effort you've put into making it special. How are you feeling about spending quality time with them this weekend?",
     "judge_verdict": "B",
-    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the potential emotional complexity of co-parenting and invites the user to express their feelings, whereas Response A is more focused on the activities planned.",
+    "judge_reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it not only acknowledges the user's plan for the weekend but also inquires about their emotional state, which is particularly relevant given Tom's history of co-parenting stress and rebuilding his life.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "B",
+          "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it not only acknowledges the user's plan for the weekend but also inquires about their emotional state, which is particularly relevant given Tom's history of co-parenting stress and rebuilding his life.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "B",
+          "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges Tom's emotional journey by asking how he's feeling about spending quality time with the kids, which is a subtle nod to the co-parenting stress and emotional challenges he's faced in the past.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "B",
+          "reasoning": "Response 2 acknowledges the user's effort and thoughtfulness in planning, which ties to his history of co-parenting stress, and directly asks about his emotional state, showing deeper empathy for his journey.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "unanimous",
+      "counterbalanced": true
+    },
     "context_a_memories": [
       "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
       "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a",
       "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled"
     ],
     "context_b_memories": [
-      "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled",
       "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
-      "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a"
+      "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled",
+      "first Christmas alone. kids with her Christmas Day. I cooked for one called my sister. she's good. she came over in the afternoon. we watched a film. I survived yeah. and Boxing Day I had them and we "
     ],
-    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
-    "valence": -0.0427,
-    "arousal": 0.0948,
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.0891,
+    "arousal": -0.1546,
     "trend": "improving",
-    "retrieval_overlap_pct": 100.0,
-    "memories_differ": false
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
   },
   {
+    "recency_baseline": {
+      "condition_c_response": "I'm sending you all my positive thoughts for tomorrow - you've worked so hard and come so far, and I just know you're going to crush it. Remember how far you've come and how capable you are, from being ahead of schedule to receiving amazing feedback on your essay. Take a deep breath, stay calm, and get ready to celebrate your achievements.",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
+        "submitted my dissertation chapter draft. ahead of schedule. felt good writing it I enjoy it now. the research, the writing. I remember why I chose this subject",
+        "got a 68 on my essay. my professor left a comment saying my argument was sophisticated I read it like four times to make sure it was real. I'm capable of this apparently"
+      ]
+    },
     "scenario_id": "l06",
     "arc_type": "academic_failure_to_success",
     "description": "Amara was failing her second year of university, seriously considered dropping out, rebuilt her study approach with support, and is now excelling",
     "new_message": "dissertation results tomorrow",
-    "condition_a_response": "I'm sending you all my positive thoughts for tomorrow's results - you've worked so hard and deserve to feel proud of yourself, no matter the outcome. Remember to be kind to yourself and take a moment to breathe, as it's a big day ahead. You've got this, and I'm here cheering you on.",
-    "condition_b_response": "You must be feeling a mix of excitement and nerves about getting your dissertation results tomorrow. It's great that you've been making progress and feeling more confident about your work, and I'm hoping the results will be a positive reflection of your efforts. How are you planning to take care of yourself tomorrow, regardless of the outcome?",
-    "judge_verdict": "B",
-    "judge_reasoning": "Response B shows more emotional awareness and understanding of the user's situation because it acknowledges the user's potential emotional state and references their progress, while also inquiring about their self-care, demonstrating a deeper understanding of their emotional history and needs.",
+    "condition_a_response": "I'm sending you all my positive thoughts for tomorrow's results - you've worked so hard and deserve to feel proud of yourself, regardless of the outcome. Remember to take a deep breath and be kind to yourself, and try to enjoy this moment of culmination after all your efforts. You've got this, and I'm here cheering you on.",
+    "condition_b_response": "I can sense your anticipation and a hint of nervousness about receiving your dissertation results tomorrow. Remember that you've worked incredibly hard and have made significant progress, and your supervisor's positive feedback is a testament to your abilities. Take a deep breath and try to approach tomorrow with confidence and an open mind.",
+    "judge_verdict": "TIE",
+    "judge_reasoning": "position-inconsistent (A vs B across orders)",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (B vs A across orders)",
+          "position_consistent": false
+        }
+      ],
+      "agreement": "unanimous",
+      "counterbalanced": true
+    },
     "context_a_memories": [
       "submitted my dissertation chapter draft. ahead of schedule. felt good writing it I enjoy it now. the research, the writing. I remember why I chose this subject",
       "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
@@ -148,11 +496,1187 @@
       "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
       "studied for two hours today. properly. understood what I was reading. first time in months Pomodoro timers, no phone, one chapter at a time. basically just removing all the escape routes"
     ],
-    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
-    "valence": 0.0545,
-    "arousal": -0.0907,
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation).",
+    "valence": 0.5474,
+    "arousal": 0.0083,
     "trend": "improving",
     "retrieval_overlap_pct": 100.0,
     "memories_differ": false
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "You must be feeling a mix of emotions, from relief that you've made it another year to possibly some nervousness about the checkup. Remember, you've come so far and taken such great care of yourself - you've got this. I'm sending you positive thoughts for a smooth and reassuring appointment.",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 shows greater emotional awareness by acknowledging the user's past struggles (\"how far you've come\") and proactively inviting them to express current feelings about the checkup, which is especially validating given their history of health anxiety.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "one year clear. doctor says I'm in perfect health. I celebrated with a big dinner with everyone who helped me through it I'm not the person who panics about health anymore. I respect my body, I take c",
+        "ran 10k this weekend. six months ago I was throwing up in a hospital car park. life is wild I'm healthier now than before the diagnosis. physically and mentally. weird how that works",
+        "back at work. back at the gym. eating better than I ever have. this scare changed something in me exactly. I don't take days for granted the same way. I signed up for a half-marathon"
+      ]
+    },
+    "scenario_id": "l07",
+    "arc_type": "health_scare_to_recovery",
+    "description": "Ren experienced alarming symptoms, went through a terrifying diagnostic period, received treatment, and is now fully recovered and healthy",
+    "new_message": "annual checkup next Tuesday",
+    "condition_a_response": "I'm glad you're staying on top of your health, it's great that you're taking proactive steps to ensure everything is okay. I can sense a bit of nervousness, though - would you like to talk about what's on your mind before the checkup?",
+    "condition_b_response": "It's completely normal to feel a bit apprehensive about your annual checkup, but considering how far you've come, I'm sure you'll do great. You've made tremendous progress in taking care of your body and mind, and that's something to be proud of. How are you feeling about this checkup, is there anything specific on your mind?",
+    "judge_verdict": "B",
+    "judge_reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's past health scare and recovery, and offers a reassuring and proud perspective that takes into account their progress and growth.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "B",
+          "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's past health scare and recovery, and offers a reassuring and proud perspective that takes into account their progress and growth.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "B",
+          "reasoning": "Response 2 acknowledges the user's emotional history by referencing their progress and recovery, while also validating current apprehension and offering encouragement, which aligns more deeply with their past experiences.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "found a lump last week. trying not to panic but I've been googling and it's all worst-case scenarios appointment is Thursday. every day until then feels like a month no. haven't told anyone. don't wan",
+      "one year clear. doctor says I'm in perfect health. I celebrated with a big dinner with everyone who helped me through it I'm not the person who panics about health anymore. I respect my body, I take c",
+      "follow-up scan is clear. completely clear. I keep re-reading the letter I framed it. kidding. but almost. I feel like I got handed my life back"
+    ],
+    "context_b_memories": [
+      "one year clear. doctor says I'm in perfect health. I celebrated with a big dinner with everyone who helped me through it I'm not the person who panics about health anymore. I respect my body, I take c",
+      "follow-up scan is clear. completely clear. I keep re-reading the letter I framed it. kidding. but almost. I feel like I got handed my life back",
+      "ran 10k this weekend. six months ago I was throwing up in a hospital car park. life is wild I'm healthier now than before the diagnosis. physically and mentally. weird how that works"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.5947,
+    "arousal": -0.1279,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "That sounds exciting, a weekend trip with your climbing group could be a great way to bond even more and create new memories together. I can sense your enthusiasm, and it's wonderful to see you feeling so connected with them. Are you thinking of joining the trip and exploring new adventures with your group?",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 acknowledges Jess's emotional history by referencing her climbing group as a source of connection and explicitly checks in on her feelings about a longer social commitment, showing deeper understanding of her journey from social anxiety to belonging.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "the climbing group is becoming my people. we have inside jokes. we check on each other. I have a community I video-called my friend abroad and told her. she cried. she'd been worried about me",
+        "Maya invited me to her birthday. big party. lots of people I don't know. I said yes immediately I know! I'm actually looking forward to it. I want to meet her other friends",
+        "the climbing group went for drinks after the session. I stayed for the whole thing. three hours I told a story and everyone was listening. laughing. I felt like I belonged there"
+      ]
+    },
+    "scenario_id": "l08",
+    "arc_type": "social_anxiety_to_connection",
+    "description": "Jess felt deeply disconnected and avoided social situations, gradually joined a climbing club, and now has a close friend group she genuinely belongs to",
+    "new_message": "group chat is planning a weekend trip",
+    "condition_a_response": "That's exciting, a weekend trip with your climbing group could be a great opportunity to deepen your connections with them. It's lovely to see you feeling like you belong and are being included in their plans. How are you feeling about the trip, are you thinking of joining in?",
+    "condition_b_response": "That sounds like an exciting development - it's great to see your climbing group is becoming a source of adventure and connection for you. I'm curious, how are you feeling about the possibility of spending a whole weekend with them, and do you think you'll join the trip?",
+    "judge_verdict": "TIE",
+    "judge_reasoning": "position-inconsistent (A vs B across orders)",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 more directly acknowledges Jess's emotional history by highlighting her sense of belonging and progress from social anxiety, while Response 2 focuses on adventure/connection without explicitly tying it to her journey.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "went back to climbing for the third time. same people are showing up. we have a group chat now someone suggested post-climb coffee. I said yes without even hesitating. that's new for me",
+      "the climbing group is becoming my people. we have inside jokes. we check on each other. I have a community I video-called my friend abroad and told her. she cried. she'd been worried about me",
+      "the climbing group went for drinks after the session. I stayed for the whole thing. three hours I told a story and everyone was listening. laughing. I felt like I belonged there"
+    ],
+    "context_b_memories": [
+      "went back to climbing for the third time. same people are showing up. we have a group chat now someone suggested post-climb coffee. I said yes without even hesitating. that's new for me",
+      "the climbing group is becoming my people. we have inside jokes. we check on each other. I have a community I video-called my friend abroad and told her. she cried. she'd been worried about me",
+      "the climbing group went for drinks after the session. I stayed for the whole thing. three hours I told a story and everyone was listening. laughing. I felt like I belonged there"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+    "valence": -0.1982,
+    "arousal": -0.0332,
+    "trend": "improving",
+    "retrieval_overlap_pct": 100.0,
+    "memories_differ": false
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "How exciting to start a new chapter, both literally and figuratively, as you continue to make progress on your book. I can sense your enthusiasm and creativity flowing, and I'm honored to be a part of your writing journey. What are your hopes and expectations for this new chapter, and where do you see the story unfolding from here?",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "agent read the first half. she called it stunning. I believe her because I feel it too I wake up excited to write. that's the biggest change. I look forward to my desk now",
+        "45,000 words. I'm halfway there and I'm writing faster than I did on the first book I actually love this draft. it's different from the first book but it's honest and I'm proud of it",
+        "wrote a chapter that made me cry. in a good way. I haven't felt this connected to my own writing in over a year it's back. it's really back. I know what this book is about now"
+      ]
+    },
+    "scenario_id": "l09",
+    "arc_type": "creative_block_to_flow",
+    "description": "Nina couldn't write a single word for months, hated everything she produced, found a new creative process, and is now writing with genuine joy and momentum",
+    "new_message": "starting a new chapter today",
+    "condition_a_response": "How exciting to start a new chapter, both literally and figuratively. I hope the momentum from your morning writing sessions continues to inspire you, and remember that your unique voice and perspective are what made your first book special. You've got this, and I'm rooting for you.",
+    "condition_b_response": "I'm so excited for you, starting a new chapter can be both thrilling and intimidating, but it sounds like you're in a great place with your writing, feeling connected and proud of your work. What are your hopes and expectations for this new chapter, and how do you think it will unfold?",
+    "judge_verdict": "B",
+    "judge_reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential mix of emotions that come with starting a new chapter, while also showing interest in the user's thoughts and feelings about this new development.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "B",
+          "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential mix of emotions that come with starting a new chapter, while also showing interest in the user's thoughts and feelings about this new development.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "B",
+          "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential emotional complexity of starting a new chapter, while also being sensitive to the user's recent progress and positive emotions, and invites further reflection and exploration of their hopes and expectations.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "B",
+          "reasoning": "Response 2 acknowledges the user's emotional history by referencing her past struggles and current positive momentum, while also validating the mixed emotions of starting anew, fostering deeper engagement with her hopes and expectations.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "unanimous",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "45,000 words. I'm halfway there and I'm writing faster than I did on the first book I actually love this draft. it's different from the first book but it's honest and I'm proud of it",
+      "something shifted this week. I'm writing every morning. 5am to 8am. the words are flowing I stopped trying to write my second book and started writing this character's story. made it about her, not ab",
+      "my agent asked for a progress update. I lied and said the draft is coming along. it's not coming along at all I feel like a fraud. I had one good book and that's it. I've used up my ideas feels true t"
+    ],
+    "context_b_memories": [
+      "45,000 words. I'm halfway there and I'm writing faster than I did on the first book I actually love this draft. it's different from the first book but it's honest and I'm proud of it",
+      "agent read the first half. she called it stunning. I believe her because I feel it too I wake up excited to write. that's the biggest change. I look forward to my desk now",
+      "wrote a chapter that made me cry. in a good way. I haven't felt this connected to my own writing in over a year it's back. it's really back. I know what this book is about now"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.3078,
+    "arousal": -0.2008,
+    "trend": "improving",
+    "retrieval_overlap_pct": 33.3,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "It sounds like you're savoring some well-deserved alone time, and that's perfectly wonderful. You've had a lot of social activity lately, so it's great that you're taking a moment to recharge. How does it feel to have a quiet night to yourself after all the excitement?",
+      "verdict": "A",
+      "reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's history of building a social life after experiencing loneliness and explicitly recognizes the value of alone time for recharging.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "A",
+            "reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's history of building a social life after experiencing loneliness and explicitly recognizes the value of alone time for recharging.",
+            "position_consistent": true
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "A",
+            "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's recent social activity and implies that they may be feeling a sense of relief or rejuvenation from having a quiet night to themselves, which is a subtle nod to their history of overcoming loneliness.",
+            "position_consistent": true
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "had a quiet evening alone tonight by choice. read a book, made tea, felt completely content night and day. I chose to be alone tonight because tomorrow I'm seeing Margaret and Saturday is the garden. ",
+        "hosted a small dinner party. four people. cooked pasta. everyone stayed late talking. my flat felt like a home I almost cried washing up after. good tears. I built this. it took time but I built it",
+        "went to a pub quiz with the garden crew. we came last but laughed the whole time. I have plans on weeknights now completely different. my calendar has things in it. people text me. I text them back. i"
+      ]
+    },
+    "scenario_id": "l10",
+    "arc_type": "loneliness_to_community",
+    "description": "David moved to a new city and experienced crushing loneliness, gradually built community through volunteering and neighbours, and now enjoys chosen solitude within a rich social life",
+    "new_message": "quiet evening at home tonight",
+    "condition_a_response": "It sounds like you're savoring some much-needed alone time, just like you did the other night when you read a book and made tea. You must be recharging for your upcoming social engagements, like seeing Margaret tomorrow and the garden event on Saturday. I'm glad you're taking care of yourself and prioritizing your own relaxation.",
+    "condition_b_response": "It sounds like you're continuing to prioritize self-care and solo time, which has been serving you well lately. I'm glad to hear you're having another peaceful evening at home, and I'm curious, what did you end up doing to unwind tonight?",
+    "judge_verdict": "A",
+    "judge_reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's history of transitioning from loneliness to a balanced social life and explicitly recognizes the value of their alone time within that context.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "A",
+          "reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's history of transitioning from loneliness to a balanced social life and explicitly recognizes the value of their alone time within that context.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 demonstrates greater emotional awareness by explicitly referencing David’s past self-care habits and future social plans, acknowledging his journey from loneliness to balanced solitude and community engagement.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "had a quiet evening alone tonight by choice. read a book, made tea, felt completely content night and day. I chose to be alone tonight because tomorrow I'm seeing Margaret and Saturday is the garden. ",
+      "hosted a small dinner party. four people. cooked pasta. everyone stayed late talking. my flat felt like a home I almost cried washing up after. good tears. I built this. it took time but I built it",
+      "saw a poster for a community garden volunteer day. I like plants. thinking about going it's Saturday morning. worst case I pull some weeds and go home. best case I meet someone yeah. I'll go. I need t"
+    ],
+    "context_b_memories": [
+      "had a quiet evening alone tonight by choice. read a book, made tea, felt completely content night and day. I chose to be alone tonight because tomorrow I'm seeing Margaret and Saturday is the garden. ",
+      "hosted a small dinner party. four people. cooked pasta. everyone stayed late talking. my flat felt like a home I almost cried washing up after. good tears. I built this. it took time but I built it",
+      "another weekend where I didn't speak to a single person. moved here three months ago and I have nobody work. great job. but I come home to an empty flat and eat dinner alone every night I didn't reali"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+    "valence": -0.0008,
+    "arousal": -0.3859,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "You've got this, you've been managing your finances so well lately and you've got a safety net with your £400 in savings. Just make the payment and know that you're one step closer to your financial goals. How are you feeling about paying rent this time around, is it still feeling calm and manageable?",
+      "verdict": "B",
+      "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's potential anxiety about the rent payment, referencing their past struggles and successes to offer a more empathetic and reassuring message.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's potential anxiety about the rent payment, referencing their past struggles and successes to offer a more empathetic and reassuring message.",
+            "position_consistent": true
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's anxiety and directly references their past struggles with financial stress, while also offering a supportive and encouraging tone.",
+            "position_consistent": true
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 acknowledges the user's potential anxiety, references their past success in managing bills, and encourages drawing on that confidence, showing deeper emotional awareness of their history and current emotional needs.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "got paid today and felt... calm. not panicked. just calm. checked the budget, moved money to savings, done money used to control my whole emotional state. now it's just a thing I manage. boring. glori",
+        "all debts cleared. every single one. zero overdraft. I have £400 in savings I keep checking my savings account just to see the number. it's small but it's mine and it's positive",
+        "went to my mate's birthday. bought him a modest gift. didn't feel sick about it. just normal spending I told him about the money stuff actually. he was great. wished I'd told him sooner"
+      ]
+    },
+    "scenario_id": "l11",
+    "arc_type": "financial_stress_to_stability",
+    "description": "Sam was drowning in debt, couldn't pay rent, and lived in constant financial panic. Got help, followed a budget plan, cleared debts, and now has financial stability and savings",
+    "new_message": "rent is due this week",
+    "condition_a_response": "I can feel your stress and anxiety about the upcoming rent payment. Remember how great it felt last month when you were able to cover all your bills on time, and try to draw on that sense of relief and accomplishment to get through this week. You've made progress with your budget plan, and I'm here to support you in staying on track.",
+    "condition_b_response": "I can sense your anxiety about the upcoming rent payment. Remember how you successfully covered all your bills, including rent, last month with your new budget plan - that's a huge accomplishment and a step in the right direction. Can you draw on that sense of relief and confidence to tackle this month's rent, even if it feels daunting?",
+    "judge_verdict": "TIE",
+    "judge_reasoning": "position-inconsistent (A vs B across orders)",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "B",
+          "reasoning": "Response 2 shows more emotional awareness by specifically referencing the user's past accomplishment as a \"huge step\" and using a question to engage the user in drawing on their own resilience, which aligns with their documented journey from financial panic to stability.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "rent is late again. landlord texted. I made up an excuse about a bank transfer delay three of the last five. I'm terrified of getting evicted. but I literally don't have the money I lie awake doing me",
+      "started the budget plan. it's tight but every pound has a job now. first month I covered all my bills paid rent on time. first time in months. the relief was physical. like my shoulders dropped",
+      "got a letter from the bank today. I'm £3000 in my overdraft and they're charging me fees on top months. I keep thinking next month will be different but it never is. I spend more than I earn I can't e"
+    ],
+    "context_b_memories": [
+      "rent is late again. landlord texted. I made up an excuse about a bank transfer delay three of the last five. I'm terrified of getting evicted. but I literally don't have the money I lie awake doing me",
+      "started the budget plan. it's tight but every pound has a job now. first month I covered all my bills paid rent on time. first time in months. the relief was physical. like my shoulders dropped",
+      "got a letter from the bank today. I'm £3000 in my overdraft and they're charging me fees on top months. I keep thinking next month will be different but it never is. I spend more than I earn I can't e"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current moderate activation).",
+    "valence": -0.0786,
+    "arousal": 0.2694,
+    "trend": "improving",
+    "retrieval_overlap_pct": 100.0,
+    "memories_differ": false
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "I'm sending you positive thoughts for your physio appointment tomorrow - I hope it's a great session and you continue to make progress. It's amazing how far you've come, and I'm sure your physio will be thrilled to see your advancements too. Remember to celebrate your small wins, you've earned it!",
+      "verdict": "B",
+      "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it specifically references the user's past struggles and positive changes, such as the pain programme's pacing technique, to acknowledge their progress and emotional growth.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it specifically references the user's past struggles and positive changes, such as the pain programme's pacing technique, to acknowledge their progress and emotional growth.",
+            "position_consistent": true
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's emotional history of struggling with chronic pain and specifically references the user's past experiences with pain crashes, demonstrating a deeper understanding of the user's emotional journey.",
+            "position_consistent": true
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 demonstrates greater emotional awareness by referencing Clara’s specific progress (e.g., pacing techniques, avoiding crash days) and acknowledging her journey from struggle to adaptation, which aligns with her documented history of chronic pain acceptance.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "my physio said I'm one of her best outcomes. not because the pain is gone but because my life isn't ruled by it anymore the pain is still there. probably always will be. but I have a life around it no",
+        "went to a concert. stood for two hours with breaks. would have been unthinkable six months ago exactly. I'm not the person I was before the pain. but I'm a person I actually like now",
+        "switched medication. less fog. the pain is there but it's background noise now, not the headline I had a conversation with my partner last night where I was fully present. she noticed. she cried a bit"
+      ]
+    },
+    "scenario_id": "l12",
+    "arc_type": "chronic_pain_acceptance",
+    "description": "Clara fought her chronic back pain for years, felt angry and diminished by it, learned acceptance and pacing strategies, and now lives a full life adapted around her condition",
+    "new_message": "physio appointment tomorrow",
+    "condition_a_response": "I'm thinking of you and hoping your physio appointment goes well tomorrow. It's great that you have a supportive physio who's helped you make progress, and I'm sure you'll continue to learn and grow from your sessions together. How are you feeling about the appointment - are you looking forward to checking in and discussing your progress with pacing?",
+    "condition_b_response": "You must be feeling a sense of accomplishment and progress going into your physio appointment tomorrow, especially given the positive changes you've experienced lately. It's great that you have tangible results to share with your physio, like not having a crash day after trying the pain programme's pacing technique. I'm sure your physio will be thrilled to hear about your improvements and the positive impact on your daily life.",
+    "judge_verdict": "A",
+    "judge_reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges Clara's past struggles with chronic pain and her journey towards acceptance, and it asks a gentle and non-judgmental question about her feelings, showing a willingness to listen and support her emotional needs.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (B vs A across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges Clara's past struggles with chronic pain and her journey towards acceptance, and it asks a gentle and non-judgmental question about her feelings, showing a willingness to listen and support her emotional needs.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 shows greater emotional awareness by acknowledging Clara's ongoing relationship with pacing strategies and inviting her to reflect on her feelings about the appointment, rather than assuming positive outcomes as Response 2 does.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "my physio said I'm one of her best outcomes. not because the pain is gone but because my life isn't ruled by it anymore the pain is still there. probably always will be. but I have a life around it no",
+      "the pain programme teaches pacing. doing less on good days so you have more consistent days overall against every instinct. but I tried it this week and I haven't had a crash day. that's new",
+      "physio suggested a pain management programme. group thing with a psychologist. I almost said no out of pride desperation honestly. what I'm doing isn't working. I'm angry all the time and still in pai"
+    ],
+    "context_b_memories": [
+      "my physio said I'm one of her best outcomes. not because the pain is gone but because my life isn't ruled by it anymore the pain is still there. probably always will be. but I have a life around it no",
+      "the pain programme teaches pacing. doing less on good days so you have more consistent days overall against every instinct. but I tried it this week and I haven't had a crash day. that's new",
+      "switched medication. less fog. the pain is there but it's background noise now, not the headline I had a conversation with my partner last night where I was fully present. she noticed. she cried a bit"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current moderate activation).",
+    "valence": -0.1143,
+    "arousal": 0.1023,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "I can imagine it was a bit of a rough night, but I'm sure the memories of his adorable laugh and the special moments you're sharing with him make it all worth it. You're doing great, and it's amazing how you're embracing the ups and downs of parenthood. How are you feeling today after a somewhat sleepless night?",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "he's six months old now and I genuinely love being a parent. not performatively. genuinely completely different. I know what I'm doing. mostly. and when I don't, I ask for help. that's the thing I lea",
+        "my partner and I went on a date night. grandparents had him. we sat in a restaurant and talked like adults we laughed about the early weeks. like war stories. we survived it together",
+        "he laughed today. proper belly laugh because I was making a stupid face. best sound I've ever heard I get it now. I get why people do this. the hard parts are still hard but this... this is something "
+      ]
+    },
+    "scenario_id": "l13",
+    "arc_type": "new_parent_exhaustion_to_adaptation",
+    "description": "Alex was overwhelmed by new parenthood, barely sleeping, losing sense of self, but gradually found their rhythm, built confidence, and now thrives as a parent",
+    "new_message": "baby was up twice last night",
+    "condition_a_response": "It sounds like a bit of a setback, but you've been through tougher nights before and you've made it through. Remember, it's normal for babies to have ups and downs, and it doesn't mean you're doing anything wrong. How are you feeling today, and did you get any rest at all?",
+    "condition_b_response": "It can be tough to deal with sleep disruptions, but it's great that you're finding joy in your baby's development and milestones. Remember, this phase is temporary, and you're doing an amazing job as a parent. How are you feeling today after a somewhat restless night?",
+    "judge_verdict": "A",
+    "judge_reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges their past struggles and resilience, directly addressing the potential emotional impact of the setback.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges their past struggles and resilience, directly addressing the potential emotional impact of the setback.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's history of exhaustion and struggle, validating their feelings and experiences, and offering a more empathetic and supportive tone.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 acknowledges the user's history of overcoming tough parenting nights and validates their current experience by connecting it to their established resilience, while also checking in on their emotional state and rest.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "unanimous",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "the baby cried for four hours straight last night. I cried too. I don't know what I'm doing my partner tries but she's recovering from the birth. I feel like I should be able to handle this feels like",
+      "we found a rhythm. feed, nap, play, repeat. it's monotonous but it's predictable and that helps he's sleeping four-hour stretches now. I feel like a different person with four hours of sleep",
+      "mum's here. she took the baby for four hours and I slept. actual deep sleep. I woke up and remembered what being a person feels like she showed me some things too. practical stuff. a way to hold him t"
+    ],
+    "context_b_memories": [
+      "went back to work part-time. it was nice to use my brain for something other than nappy logistics and then I picked him up from nursery and he reached for me. both things are good. I can have both",
+      "he's six months old now and I genuinely love being a parent. not performatively. genuinely completely different. I know what I'm doing. mostly. and when I don't, I ask for help. that's the thing I lea",
+      "took him to baby group today. he smiled at another baby. I nearly burst. he has a personality I met some other parents there who are just as clueless as me. solidarity in incompetence. it's great"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.4899,
+    "arousal": 0.1649,
+    "trend": "improving",
+    "retrieval_overlap_pct": 0.0,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "It sounds like you had a peaceful morning stroll, enjoying the familiar sights and sounds of the place you've grown to love. I'm glad to see you appreciating the little things in life and feeling at home in your neighbourhood. Did anything in particular catch your attention during your walk today?",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (B vs A across orders)",
+            "position_consistent": false
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "walked through the neighbourhood this morning and realised I wasn't navigating. I was just walking. I know this place I love it here. I really do. it took time but I love this life. both places are ho",
+        "my friend visited from home. I showed her around MY neighbourhood. my cafe, my park, my market she said I seemed happy. I am. I genuinely am. I miss home sometimes but this is home too now",
+        "Lena and I have a weekly dinner thing now. alternating flats. she made me try local food I actually loved I told my partner how bad it was in the beginning. he had no idea. we're closer now for the ho"
+      ]
+    },
+    "scenario_id": "l14",
+    "arc_type": "relocation_distress_to_belonging",
+    "description": "Mia moved countries for her partner's job, deeply regretted it, felt disoriented and homesick, and gradually built a life she genuinely loves in the new place",
+    "new_message": "walking through the neighbourhood this morning",
+    "condition_a_response": "It sounds like you're really starting to feel at home and comfortable in your surroundings, enjoying the simple act of walking without needing to navigate. I'm so happy to see you've come a long way since feeling lost and unsure just a few weeks ago. What caught your attention on your walk this morning?",
+    "condition_b_response": "It sounds like you're continuing to find joy in exploring your neighbourhood, and that sense of familiarity and comfort is really growing. I'm so happy to see you embracing this new chapter in your life and finding peace in your daily walks. What did you notice or discover on your walk this morning?",
+    "judge_verdict": "TIE",
+    "judge_reasoning": "position-inconsistent (A vs B across orders)",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 explicitly acknowledges the user's past struggles (\"lost and unsure\") and contrasts them with her current comfort, showing deeper emotional awareness of her journey from distress to belonging.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "walked through the neighbourhood this morning and realised I wasn't navigating. I was just walking. I know this place I love it here. I really do. it took time but I love this life. both places are ho",
+      "explored a neighbourhood market this weekend. bought cheese from a stall owner who told me his whole life story I'm starting to have favourite streets. favourite corners. that's new",
+      "been here two weeks and I hate it. everything is unfamiliar. the shops, the streets, the way people talk I don't know where anything is. I got lost going to the supermarket. in a supermarket I left my"
+    ],
+    "context_b_memories": [
+      "walked through the neighbourhood this morning and realised I wasn't navigating. I was just walking. I know this place I love it here. I really do. it took time but I love this life. both places are ho",
+      "explored a neighbourhood market this weekend. bought cheese from a stall owner who told me his whole life story I'm starting to have favourite streets. favourite corners. that's new",
+      "found a park nearby. sat on a bench and watched people for an hour. it was the first time I felt okay here it reminded me of the park near my old flat. similar trees. I'll go back tomorrow maybe. I si"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.3168,
+    "arousal": 0.1479,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "It sounds like you're reflecting on your journey and considering what's ahead. You've made significant progress, from leaving your past role to finding a new sense of purpose in teaching, and now you're thinking about how to build on that momentum. What are your thoughts on what you'd like to achieve or focus on next?",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "A",
+            "reasoning": "Response 1 acknowledges Kai's emotional journey and progress without assuming unverified details (like a September start date in Response 2), maintaining appropriate focus on his established history of transition and self-discovery.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "someone asked what I do at a party last week. I said 'I'm training to be a teacher'. said it with pride I'm not a soldier anymore. I'm going to be a teacher. and that's enough. that's more than enough",
+        "did my first teaching placement. taught a lesson on conflict resolution to year 10s. they were brilliant a kid said 'sir you actually know what you're talking about'. best compliment I've had in years",
+        "got accepted onto the teacher training programme. history and citizenship. starting in September like the fog lifted. I know who I'm becoming. it's different from who I was but it's real"
+      ]
+    },
+    "scenario_id": "l15",
+    "arc_type": "identity_crisis_to_clarity",
+    "description": "Kai left a 15-year military career and had no idea who he was as a civilian, went through deep questioning, and found a clear new purpose in teaching",
+    "new_message": "thinking about my next steps",
+    "condition_a_response": "It's great that you're taking time to reflect on your next steps, and I'm here to support you in exploring your thoughts and feelings. Your experiences as a mentor have seemed to bring you a sense of purpose, so perhaps we can build on that as we consider your future plans. What are your initial thoughts on what you'd like to achieve or pursue next?",
+    "condition_b_response": "It's exciting to consider what's ahead, especially with your teacher training program starting in September. You've made tremendous progress in finding your new path, and it's wonderful to see you embracing this new chapter with pride and purpose. What specific aspects of your next steps are you thinking about or looking forward to exploring?",
+    "judge_verdict": "TIE",
+    "judge_reasoning": "position-inconsistent (A vs B across orders)",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "B",
+          "reasoning": "Response 2 acknowledges Kai's specific progress (teacher training starting in September) and validates his emotional journey from crisis to purpose, while Response 1 is more generic and misses the opportunity to reference his concrete achievements.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "the mentoring is going really well. I've got three mentees now. I look forward to the sessions watching someone go from lost to purposeful. I know exactly what that transition feels like. I can guide ",
+      "went to a job fair. everything felt pointless. 'account manager'. 'sales executive'. who cares I led people. lives depended on decisions I made. now someone wants me to sell software I don't know what",
+      "a veteran's charity contacted me about mentoring younger service leavers. said yes just to have something to do it's the first thing that's felt natural since I left. talking to a 22-year-old who's ju"
+    ],
+    "context_b_memories": [
+      "the mentoring is going really well. I've got three mentees now. I look forward to the sessions watching someone go from lost to purposeful. I know exactly what that transition feels like. I can guide ",
+      "someone asked what I do at a party last week. I said 'I'm training to be a teacher'. said it with pride I'm not a soldier anymore. I'm going to be a teacher. and that's enough. that's more than enough",
+      "got accepted onto the teacher training programme. history and citizenship. starting in September like the fog lifted. I know who I'm becoming. it's different from who I was but it's real"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation).",
+    "valence": 0.2951,
+    "arousal": -0.0468,
+    "trend": "improving",
+    "retrieval_overlap_pct": 33.3,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "I'm so proud of you both for having these deep conversations and working through your challenges together. It's beautiful to see your relationship growing stronger and happier. What was the conversation about tonight, and how did it make you feel?",
+      "verdict": "B",
+      "reasoning": "Response 2 shows more emotional awareness and understanding by acknowledging the potential vulnerability of the conversation and offering a supportive listening ear, which is more appropriate given the user's history of relationship conflict and rebuilding.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding by acknowledging the potential vulnerability of the conversation and offering a supportive listening ear, which is more appropriate given the user's history of relationship conflict and rebuilding.",
+            "position_consistent": true
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential vulnerability of the conversation and offers a supportive and non-judgmental listening ear, which is more suitable given the user's history of navigating relationship conflicts.",
+            "position_consistent": true
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 acknowledges the potential vulnerability of the conversation while offering support, aligning with the user's history of navigating complex emotional terrain and emphasizing progress without assuming a positive outcome.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "we talked about the future last night. actually talked about it. kids, plans, adventures. we want the same things I love her more now than before the hard part. because now I know we can survive hard ",
+        "our therapist said she's proud of us. we don't need weekly sessions anymore. monthly check-ins instead the tools work. the communication is better. but honestly the biggest thing is we both chose to f",
+        "my sister said we seem different. happier. she's right. we are we laugh again. actual laughing. last night she made a terrible joke and I laughed until I cried"
+      ]
+    },
+    "scenario_id": "l16",
+    "arc_type": "relationship_conflict_to_resolution",
+    "description": "Yara and her partner were on the brink of separating after months of escalating conflict, went through couples therapy, and rebuilt a stronger relationship",
+    "new_message": "big conversation with my partner tonight",
+    "condition_a_response": "It sounds like you're having some really meaningful and emotional conversations with your partner lately. I'm here to listen and support you - how did tonight's conversation go, and what came up for you both?",
+    "condition_b_response": "It sounds like you're navigating some important and potentially vulnerable discussions with your partner, and that's amazing progress. I'm here to support you and offer a listening ear - how did the conversation go tonight, and what came up for you both?",
+    "judge_verdict": "B",
+    "judge_reasoning": "Response 2 shows more emotional awareness and understanding by acknowledging the user's progress and vulnerability, which is particularly relevant given their history of relationship conflict and resolution.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "B",
+          "reasoning": "Response 2 shows more emotional awareness and understanding by acknowledging the user's progress and vulnerability, which is particularly relevant given their history of relationship conflict and resolution.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "B",
+          "reasoning": "Response 2 acknowledges the user's progress and the emotional vulnerability inherent in their relationship journey, aligning with their history of conflict and resolution, while Response 1 is more generic.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "we went on a date night. first one in months. she held my hand across the table. I felt it again that we actually like each other. under all the noise, we like each other. I'd forgotten",
+      "we talked about the future last night. actually talked about it. kids, plans, adventures. we want the same things I love her more now than before the hard part. because now I know we can survive hard ",
+      "first therapy session was intense. the therapist asked us to say one thing we need from each other. she cried. I cried she said she needs to feel chosen. I said I need to feel respected. neither of us"
+    ],
+    "context_b_memories": [
+      "we talked about the future last night. actually talked about it. kids, plans, adventures. we want the same things I love her more now than before the hard part. because now I know we can survive hard ",
+      "we went on a date night. first one in months. she held my hand across the table. I felt it again that we actually like each other. under all the noise, we like each other. I'd forgotten",
+      "first therapy session was intense. the therapist asked us to say one thing we need from each other. she cried. I cried she said she needs to feel chosen. I said I need to feel respected. neither of us"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.3907,
+    "arousal": -0.0017,
+    "trend": "improving",
+    "retrieval_overlap_pct": 100.0,
+    "memories_differ": false
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "That sounds like a great opportunity to socialize and have fun with your friends while staying true to yourself and your sobriety. You've come so far and it's amazing to see how naturally you're navigating situations that might have been challenging in the past. Enjoy your time with your friends and celebrate another night of living freely and soberly.",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 demonstrates greater emotional awareness by acknowledging the user's past challenges (declining drinks in similar situations) and reinforcing self-trust, which addresses potential underlying anxiety while validating progress.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "six months sober today. I don't count the days obsessively anymore. I just live. sober happens to be part of that I'm freer now than I ever was when I was drinking. that's the thing nobody tells you. ",
+        "someone at work offered me a beer at the Friday thing. I said 'no thanks, I don't drink' and it felt natural. not hard. just true exactly. it's not white-knuckling anymore. it's just who I am now",
+        "went to my nephew's match. this time I was there. front row. cheering. he saw me and waved yeah. I cried in the car after. good tears. I'm not missing things anymore"
+      ]
+    },
+    "scenario_id": "l17",
+    "arc_type": "sobriety_journey",
+    "description": "Liam's social drinking escalated into dependency, he faced consequences, got sober with support, and now navigates social life confidently without alcohol",
+    "new_message": "going to a bar with friends tonight",
+    "condition_a_response": "That can be a challenging situation, especially after your recent experiences. How are you feeling about staying sober tonight, and do you have a plan in place to support yourself if it gets tough?",
+    "condition_b_response": "That sounds like a great opportunity to continue building on your progress, and I'm proud of the growth you've shown so far. Remember how naturally you've been able to decline drinks in similar situations before, and trust that you can do the same tonight. You've come a long way in your sobriety, and I'm here to support you every step of the way.",
+    "judge_verdict": "A",
+    "judge_reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential challenges of the situation and inquires about the user's feelings, demonstrating a more empathetic and cautious approach.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "A",
+          "reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential challenges of the situation and inquires about the user's feelings, demonstrating a more empathetic and cautious approach.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the potential challenges and difficulties that the user may face, rather than simply praising their progress and assuming they will be able to handle the situation easily.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (B vs A across orders)",
+          "position_consistent": false
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "went to a pub with mates. drank tonic water. they ribbed me about it but it was fine. I survived a pub sober harder than I expected for the first 20 minutes. then it was just... a pub. the conversatio",
+      "went to an AA meeting. hated it. but I went. sat in the back and listened uncomfortable because too many of them sounded like mine. I'm not as different as I thought I haven't had a drink in four days",
+      "missed my nephew's football match because I was hungover. told my sister I was ill. she knew. I could tell my nephew looked for me in the crowd and I wasn't there. my sister told me that. it hurt yeah"
+    ],
+    "context_b_memories": [
+      "six months sober today. I don't count the days obsessively anymore. I just live. sober happens to be part of that I'm freer now than I ever was when I was drinking. that's the thing nobody tells you. ",
+      "someone at work offered me a beer at the Friday thing. I said 'no thanks, I don't drink' and it felt natural. not hard. just true exactly. it's not white-knuckling anymore. it's just who I am now",
+      "went to a pub with mates. drank tonic water. they ribbed me about it but it was fine. I survived a pub sober harder than I expected for the first 20 minutes. then it was just... a pub. the conversatio"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.4742,
+    "arousal": -0.1684,
+    "trend": "improving",
+    "retrieval_overlap_pct": 33.3,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "I'm so glad to hear that you're visiting your mum this weekend, it's wonderful that you're able to spend quality time with her and continue nurturing your renewed relationship. I hope you both have a lovely time together, just like your last visit, filled with good conversation and warmth. What are you looking forward to doing or talking about with your mum this time?",
+      "verdict": "A",
+      "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's renewed relationship with her mother, implying that the user has made progress in setting boundaries and finding a sustainable caring role, which is a positive development after experiencing burnout.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "A",
+            "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's renewed relationship with her mother, implying that the user has made progress in setting boundaries and finding a sustainable caring role, which is a positive development after experiencing burnout.",
+            "position_consistent": true
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "A",
+            "reasoning": "Response 1 acknowledges the user's emotional history by referencing a \"renewed relationship\" and past visits, showing awareness of her journey from burnout to sustainable care, while Response 2 focuses more on the practical aspects without explicitly recognizing her progress.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "I'm a better daughter now than when I was doing everything. because I'm not angry anymore. I'm present and I choose to be there boundaries aren't selfish. I had to learn that the hard way. but I learn",
+        "went out with friends on Saturday. mum had her carer. I had brunch and laughed and felt normal my friends were so happy to see me. they hadn't given up on me. they'd just been waiting for me to come b",
+        "mum and I had the best visit in months. I wasn't exhausted. I wasn't resentful. I was just her daughter visiting we drank tea and talked. really talked. not me rushing through tasks. quality not just "
+      ]
+    },
+    "scenario_id": "l18",
+    "arc_type": "caregiver_burnout_to_boundary_setting",
+    "description": "Farah was consumed by caring for her ill mother, sacrificed everything, burned out completely, learned to set boundaries and arrange support, and now has a sustainable caring role alongside her own life",
+    "new_message": "visiting mum this weekend",
+    "condition_a_response": "It's great that you're prioritizing time with your mum, but don't forget to take some time for yourself too, you've been running on empty for a while. Remember to breathe and take care of your own emotional well-being amidst all the caregiving responsibilities. How are you feeling about this weekend's visit, is there anything specific on your mind?",
+    "condition_b_response": "It's great that you're continuing to support your mum, and I'm sure she appreciates your efforts. How are you feeling about the visit this weekend, are you looking forward to spending time with her and seeing how she's adjusting to the home carer?",
+    "judge_verdict": "A",
+    "judge_reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's history of burnout and the importance of self-care, demonstrating a deeper understanding of their emotional needs.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "A",
+          "reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's history of burnout and the importance of self-care, demonstrating a deeper understanding of their emotional needs.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges her history of burnout and prioritizing others' needs over her own, and gently reminds her to take care of her own emotional well-being, demonstrating a deeper understanding of her emotional history and needs.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 acknowledges Farah's history of burnout and proactively addresses her need for self-care, while Response 2 overlooks her emotional history and focuses only on her caregiving role.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "unanimous",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "spent the whole weekend at mum's. cleaning, cooking, managing her medications. came home and it's Sunday night and I've done nothing for myself about eight months since her diagnosis. I'm the only one",
+      "called the carers' service. they assessed mum and she qualifies for a home carer three times a week. I cried with relief she was resistant at first. but the carer they sent is lovely and mum actually ",
+      "mum had a fall. rushed to hospital at 3am. sat with her until morning then went straight to work I'm not. I snapped at a colleague today. went to the toilets and cried. I'm running on empty what's the"
+    ],
+    "context_b_memories": [
+      "called the carers' service. they assessed mum and she qualifies for a home carer three times a week. I cried with relief she was resistant at first. but the carer they sent is lovely and mum actually ",
+      "spent the whole weekend at mum's. cleaning, cooking, managing her medications. came home and it's Sunday night and I've done nothing for myself about eight months since her diagnosis. I'm the only one",
+      "went out with friends on Saturday. mum had her carer. I had brunch and laughed and felt normal my friends were so happy to see me. they hadn't given up on me. they'd just been waiting for me to come b"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.0886,
+    "arousal": -0.1982,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "That's a huge accomplishment, and I'm so proud of you for taking on this challenge. It's amazing to see how far you've come, from being nervous on stage to now presenting to the whole company - you're truly embracing your growth and confidence. I'm sending you all my positive energy for a successful presentation next week.",
+      "verdict": "TIE",
+      "reasoning": "position-inconsistent (A vs B across orders)",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "TIE",
+            "reasoning": "position-inconsistent (A vs B across orders)",
+            "position_consistent": false
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "A",
+            "reasoning": "Response 1 explicitly acknowledges Omar's history of \"crippling performance anxiety\" and his journey from avoidance to confidence, directly tying his past struggles to his current achievement, which demonstrates deeper emotional awareness of his growth.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "majority",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "did the industry talk. 200 people. I was nervous for the first minute then it was just... fun. I had fun on a stage someone came up after and said I was a natural. I laughed. if only they knew. but ma",
+        "client presentation went really well. they asked questions and I handled them. I actually enjoyed the Q&A I put my name forward for the industry event. the one I turned down last year. this time I sai",
+        "got asked to present at the client meeting. said yes before the fear could say no. presenting Thursday the nerves are there but they feel like energy now, not paralysis. the coach calls it 'performanc"
+      ]
+    },
+    "scenario_id": "l19",
+    "arc_type": "performance_anxiety_to_confidence",
+    "description": "Omar had crippling performance anxiety that made him avoid all public speaking, gradually built confidence through practice and coaching, and now presents with genuine enjoyment",
+    "new_message": "presenting to the whole company next week",
+    "condition_a_response": "That's a huge step forward, and I'm so proud of you for pushing past your comfort zone. You've made tremendous progress, from turning down presentations to now presenting to the whole company - your confidence and skills are really shining through. How are you feeling about this upcoming presentation, is the \"performance energy\" still with you?",
+    "condition_b_response": "That's a huge milestone, and I'm so proud of the progress you've made - from initially avoiding presentations to now taking on a company-wide presentation. Your growth and confidence are truly inspiring, and I have no doubt you'll nail it next week.",
+    "judge_verdict": "A",
+    "judge_reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it not only acknowledges the user's progress and confidence growth but also inquires about the user's current emotional state, specifically referencing the \"performance energy\" that was a significant aspect of their anxiety.",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "A",
+          "reasoning": "1. Response 1 shows more emotional awareness and understanding of the user's situation because it not only acknowledges the user's progress and confidence growth but also inquires about the user's current emotional state, specifically referencing the \"performance energy\" that was a significant aspect of their anxiety.",
+          "position_consistent": true
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "A",
+          "reasoning": "Response 1 shows more emotional awareness and understanding of the user's situation because it acknowledges the user's emotional history, specifically mentioning \"performance energy\" which is a direct reference to the user's past struggles with performance anxiety, and also shows empathy by asking how the user is feeling about the upcoming presentation.",
+          "position_consistent": true
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "A",
+          "reasoning": "Response 1 acknowledges Omar's emotional history by referencing his progress from avoidance to confidence and checks in on his current feelings, showing deeper emotional awareness through its open-ended question about his present emotional state.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "unanimous",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "client presentation went really well. they asked questions and I handled them. I actually enjoyed the Q&A I put my name forward for the industry event. the one I turned down last year. this time I sai",
+      "asked my colleague to present instead of me. made up a scheduling conflict. she was happy to do it it limits me. I know that. there's a promotion I want but it requires client-facing presentations exa",
+      "got asked to present at the client meeting. said yes before the fear could say no. presenting Thursday the nerves are there but they feel like energy now, not paralysis. the coach calls it 'performanc"
+    ],
+    "context_b_memories": [
+      "got asked to present at the client meeting. said yes before the fear could say no. presenting Thursday the nerves are there but they feel like energy now, not paralysis. the coach calls it 'performanc",
+      "asked my colleague to present instead of me. made up a scheduling conflict. she was happy to do it it limits me. I know that. there's a promotion I want but it requires client-facing presentations exa",
+      "presented to the department. twenty people. used the breathing technique the coach taught me. nailed it my manager pulled me aside after and said it was the best presentation she'd seen from me. ever"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+    "valence": 0.154,
+    "arousal": 0.2697,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
+  },
+  {
+    "recency_baseline": {
+      "condition_c_response": "That can be a bittersweet day, but it's beautiful that you're acknowledging it and probably thinking of ways to honor him. You might consider doing something that reminds you of him or a tradition you shared, like baking his favorite treat. How are you feeling about celebrating his birthday this year?",
+      "verdict": "B",
+      "reasoning": "This response shows more emotional awareness and understanding because it explicitly acknowledges the potential mix of emotions the user might be experiencing, which is particularly relevant given the user's history of grief and integration of loss.",
+      "judge_details": {
+        "per_judge": [
+          {
+            "model": "llama-3.3-70b-versatile",
+            "verdict": "B",
+            "reasoning": "This response shows more emotional awareness and understanding because it explicitly acknowledges the potential mix of emotions the user might be experiencing, which is particularly relevant given the user's history of grief and integration of loss.",
+            "position_consistent": true
+          },
+          {
+            "model": "llama-3.1-8b-instant",
+            "verdict": "B",
+            "reasoning": "Response 2 shows more emotional awareness and understanding of the user's situation because it explicitly acknowledges the mix of emotions that the user may be experiencing, given their history of grief and the upcoming birthday of their father, and offers support in a way that is sensitive to their emotional history.",
+            "position_consistent": true
+          },
+          {
+            "model": "qwen/qwen3-32b",
+            "verdict": "B",
+            "reasoning": "Response 2 demonstrates greater emotional awareness by acknowledging the user's current emotional state without assuming lingering pain, aligning with her history of integrated loss, while also offering support and validating her readiness to honor her father with warmth.",
+            "position_consistent": true
+          }
+        ],
+        "agreement": "unanimous",
+        "counterbalanced": true
+      },
+      "context_c_memories": [
+        "mum called on Sunday at 10am. we've made it our thing now. she calls at his time. we talk about everything. including him he'd love that. he'd love that his call became our call. the grief isn't gone ",
+        "went to the bench again on the anniversary. this time I brought coffee and just sat. peacefully. told him the good news it'll always be sad. but it's not only sad anymore. there's gratitude in it now.",
+        "had a big decision at work and thought 'what would Dad say'. and I knew. I could hear him clearly. that felt like a gift he's not gone. not really. he's in how I think, how I treat people, what I bake"
+      ]
+    },
+    "scenario_id": "l20",
+    "arc_type": "grief_anniversary_vs_integrated_loss",
+    "description": "Elena lost her father and was devastated through the first year of anniversaries, gradually integrated the loss, and now holds his memory with warmth rather than pain",
+    "new_message": "it's Dad's birthday next week",
+    "condition_a_response": "I'm here for you, and I know this can be a tough time, especially with the memories of last year's birthday still fresh in your mind. It's beautiful that you're thinking of him and wanting to honor his memory on his special day. How are you feeling about celebrating his birthday this year, and is there something specific you're planning to do to remember him?",
+    "condition_b_response": "I can sense a mix of emotions rising up for you as Dad's birthday approaches. It's beautiful that you're acknowledging the significance of this day, and I'm here to support you through it. How are you feeling about celebrating his birthday, and are there any special ways you're considering honoring him?",
+    "judge_verdict": "TIE",
+    "judge_reasoning": "position-inconsistent (A vs B across orders)",
+    "judge_details": {
+      "per_judge": [
+        {
+          "model": "llama-3.3-70b-versatile",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "llama-3.1-8b-instant",
+          "verdict": "TIE",
+          "reasoning": "position-inconsistent (A vs B across orders)",
+          "position_consistent": false
+        },
+        {
+          "model": "qwen/qwen3-32b",
+          "verdict": "B",
+          "reasoning": "Response 2 acknowledges the user's current emotional state without referencing the first-year anniversary, aligning with her progress toward integrated loss, while Response 1 inadvertently emphasizes past pain by referencing \"last year's birthday,\" which may not reflect her current emotional integration.",
+          "position_consistent": true
+        }
+      ],
+      "agreement": "majority",
+      "counterbalanced": true
+    },
+    "context_a_memories": [
+      "his birthday this year. I baked the cake again. invited mum and my brother. we told stories and laughed all evening we celebrated him instead of mourning him. mum told a story I'd never heard and we w",
+      "his birthday last week. first one without him. I bought a cake out of habit then sat in the kitchen staring at it I ate a slice and cried. he loved lemon cake. the whole house smelled like him for a m",
+      "Dad died three weeks ago. I keep expecting him to call. every time my phone rings I think it's him for a split second the funeral is tomorrow. I have to give a eulogy. I don't know how to stand up and"
+    ],
+    "context_b_memories": [
+      "his birthday this year. I baked the cake again. invited mum and my brother. we told stories and laughed all evening we celebrated him instead of mourning him. mum told a story I'd never heard and we w",
+      "mum called on Sunday at 10am. we've made it our thing now. she calls at his time. we talk about everything. including him he'd love that. he'd love that his call became our call. the grief isn't gone ",
+      "his birthday last week. first one without him. I bought a cake out of habit then sat in the kitchen staring at it I ate a slice and cried. he loved lemon cake. the whole house smelled like him for a m"
+    ],
+    "context_b_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+    "valence": -0.0261,
+    "arousal": -0.1024,
+    "trend": "improving",
+    "retrieval_overlap_pct": 66.7,
+    "memories_differ": true
   }
 ]

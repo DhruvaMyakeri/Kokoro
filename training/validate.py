@@ -821,12 +821,9 @@ if __name__ == "__main__":
 
     # ----- Load model -----
     device = torch.device("cpu")
-    ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=True)
-    cfg  = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
-    model = TransitionModel(**cfg)
-    model.load_state_dict(ckpt["model_state_dict"])
-    model.eval()
-    logger.info(f"  Model: epoch {ckpt['epoch']}, val_loss={ckpt['val_loss']:.4f}")
+    from kokoro.transition import load_transition_checkpoint
+    model, cfg = load_transition_checkpoint(ckpt_path)
+    logger.info(f"  Model: arch={cfg.get('arch', 'mlp')}")
 
     # ----- Load encoder -----
     from kokoro.encoder import SessionEncoder

@@ -30,16 +30,12 @@ from training.train_probe import ValenceArousalProbe
 # Load models (once, at startup)
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).parent
-CKPT_MODEL   = PROJECT_ROOT / "checkpoints" / "transition_v1.pt"
-CKPT_PROBE   = PROJECT_ROOT / "checkpoints" / "valence_arousal_probe.pt"
+CKPT_MODEL   = PROJECT_ROOT / "checkpoints" / "transition_v2.pt"
+CKPT_PROBE   = PROJECT_ROOT / "checkpoints" / "valence_arousal_probe_v2.pt"
 
 print("Loading transition model…")
-ckpt  = torch.load(CKPT_MODEL, map_location="cpu", weights_only=False)
-cfg   = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
-model = TransitionModel(**{k: v for k, v in cfg.items()
-                           if k in ("state_dim", "session_dim", "hidden_dim")})
-model.load_state_dict(ckpt["model_state_dict"])
-model.eval()
+from kokoro.transition import load_transition_checkpoint
+model, cfg = load_transition_checkpoint(CKPT_MODEL)
 use_vad    = cfg.get("session_dim", 384) > 384
 state_dim  = cfg.get("state_dim", 384)
 

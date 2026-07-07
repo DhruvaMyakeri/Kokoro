@@ -23,7 +23,7 @@ Expected on current model (PR=339.7):
 
 Run:
     python -m diagnostics.probe_generalization
-    python -m diagnostics.probe_generalization --checkpoint checkpoints/transition_v1.pt
+    python -m diagnostics.probe_generalization --checkpoint checkpoints/transition_v2.pt
 """
 
 from __future__ import annotations
@@ -471,8 +471,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     parser = argparse.ArgumentParser(description="Probe generalization on naturalistic text")
-    parser.add_argument("--checkpoint",        type=str, default="checkpoints/transition_v1.pt")
-    parser.add_argument("--probe-checkpoint",  type=str, default="checkpoints/valence_arousal_probe.pt")
+    parser.add_argument("--checkpoint",        type=str, default="checkpoints/transition_v2.pt")
+    parser.add_argument("--probe-checkpoint",  type=str, default="checkpoints/valence_arousal_probe_v2.pt")
     args = parser.parse_args()
 
     root = Path(__file__).parent.parent
@@ -487,14 +487,10 @@ if __name__ == "__main__":
 
     # Load transition model
     logger.info("Loading transition model...")
-    from kokoro.transition import TransitionModel
-    ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-    cfg  = ckpt.get("model_config", {})
-    model = TransitionModel(**{k: v for k, v in cfg.items() if k in ("state_dim", "session_dim", "hidden_dim")})
-    model.load_state_dict(ckpt["model_state_dict"])
-    model.eval()
+    from kokoro.transition import load_transition_checkpoint
+    model, cfg = load_transition_checkpoint(ckpt_path)
     use_vad = cfg.get("session_dim", 384) > 384
-    logger.info(f"  Epoch {ckpt['epoch']}, val_loss={ckpt['val_loss']:.4f}, use_vad={use_vad}")
+    logger.info(f"  arch={cfg.get('arch', 'mlp')}, use_vad={use_vad}")
 
     # Load probe
     logger.info("Loading linear probe...")

@@ -118,9 +118,158 @@ import torch.nn.functional as F
 logger = logging.getLogger(__name__)
 
 
+class TransitionModelGRU(nn.Module):
+    """
+    GRU transition model — the current production world model.
+
+    The user state IS the GRU hidden state: a gated recurrent accumulator that
+    structurally separates "what I remember about this user" (the hidden state
+    h) from "what I predict their next session will feel like" (the output of
+    the prediction head). The MLP predecessor conflated the two — its state was
+    literally its prediction of the next session embedding, so any trajectory
+    information not present in MiniLM space was discarded at every step, and
+    the measured state-ablation gap was ~0 (the state did nothing).
+
+    Architecture:
+        emb  → LayerNorm(session_dim) ─► GRUCell(session_dim → state_dim) ─► h'
+        h'   → head: Linear(384→hidden) → GELU → Dropout → Linear(hidden→384) → z
+
+    - forward(state, emb) returns h' — the updated user state. This is what
+      gets persisted in StateStore, decoded by the probe, and fed back on the
+      next session. GRU gating bounds h' in (-1, 1)^D, so state norm is stable
+      over arbitrarily long deployments (no drift — see diagnostics/norm_drift).
+    - predict(state) returns z — the unconstrained next-session prediction used
+      by the VICReg training objective. VICReg's variance/covariance terms
+      operate on z, so the gamma=1.0 std target never fights the bounded state.
+
+    The training objective (training/train.py) adds a state-utility margin loss
+    that explicitly requires predictions from the accumulated state to beat
+    predictions from a zeroed state — the model cannot converge to a solution
+    that ignores its own memory.
+
+    Public API is identical to the MLP version: forward(state, session_emb),
+    initial_state(), STATE_DIM. Checkpoints record model_config["arch"]="gru";
+    load_transition_checkpoint() below auto-detects architecture for old files.
+    """
+
+    STATE_DIM: int = 384
+
+    def __init__(
+        self,
+        state_dim: int = 384,
+        session_dim: int | None = None,
+        hidden_dim: int = 512,
+        dropout: float = 0.1,
+    ) -> None:
+        super().__init__()
+        self.state_dim   = state_dim
+        self.session_dim = session_dim if session_dim is not None else state_dim
+        self.hidden_dim  = hidden_dim
+
+        self.emb_norm = nn.LayerNorm(self.session_dim)
+        self.cell     = nn.GRUCell(self.session_dim, state_dim)
+        self.head     = nn.Sequential(
+            nn.Linear(state_dim, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, state_dim),
+        )
+        # Auxiliary head: predict the NEXT session's (valence, arousal) from the
+        # state. This is the task where trajectory history genuinely matters —
+        # the next embedding is dominated by unpredictable topical content, but
+        # the next emotional position follows the arc the state has observed.
+        # Trained against the lexicon VAD dims already carried in the session
+        # embedding (dims 384:386) when VAD features are enabled.
+        self.vad_head = nn.Linear(state_dim, 2)
+
+        n_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        logger.debug(f"TransitionModelGRU: {n_params:,} trainable parameters")
+
+    def forward(
+        self,
+        state: torch.Tensor,
+        session_emb: torch.Tensor,
+    ) -> torch.Tensor:
+        """(state, session_emb) → updated state (the GRU hidden). Accepts
+        (D,)/(B, D) shapes like the MLP version."""
+        e = self.emb_norm(session_emb)
+        squeeze = state.dim() == 1
+        if squeeze:
+            state = state.unsqueeze(0)
+            e     = e.unsqueeze(0)
+        h = self.cell(e, state)
+        return h.squeeze(0) if squeeze else h
+
+    def predict(self, state: torch.Tensor) -> torch.Tensor:
+        """Map a user state to the (unconstrained) next-session prediction z.
+        Training compares normalize(z) against the next session's MiniLM
+        embedding; the state itself is NOT the prediction (unlike the MLP)."""
+        return self.head(state)
+
+    @staticmethod
+    def initial_state(
+        batch_size: int = 1,
+        device: torch.device | str | None = None,
+    ) -> torch.Tensor:
+        shape = (TransitionModelGRU.STATE_DIM,) if batch_size == 1 \
+            else (batch_size, TransitionModelGRU.STATE_DIM)
+        return torch.zeros(shape, device=device)
+
+    def parameter_count(self) -> int:
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
+
+def predict_from_state(model: nn.Module, state: torch.Tensor) -> torch.Tensor:
+    """Architecture-agnostic next-session prediction.
+
+    GRU models decouple state from prediction (state → head → z); the legacy
+    MLP used the state itself as the prediction. Every consumer that compares
+    a state against a next-session embedding (training loss, validation,
+    state_ablation, per_arc_val_loss, eval_worldmodel, arc_ood_eval) must go
+    through this helper so both architectures are measured on the same terms.
+    """
+    if hasattr(model, "predict"):
+        return model.predict(state)
+    return state
+
+
+def load_transition_checkpoint(path) -> tuple[nn.Module, dict]:
+    """Load a transition-model checkpoint, auto-detecting the architecture.
+
+    Detection order: model_config["arch"] if present, else state-dict keys
+    ("cell.weight_ih" → GRU, otherwise split-LayerNorm MLP). Returns
+    (model in eval mode, model_config).
+    """
+    import pathlib
+    path = pathlib.Path(path)
+    ckpt = torch.load(str(path), map_location="cpu", weights_only=False)
+    cfg  = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
+    sd   = ckpt["model_state_dict"]
+
+    arch = cfg.get("arch")
+    if arch is None:
+        arch = "gru" if any(k.startswith("cell.") for k in sd) else "mlp"
+
+    cls = TransitionModelGRU if arch == "gru" else TransitionModel
+    model = cls(
+        state_dim   = cfg.get("state_dim", 384),
+        session_dim = cfg.get("session_dim", None),
+        hidden_dim  = cfg.get("hidden_dim", 512),
+    )
+    model.load_state_dict(sd)
+    model.eval()
+    logger.debug(f"Loaded {arch.upper()} transition model from {path.name}")
+    return model, cfg
+
+
 class TransitionModel(nn.Module):
     """
-    MLP transition model.
+    MLP transition model (legacy).
+
+    Superseded by TransitionModelGRU: the MLP's state is its own next-session
+    prediction, which discards non-embedding trajectory information at every
+    step; its measured state-ablation gap on the production checkpoint was
+    +0.0001 (state contributes nothing). Kept for loading old checkpoints.
 
     Maps (current_state, new_session_embedding) → updated_state.
     Output is NOT L2-normalized — VICReg training controls the output

@@ -113,12 +113,13 @@ class _InMemoryStore:
     def retrieve(
         self,
         user_id: str,
-        query_embedding: np.ndarray,
+        query_embedding: np.ndarray | None,
         state_vector: np.ndarray,
         top_k: int = 5,
         alpha: float = 0.6,
         current_valence: float | None = None,
         current_arousal: float | None = None,
+        **_kwargs,   # tolerate recency_weight / adaptive from WorldMemory
     ) -> list[dict]:
         user_sess = [s for s in self._sessions if s["user_id"] == user_id]
         if not user_sess:
@@ -134,7 +135,11 @@ class _InMemoryStore:
             norms = np.where(norms < 1e-12, 1.0, norms)
             return (S / norms) @ q_norm
 
-        sem = _cosine(query_embedding, stored_embs)
+        if query_embedding is not None:
+            sem = _cosine(query_embedding, stored_embs)
+        else:
+            sem   = np.zeros(len(user_sess), dtype=np.float64)
+            alpha = 0.0
 
         if current_valence is not None and current_arousal is not None:
             va_cur    = np.array([current_valence, current_arousal], dtype=np.float32)

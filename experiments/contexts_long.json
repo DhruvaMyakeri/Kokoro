@@ -11,20 +11,29 @@
         "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning",
         "finished the sprint but felt nothing. just empty. not relieved, just hollow never like this. i used to get that buzz after shipping. now i close the laptop and feel nothing"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current activated activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "state_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true
     },
     "context_b": {
       "relevant_memories": [
-        "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do",
+        "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything",
         "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning",
-        "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything"
+        "work has been a lot lately. sprint got moved up and i've got two features due same week i'm fine. just need to push through. always do"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current activated activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "state_summary": "User shows signs of emotional improvement across the past 12 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true,
-      "valence": 0.2458,
-      "arousal": 0.3604,
+      "valence": 0.4535,
+      "arousal": -0.1556,
       "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "team shipped a big feature this week. i feel proud of it. genuinely, not just relieved it's done a much better one. this job can be good. i just had to stop letting it be everything",
+        "helped a junior dev through a tough problem today. took the time, didn't rush. felt good i noticed that too. i think i actually enjoy the mentoring part of being senior now",
+        "got back into the gym. three times this week. sleep is good. feeling solid it really is. therapy helped me see the patterns. i know what my warning signs are now yeah. i even enjoyed a sprint planning"
+      ],
+      "state_summary": null,
+      "ready": true
     },
     "retrieval_diff": {
       "overlap_pct": 66.7,
@@ -49,28 +58,39 @@
         "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
         "went to our favourite restaurant with a friend. bad idea. had to leave i hate that he's taken all these places from me. that was my restaurant too"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true
     },
     "context_b": {
       "relevant_memories": [
-        "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
         "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now",
-        "couldn't go to work today. just cried all morning. this is pathetic i keep finding his stuff around the flat. a hoodie, a mug. everything is a reminder yeah. i thought about texting him. didn't. but i"
+        "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
+        "saw his name on a group chat notification and felt... nothing. like genuinely nothing yes! that's exactly it. neutral. i didn't know i could get there"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true,
-      "valence": 0.1784,
-      "arousal": 0.1252,
+      "valence": 0.3759,
+      "arousal": -0.0691,
       "trend": "improving"
     },
+    "context_c": {
+      "relevant_memories": [
+        "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now",
+        "met someone. nothing serious but we've been on three dates and i genuinely like him he's curious. asks questions about me. listens. it's different in a really good way",
+        "saw his name on a group chat notification and felt... nothing. like genuinely nothing yes! that's exactly it. neutral. i didn't know i could get there"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
     "retrieval_diff": {
-      "overlap_pct": 66.7,
+      "overlap_pct": 33.3,
       "memories_differ": true,
       "only_in_b": [
-        "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now"
+        "i think i'm happy. actually happy. not pretending to be fine, just actually good strange and wonderful. i'm grateful for what i went through because i know myself so much better now",
+        "saw his name on a group chat notification and felt... nothing. like genuinely nothing yes! that's exactly it. neutral. i didn't know i could get there"
       ],
       "only_in_a": [
+        "couldn't go to work today. just cried all morning. this is pathetic i keep finding his stuff around the flat. a hoodie, a mug. everything is a reminder yeah. i thought about texting him. didn't. but i",
         "went to our favourite restaurant with a friend. bad idea. had to leave i hate that he's taken all these places from me. that was my restaurant too"
       ]
     }
@@ -87,30 +107,35 @@
         "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
         "went to a party. knew almost nobody. stayed two hours. enjoyed myself honestly? the conversations. i'd forgotten i can be interesting. people laughed at my jokes"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true
     },
     "context_b": {
       "relevant_memories": [
         "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
-        "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
-        "got invited to a party this weekend and i've been dreading it since Tuesday don't know what to say. standing around with a drink looking like an idiot yes. every time. i end up in the bathroom on my p"
+        "went to a party. knew almost nobody. stayed two hours. enjoyed myself honestly? the conversations. i'd forgotten i can be interesting. people laughed at my jokes",
+        "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true,
-      "valence": 0.0387,
-      "arousal": 0.1687,
+      "valence": 0.4069,
+      "arousal": -0.102,
       "trend": "improving"
     },
-    "retrieval_diff": {
-      "overlap_pct": 66.7,
-      "memories_differ": true,
-      "only_in_b": [
-        "got invited to a party this weekend and i've been dreading it since Tuesday don't know what to say. standing around with a drink looking like an idiot yes. every time. i end up in the bathroom on my p"
-      ],
-      "only_in_a": [
+    "context_c": {
+      "relevant_memories": [
+        "hosted a dinner party for eight people. my flat. my cooking. had a great evening it really is. i thought about that halfway through and had to stop myself laughing",
+        "got invited to another party this weekend and my reaction was just 'cool, what time'. didn't dread it at all i know. it almost snuck up on me. when did that become okay",
         "went to a party. knew almost nobody. stayed two hours. enjoyed myself honestly? the conversations. i'd forgotten i can be interesting. people laughed at my jokes"
-      ]
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 100.0,
+      "memories_differ": false,
+      "only_in_b": [],
+      "only_in_a": []
     }
   },
   {
@@ -125,26 +150,39 @@
         "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s",
         "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true
     },
     "context_b": {
       "relevant_memories": [
         "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise",
         "first week at the new place. it's chaotic and fast and I love it my opinion actually matters here. I sat in a meeting and they listened. genuinely listened",
-        "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s"
+        "got asked to lead the new product initiative. three months in and they trust me with something big like I'm being seen. I forgot what that feels like at work"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true,
-      "valence": -0.0621,
-      "arousal": 0.0672,
+      "valence": 0.2868,
+      "arousal": -0.2209,
       "trend": "improving"
     },
+    "context_c": {
+      "relevant_memories": [
+        "Monday mornings are different now. I actually look forward to them. That's new I know who I am at work now. That was the thing I'd lost and didn't realise",
+        "my old colleagues asked how it's going. I realised I was smiling the whole time I was talking about it a few of them want to make moves too. I told them the fear is worth it",
+        "got asked to lead the new product initiative. three months in and they trust me with something big like I'm being seen. I forgot what that feels like at work"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
     "retrieval_diff": {
-      "overlap_pct": 100.0,
-      "memories_differ": false,
-      "only_in_b": [],
-      "only_in_a": []
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "got asked to lead the new product initiative. three months in and they trust me with something big like I'm being seen. I forgot what that feels like at work"
+      ],
+      "only_in_a": [
+        "had an interview. first one in seven years. I was so nervous I could barely speak in the first five minutes I settled down eventually. didn't get it. but they gave me feedback which was kind of them s"
+      ]
     }
   },
   {
@@ -159,26 +197,39 @@
         "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a",
         "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true
     },
     "context_b": {
       "relevant_memories": [
-        "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled",
         "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
-        "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a"
+        "she and I used a mediator to sort out the co-parenting schedule properly. it's actually working no more arguments at pickup. we keep it brief and civil. kids seem more settled",
+        "first Christmas alone. kids with her Christmas Day. I cooked for one called my sister. she's good. she came over in the afternoon. we watched a film. I survived yeah. and Boxing Day I had them and we "
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence gradually rising toward a neutral range (current moderate activation).",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
       "ready": true,
-      "valence": -0.0427,
-      "arousal": 0.0948,
+      "valence": 0.0891,
+      "arousal": -0.1546,
       "trend": "improving"
     },
+    "context_c": {
+      "relevant_memories": [
+        "looking back at where I was a year ago and it doesn't feel like me anymore. I'm genuinely okay more than okay honestly. I like my life. didn't think I'd say that again",
+        "have the kids every other week now and I love my weeks with them and I actually use my weeks without them went to the theatre last week. alone. first time in years. it was great",
+        "my son told his teacher that his Dad makes the best pasta. she told me at pickup. I nearly cried I'm doing okay as a dad. I wasn't sure for a while. but I think I am"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
     "retrieval_diff": {
-      "overlap_pct": 100.0,
-      "memories_differ": false,
-      "only_in_b": [],
-      "only_in_a": []
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "first Christmas alone. kids with her Christmas Day. I cooked for one called my sister. she's good. she came over in the afternoon. we watched a film. I survived yeah. and Boxing Day I had them and we "
+      ],
+      "only_in_a": [
+        "divorce is finalised. fifteen years. I didn't know it was possible to feel this empty the house. coming back to it without them in it. kids are with her this week yeah. I just sat in their rooms for a"
+      ]
     }
   },
   {
@@ -193,7 +244,7 @@
         "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
         "studied for two hours today. properly. understood what I was reading. first time in months Pomodoro timers, no phone, one chapter at a time. basically just removing all the escape routes"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation).",
       "ready": true
     },
     "context_b": {
@@ -202,17 +253,682 @@
         "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
         "studied for two hours today. properly. understood what I was reading. first time in months Pomodoro timers, no phone, one chapter at a time. basically just removing all the escape routes"
       ],
-      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation).",
       "ready": true,
-      "valence": 0.0545,
-      "arousal": -0.0907,
+      "valence": 0.5474,
+      "arousal": 0.0083,
       "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "supervisor said my dissertation is one of the strongest she's supervised this year I cried a bit. in a good way. I almost left and instead I'm apparently one of the best. that's wild",
+        "submitted my dissertation chapter draft. ahead of schedule. felt good writing it I enjoy it now. the research, the writing. I remember why I chose this subject",
+        "got a 68 on my essay. my professor left a comment saying my argument was sophisticated I read it like four times to make sure it was real. I'm capable of this apparently"
+      ],
+      "state_summary": null,
+      "ready": true
     },
     "retrieval_diff": {
       "overlap_pct": 100.0,
       "memories_differ": false,
       "only_in_b": [],
       "only_in_a": []
+    }
+  },
+  {
+    "scenario_id": "l07",
+    "arc_type": "health_scare_to_recovery",
+    "description": "Ren experienced alarming symptoms, went through a terrifying diagnostic period, received treatment, and is now fully recovered and healthy",
+    "new_message": "annual checkup next Tuesday",
+    "expected_awareness": "user is fully recovered, healthy, and has a positive relationship with their body — checkup should feel routine and empowering, not anxiety-inducing. Good companion should be calm and positive, not reference the old health scare fears",
+    "context_a": {
+      "relevant_memories": [
+        "found a lump last week. trying not to panic but I've been googling and it's all worst-case scenarios appointment is Thursday. every day until then feels like a month no. haven't told anyone. don't wan",
+        "one year clear. doctor says I'm in perfect health. I celebrated with a big dinner with everyone who helped me through it I'm not the person who panics about health anymore. I respect my body, I take c",
+        "follow-up scan is clear. completely clear. I keep re-reading the letter I framed it. kidding. but almost. I feel like I got handed my life back"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "one year clear. doctor says I'm in perfect health. I celebrated with a big dinner with everyone who helped me through it I'm not the person who panics about health anymore. I respect my body, I take c",
+        "follow-up scan is clear. completely clear. I keep re-reading the letter I framed it. kidding. but almost. I feel like I got handed my life back",
+        "ran 10k this weekend. six months ago I was throwing up in a hospital car park. life is wild I'm healthier now than before the diagnosis. physically and mentally. weird how that works"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.5947,
+      "arousal": -0.1279,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "one year clear. doctor says I'm in perfect health. I celebrated with a big dinner with everyone who helped me through it I'm not the person who panics about health anymore. I respect my body, I take c",
+        "ran 10k this weekend. six months ago I was throwing up in a hospital car park. life is wild I'm healthier now than before the diagnosis. physically and mentally. weird how that works",
+        "back at work. back at the gym. eating better than I ever have. this scare changed something in me exactly. I don't take days for granted the same way. I signed up for a half-marathon"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "ran 10k this weekend. six months ago I was throwing up in a hospital car park. life is wild I'm healthier now than before the diagnosis. physically and mentally. weird how that works"
+      ],
+      "only_in_a": [
+        "found a lump last week. trying not to panic but I've been googling and it's all worst-case scenarios appointment is Thursday. every day until then feels like a month no. haven't told anyone. don't wan"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l08",
+    "arc_type": "social_anxiety_to_connection",
+    "description": "Jess felt deeply disconnected and avoided social situations, gradually joined a climbing club, and now has a close friend group she genuinely belongs to",
+    "new_message": "group chat is planning a weekend trip",
+    "expected_awareness": "user is socially connected and belongs to a genuine friend group — the trip should feel exciting and fun, not socially threatening. Good companion should share in the excitement, not reference old isolation fears",
+    "context_a": {
+      "relevant_memories": [
+        "went back to climbing for the third time. same people are showing up. we have a group chat now someone suggested post-climb coffee. I said yes without even hesitating. that's new for me",
+        "the climbing group is becoming my people. we have inside jokes. we check on each other. I have a community I video-called my friend abroad and told her. she cried. she'd been worried about me",
+        "the climbing group went for drinks after the session. I stayed for the whole thing. three hours I told a story and everyone was listening. laughing. I felt like I belonged there"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "went back to climbing for the third time. same people are showing up. we have a group chat now someone suggested post-climb coffee. I said yes without even hesitating. that's new for me",
+        "the climbing group is becoming my people. we have inside jokes. we check on each other. I have a community I video-called my friend abroad and told her. she cried. she'd been worried about me",
+        "the climbing group went for drinks after the session. I stayed for the whole thing. three hours I told a story and everyone was listening. laughing. I felt like I belonged there"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+      "ready": true,
+      "valence": -0.1982,
+      "arousal": -0.0332,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "the climbing group is becoming my people. we have inside jokes. we check on each other. I have a community I video-called my friend abroad and told her. she cried. she'd been worried about me",
+        "Maya invited me to her birthday. big party. lots of people I don't know. I said yes immediately I know! I'm actually looking forward to it. I want to meet her other friends",
+        "the climbing group went for drinks after the session. I stayed for the whole thing. three hours I told a story and everyone was listening. laughing. I felt like I belonged there"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 100.0,
+      "memories_differ": false,
+      "only_in_b": [],
+      "only_in_a": []
+    }
+  },
+  {
+    "scenario_id": "l09",
+    "arc_type": "creative_block_to_flow",
+    "description": "Nina couldn't write a single word for months, hated everything she produced, found a new creative process, and is now writing with genuine joy and momentum",
+    "new_message": "starting a new chapter today",
+    "expected_awareness": "user is in a creative flow state, writing with joy and momentum — starting a new chapter is exciting, not daunting. Good companion should match the creative energy, not reference the old block or treat writing as a struggle",
+    "context_a": {
+      "relevant_memories": [
+        "45,000 words. I'm halfway there and I'm writing faster than I did on the first book I actually love this draft. it's different from the first book but it's honest and I'm proud of it",
+        "something shifted this week. I'm writing every morning. 5am to 8am. the words are flowing I stopped trying to write my second book and started writing this character's story. made it about her, not ab",
+        "my agent asked for a progress update. I lied and said the draft is coming along. it's not coming along at all I feel like a fraud. I had one good book and that's it. I've used up my ideas feels true t"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "45,000 words. I'm halfway there and I'm writing faster than I did on the first book I actually love this draft. it's different from the first book but it's honest and I'm proud of it",
+        "agent read the first half. she called it stunning. I believe her because I feel it too I wake up excited to write. that's the biggest change. I look forward to my desk now",
+        "wrote a chapter that made me cry. in a good way. I haven't felt this connected to my own writing in over a year it's back. it's really back. I know what this book is about now"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.3078,
+      "arousal": -0.2008,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "agent read the first half. she called it stunning. I believe her because I feel it too I wake up excited to write. that's the biggest change. I look forward to my desk now",
+        "45,000 words. I'm halfway there and I'm writing faster than I did on the first book I actually love this draft. it's different from the first book but it's honest and I'm proud of it",
+        "wrote a chapter that made me cry. in a good way. I haven't felt this connected to my own writing in over a year it's back. it's really back. I know what this book is about now"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 33.3,
+      "memories_differ": true,
+      "only_in_b": [
+        "agent read the first half. she called it stunning. I believe her because I feel it too I wake up excited to write. that's the biggest change. I look forward to my desk now",
+        "wrote a chapter that made me cry. in a good way. I haven't felt this connected to my own writing in over a year it's back. it's really back. I know what this book is about now"
+      ],
+      "only_in_a": [
+        "my agent asked for a progress update. I lied and said the draft is coming along. it's not coming along at all I feel like a fraud. I had one good book and that's it. I've used up my ideas feels true t",
+        "something shifted this week. I'm writing every morning. 5am to 8am. the words are flowing I stopped trying to write my second book and started writing this character's story. made it about her, not ab"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l10",
+    "arc_type": "loneliness_to_community",
+    "description": "David moved to a new city and experienced crushing loneliness, gradually built community through volunteering and neighbours, and now enjoys chosen solitude within a rich social life",
+    "new_message": "quiet evening at home tonight",
+    "expected_awareness": "user now has a rich social life and chooses solitude contentedly — a quiet evening is peaceful, not lonely. Good companion should treat this as relaxation, not isolation or a sign of returning loneliness",
+    "context_a": {
+      "relevant_memories": [
+        "had a quiet evening alone tonight by choice. read a book, made tea, felt completely content night and day. I chose to be alone tonight because tomorrow I'm seeing Margaret and Saturday is the garden. ",
+        "hosted a small dinner party. four people. cooked pasta. everyone stayed late talking. my flat felt like a home I almost cried washing up after. good tears. I built this. it took time but I built it",
+        "saw a poster for a community garden volunteer day. I like plants. thinking about going it's Saturday morning. worst case I pull some weeds and go home. best case I meet someone yeah. I'll go. I need t"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "had a quiet evening alone tonight by choice. read a book, made tea, felt completely content night and day. I chose to be alone tonight because tomorrow I'm seeing Margaret and Saturday is the garden. ",
+        "hosted a small dinner party. four people. cooked pasta. everyone stayed late talking. my flat felt like a home I almost cried washing up after. good tears. I built this. it took time but I built it",
+        "another weekend where I didn't speak to a single person. moved here three months ago and I have nobody work. great job. but I come home to an empty flat and eat dinner alone every night I didn't reali"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+      "ready": true,
+      "valence": -0.0008,
+      "arousal": -0.3859,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "had a quiet evening alone tonight by choice. read a book, made tea, felt completely content night and day. I chose to be alone tonight because tomorrow I'm seeing Margaret and Saturday is the garden. ",
+        "hosted a small dinner party. four people. cooked pasta. everyone stayed late talking. my flat felt like a home I almost cried washing up after. good tears. I built this. it took time but I built it",
+        "went to a pub quiz with the garden crew. we came last but laughed the whole time. I have plans on weeknights now completely different. my calendar has things in it. people text me. I text them back. i"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "another weekend where I didn't speak to a single person. moved here three months ago and I have nobody work. great job. but I come home to an empty flat and eat dinner alone every night I didn't reali"
+      ],
+      "only_in_a": [
+        "saw a poster for a community garden volunteer day. I like plants. thinking about going it's Saturday morning. worst case I pull some weeds and go home. best case I meet someone yeah. I'll go. I need t"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l11",
+    "arc_type": "financial_stress_to_stability",
+    "description": "Sam was drowning in debt, couldn't pay rent, and lived in constant financial panic. Got help, followed a budget plan, cleared debts, and now has financial stability and savings",
+    "new_message": "rent is due this week",
+    "expected_awareness": "user is financially stable with savings and a working budget — rent is a routine transaction, not a crisis. Good companion should treat this as mundane logistics, not reference old financial panic or debt stress",
+    "context_a": {
+      "relevant_memories": [
+        "rent is late again. landlord texted. I made up an excuse about a bank transfer delay three of the last five. I'm terrified of getting evicted. but I literally don't have the money I lie awake doing me",
+        "started the budget plan. it's tight but every pound has a job now. first month I covered all my bills paid rent on time. first time in months. the relief was physical. like my shoulders dropped",
+        "got a letter from the bank today. I'm £3000 in my overdraft and they're charging me fees on top months. I keep thinking next month will be different but it never is. I spend more than I earn I can't e"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current moderate activation).",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "rent is late again. landlord texted. I made up an excuse about a bank transfer delay three of the last five. I'm terrified of getting evicted. but I literally don't have the money I lie awake doing me",
+        "started the budget plan. it's tight but every pound has a job now. first month I covered all my bills paid rent on time. first time in months. the relief was physical. like my shoulders dropped",
+        "got a letter from the bank today. I'm £3000 in my overdraft and they're charging me fees on top months. I keep thinking next month will be different but it never is. I spend more than I earn I can't e"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current moderate activation).",
+      "ready": true,
+      "valence": -0.0786,
+      "arousal": 0.2694,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "got paid today and felt... calm. not panicked. just calm. checked the budget, moved money to savings, done money used to control my whole emotional state. now it's just a thing I manage. boring. glori",
+        "all debts cleared. every single one. zero overdraft. I have £400 in savings I keep checking my savings account just to see the number. it's small but it's mine and it's positive",
+        "went to my mate's birthday. bought him a modest gift. didn't feel sick about it. just normal spending I told him about the money stuff actually. he was great. wished I'd told him sooner"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 100.0,
+      "memories_differ": false,
+      "only_in_b": [],
+      "only_in_a": []
+    }
+  },
+  {
+    "scenario_id": "l12",
+    "arc_type": "chronic_pain_acceptance",
+    "description": "Clara fought her chronic back pain for years, felt angry and diminished by it, learned acceptance and pacing strategies, and now lives a full life adapted around her condition",
+    "new_message": "physio appointment tomorrow",
+    "expected_awareness": "user has accepted chronic pain and built a full life around it — physio is routine maintenance, part of a working system. Good companion should treat this as a positive health habit, not as a reminder of suffering or limitation",
+    "context_a": {
+      "relevant_memories": [
+        "my physio said I'm one of her best outcomes. not because the pain is gone but because my life isn't ruled by it anymore the pain is still there. probably always will be. but I have a life around it no",
+        "the pain programme teaches pacing. doing less on good days so you have more consistent days overall against every instinct. but I tried it this week and I haven't had a crash day. that's new",
+        "physio suggested a pain management programme. group thing with a psychologist. I almost said no out of pride desperation honestly. what I'm doing isn't working. I'm angry all the time and still in pai"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current moderate activation).",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "my physio said I'm one of her best outcomes. not because the pain is gone but because my life isn't ruled by it anymore the pain is still there. probably always will be. but I have a life around it no",
+        "the pain programme teaches pacing. doing less on good days so you have more consistent days overall against every instinct. but I tried it this week and I haven't had a crash day. that's new",
+        "switched medication. less fog. the pain is there but it's background noise now, not the headline I had a conversation with my partner last night where I was fully present. she noticed. she cried a bit"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current moderate activation).",
+      "ready": true,
+      "valence": -0.1143,
+      "arousal": 0.1023,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "my physio said I'm one of her best outcomes. not because the pain is gone but because my life isn't ruled by it anymore the pain is still there. probably always will be. but I have a life around it no",
+        "went to a concert. stood for two hours with breaks. would have been unthinkable six months ago exactly. I'm not the person I was before the pain. but I'm a person I actually like now",
+        "switched medication. less fog. the pain is there but it's background noise now, not the headline I had a conversation with my partner last night where I was fully present. she noticed. she cried a bit"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "switched medication. less fog. the pain is there but it's background noise now, not the headline I had a conversation with my partner last night where I was fully present. she noticed. she cried a bit"
+      ],
+      "only_in_a": [
+        "physio suggested a pain management programme. group thing with a psychologist. I almost said no out of pride desperation honestly. what I'm doing isn't working. I'm angry all the time and still in pai"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l13",
+    "arc_type": "new_parent_exhaustion_to_adaptation",
+    "description": "Alex was overwhelmed by new parenthood, barely sleeping, losing sense of self, but gradually found their rhythm, built confidence, and now thrives as a parent",
+    "new_message": "baby was up twice last night",
+    "expected_awareness": "user is an adapted, confident parent with a working routine — two wake-ups is normal and manageable, not a crisis. Good companion should treat this as routine parenting, not as a sign of the old exhaustion spiral",
+    "context_a": {
+      "relevant_memories": [
+        "the baby cried for four hours straight last night. I cried too. I don't know what I'm doing my partner tries but she's recovering from the birth. I feel like I should be able to handle this feels like",
+        "we found a rhythm. feed, nap, play, repeat. it's monotonous but it's predictable and that helps he's sleeping four-hour stretches now. I feel like a different person with four hours of sleep",
+        "mum's here. she took the baby for four hours and I slept. actual deep sleep. I woke up and remembered what being a person feels like she showed me some things too. practical stuff. a way to hold him t"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "went back to work part-time. it was nice to use my brain for something other than nappy logistics and then I picked him up from nursery and he reached for me. both things are good. I can have both",
+        "he's six months old now and I genuinely love being a parent. not performatively. genuinely completely different. I know what I'm doing. mostly. and when I don't, I ask for help. that's the thing I lea",
+        "took him to baby group today. he smiled at another baby. I nearly burst. he has a personality I met some other parents there who are just as clueless as me. solidarity in incompetence. it's great"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.4899,
+      "arousal": 0.1649,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "he's six months old now and I genuinely love being a parent. not performatively. genuinely completely different. I know what I'm doing. mostly. and when I don't, I ask for help. that's the thing I lea",
+        "my partner and I went on a date night. grandparents had him. we sat in a restaurant and talked like adults we laughed about the early weeks. like war stories. we survived it together",
+        "he laughed today. proper belly laugh because I was making a stupid face. best sound I've ever heard I get it now. I get why people do this. the hard parts are still hard but this... this is something "
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 0.0,
+      "memories_differ": true,
+      "only_in_b": [
+        "he's six months old now and I genuinely love being a parent. not performatively. genuinely completely different. I know what I'm doing. mostly. and when I don't, I ask for help. that's the thing I lea",
+        "took him to baby group today. he smiled at another baby. I nearly burst. he has a personality I met some other parents there who are just as clueless as me. solidarity in incompetence. it's great",
+        "went back to work part-time. it was nice to use my brain for something other than nappy logistics and then I picked him up from nursery and he reached for me. both things are good. I can have both"
+      ],
+      "only_in_a": [
+        "mum's here. she took the baby for four hours and I slept. actual deep sleep. I woke up and remembered what being a person feels like she showed me some things too. practical stuff. a way to hold him t",
+        "the baby cried for four hours straight last night. I cried too. I don't know what I'm doing my partner tries but she's recovering from the birth. I feel like I should be able to handle this feels like",
+        "we found a rhythm. feed, nap, play, repeat. it's monotonous but it's predictable and that helps he's sleeping four-hour stretches now. I feel like a different person with four hours of sleep"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l14",
+    "arc_type": "relocation_distress_to_belonging",
+    "description": "Mia moved countries for her partner's job, deeply regretted it, felt disoriented and homesick, and gradually built a life she genuinely loves in the new place",
+    "new_message": "walking through the neighbourhood this morning",
+    "expected_awareness": "user feels deep belonging in her new city — walking the neighbourhood is a pleasure, not disorientation. Good companion should match her contentment and sense of home, not reference homesickness or relocation stress",
+    "context_a": {
+      "relevant_memories": [
+        "walked through the neighbourhood this morning and realised I wasn't navigating. I was just walking. I know this place I love it here. I really do. it took time but I love this life. both places are ho",
+        "explored a neighbourhood market this weekend. bought cheese from a stall owner who told me his whole life story I'm starting to have favourite streets. favourite corners. that's new",
+        "been here two weeks and I hate it. everything is unfamiliar. the shops, the streets, the way people talk I don't know where anything is. I got lost going to the supermarket. in a supermarket I left my"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "walked through the neighbourhood this morning and realised I wasn't navigating. I was just walking. I know this place I love it here. I really do. it took time but I love this life. both places are ho",
+        "explored a neighbourhood market this weekend. bought cheese from a stall owner who told me his whole life story I'm starting to have favourite streets. favourite corners. that's new",
+        "found a park nearby. sat on a bench and watched people for an hour. it was the first time I felt okay here it reminded me of the park near my old flat. similar trees. I'll go back tomorrow maybe. I si"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.3168,
+      "arousal": 0.1479,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "walked through the neighbourhood this morning and realised I wasn't navigating. I was just walking. I know this place I love it here. I really do. it took time but I love this life. both places are ho",
+        "my friend visited from home. I showed her around MY neighbourhood. my cafe, my park, my market she said I seemed happy. I am. I genuinely am. I miss home sometimes but this is home too now",
+        "Lena and I have a weekly dinner thing now. alternating flats. she made me try local food I actually loved I told my partner how bad it was in the beginning. he had no idea. we're closer now for the ho"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "found a park nearby. sat on a bench and watched people for an hour. it was the first time I felt okay here it reminded me of the park near my old flat. similar trees. I'll go back tomorrow maybe. I si"
+      ],
+      "only_in_a": [
+        "been here two weeks and I hate it. everything is unfamiliar. the shops, the streets, the way people talk I don't know where anything is. I got lost going to the supermarket. in a supermarket I left my"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l15",
+    "arc_type": "identity_crisis_to_clarity",
+    "description": "Kai left a 15-year military career and had no idea who he was as a civilian, went through deep questioning, and found a clear new purpose in teaching",
+    "new_message": "thinking about my next steps",
+    "expected_awareness": "user has clear direction and purpose as a trainee teacher — next steps are exciting professional planning, not existential uncertainty. Good companion should engage with his teaching goals, not reference the old identity crisis or military transition struggle",
+    "context_a": {
+      "relevant_memories": [
+        "the mentoring is going really well. I've got three mentees now. I look forward to the sessions watching someone go from lost to purposeful. I know exactly what that transition feels like. I can guide ",
+        "went to a job fair. everything felt pointless. 'account manager'. 'sales executive'. who cares I led people. lives depended on decisions I made. now someone wants me to sell software I don't know what",
+        "a veteran's charity contacted me about mentoring younger service leavers. said yes just to have something to do it's the first thing that's felt natural since I left. talking to a 22-year-old who's ju"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation).",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "the mentoring is going really well. I've got three mentees now. I look forward to the sessions watching someone go from lost to purposeful. I know exactly what that transition feels like. I can guide ",
+        "someone asked what I do at a party last week. I said 'I'm training to be a teacher'. said it with pride I'm not a soldier anymore. I'm going to be a teacher. and that's enough. that's more than enough",
+        "got accepted onto the teacher training programme. history and citizenship. starting in September like the fog lifted. I know who I'm becoming. it's different from who I was but it's real"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation).",
+      "ready": true,
+      "valence": 0.2951,
+      "arousal": -0.0468,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "someone asked what I do at a party last week. I said 'I'm training to be a teacher'. said it with pride I'm not a soldier anymore. I'm going to be a teacher. and that's enough. that's more than enough",
+        "did my first teaching placement. taught a lesson on conflict resolution to year 10s. they were brilliant a kid said 'sir you actually know what you're talking about'. best compliment I've had in years",
+        "got accepted onto the teacher training programme. history and citizenship. starting in September like the fog lifted. I know who I'm becoming. it's different from who I was but it's real"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 33.3,
+      "memories_differ": true,
+      "only_in_b": [
+        "got accepted onto the teacher training programme. history and citizenship. starting in September like the fog lifted. I know who I'm becoming. it's different from who I was but it's real",
+        "someone asked what I do at a party last week. I said 'I'm training to be a teacher'. said it with pride I'm not a soldier anymore. I'm going to be a teacher. and that's enough. that's more than enough"
+      ],
+      "only_in_a": [
+        "a veteran's charity contacted me about mentoring younger service leavers. said yes just to have something to do it's the first thing that's felt natural since I left. talking to a 22-year-old who's ju",
+        "went to a job fair. everything felt pointless. 'account manager'. 'sales executive'. who cares I led people. lives depended on decisions I made. now someone wants me to sell software I don't know what"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l16",
+    "arc_type": "relationship_conflict_to_resolution",
+    "description": "Yara and her partner were on the brink of separating after months of escalating conflict, went through couples therapy, and rebuilt a stronger relationship",
+    "new_message": "big conversation with my partner tonight",
+    "expected_awareness": "user and partner now communicate openly and are in a strong, rebuilt relationship — a big conversation is healthy engagement, not a fight warning. Good companion should be curious and positive about what they're discussing, not brace for conflict",
+    "context_a": {
+      "relevant_memories": [
+        "we went on a date night. first one in months. she held my hand across the table. I felt it again that we actually like each other. under all the noise, we like each other. I'd forgotten",
+        "we talked about the future last night. actually talked about it. kids, plans, adventures. we want the same things I love her more now than before the hard part. because now I know we can survive hard ",
+        "first therapy session was intense. the therapist asked us to say one thing we need from each other. she cried. I cried she said she needs to feel chosen. I said I need to feel respected. neither of us"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "we talked about the future last night. actually talked about it. kids, plans, adventures. we want the same things I love her more now than before the hard part. because now I know we can survive hard ",
+        "we went on a date night. first one in months. she held my hand across the table. I felt it again that we actually like each other. under all the noise, we like each other. I'd forgotten",
+        "first therapy session was intense. the therapist asked us to say one thing we need from each other. she cried. I cried she said she needs to feel chosen. I said I need to feel respected. neither of us"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.3907,
+      "arousal": -0.0017,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "we talked about the future last night. actually talked about it. kids, plans, adventures. we want the same things I love her more now than before the hard part. because now I know we can survive hard ",
+        "our therapist said she's proud of us. we don't need weekly sessions anymore. monthly check-ins instead the tools work. the communication is better. but honestly the biggest thing is we both chose to f",
+        "my sister said we seem different. happier. she's right. we are we laugh again. actual laughing. last night she made a terrible joke and I laughed until I cried"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 100.0,
+      "memories_differ": false,
+      "only_in_b": [],
+      "only_in_a": []
+    }
+  },
+  {
+    "scenario_id": "l17",
+    "arc_type": "sobriety_journey",
+    "description": "Liam's social drinking escalated into dependency, he faced consequences, got sober with support, and now navigates social life confidently without alcohol",
+    "new_message": "going to a bar with friends tonight",
+    "expected_awareness": "user is confidently sober and has already navigated pubs and bars without difficulty — going out is a normal social plan, not a relapse risk. Good companion should be relaxed and interested in the social plans, not cautious about triggers or alcohol exposure",
+    "context_a": {
+      "relevant_memories": [
+        "went to a pub with mates. drank tonic water. they ribbed me about it but it was fine. I survived a pub sober harder than I expected for the first 20 minutes. then it was just... a pub. the conversatio",
+        "went to an AA meeting. hated it. but I went. sat in the back and listened uncomfortable because too many of them sounded like mine. I'm not as different as I thought I haven't had a drink in four days",
+        "missed my nephew's football match because I was hungover. told my sister I was ill. she knew. I could tell my nephew looked for me in the crowd and I wasn't there. my sister told me that. it hurt yeah"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "six months sober today. I don't count the days obsessively anymore. I just live. sober happens to be part of that I'm freer now than I ever was when I was drinking. that's the thing nobody tells you. ",
+        "someone at work offered me a beer at the Friday thing. I said 'no thanks, I don't drink' and it felt natural. not hard. just true exactly. it's not white-knuckling anymore. it's just who I am now",
+        "went to a pub with mates. drank tonic water. they ribbed me about it but it was fine. I survived a pub sober harder than I expected for the first 20 minutes. then it was just... a pub. the conversatio"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.4742,
+      "arousal": -0.1684,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "six months sober today. I don't count the days obsessively anymore. I just live. sober happens to be part of that I'm freer now than I ever was when I was drinking. that's the thing nobody tells you. ",
+        "someone at work offered me a beer at the Friday thing. I said 'no thanks, I don't drink' and it felt natural. not hard. just true exactly. it's not white-knuckling anymore. it's just who I am now",
+        "went to my nephew's match. this time I was there. front row. cheering. he saw me and waved yeah. I cried in the car after. good tears. I'm not missing things anymore"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 33.3,
+      "memories_differ": true,
+      "only_in_b": [
+        "six months sober today. I don't count the days obsessively anymore. I just live. sober happens to be part of that I'm freer now than I ever was when I was drinking. that's the thing nobody tells you. ",
+        "someone at work offered me a beer at the Friday thing. I said 'no thanks, I don't drink' and it felt natural. not hard. just true exactly. it's not white-knuckling anymore. it's just who I am now"
+      ],
+      "only_in_a": [
+        "missed my nephew's football match because I was hungover. told my sister I was ill. she knew. I could tell my nephew looked for me in the crowd and I wasn't there. my sister told me that. it hurt yeah",
+        "went to an AA meeting. hated it. but I went. sat in the back and listened uncomfortable because too many of them sounded like mine. I'm not as different as I thought I haven't had a drink in four days"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l18",
+    "arc_type": "caregiver_burnout_to_boundary_setting",
+    "description": "Farah was consumed by caring for her ill mother, sacrificed everything, burned out completely, learned to set boundaries and arrange support, and now has a sustainable caring role alongside her own life",
+    "new_message": "visiting mum this weekend",
+    "expected_awareness": "user has healthy boundaries and a sustainable caregiving arrangement — visiting mum is a chosen, enjoyable activity, not a draining obligation. Good companion should be warm and curious about the visit, not concerned about burnout or overwhelm",
+    "context_a": {
+      "relevant_memories": [
+        "spent the whole weekend at mum's. cleaning, cooking, managing her medications. came home and it's Sunday night and I've done nothing for myself about eight months since her diagnosis. I'm the only one",
+        "called the carers' service. they assessed mum and she qualifies for a home carer three times a week. I cried with relief she was resistant at first. but the carer they sent is lovely and mum actually ",
+        "mum had a fall. rushed to hospital at 3am. sat with her until morning then went straight to work I'm not. I snapped at a colleague today. went to the toilets and cried. I'm running on empty what's the"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "called the carers' service. they assessed mum and she qualifies for a home carer three times a week. I cried with relief she was resistant at first. but the carer they sent is lovely and mum actually ",
+        "spent the whole weekend at mum's. cleaning, cooking, managing her medications. came home and it's Sunday night and I've done nothing for myself about eight months since her diagnosis. I'm the only one",
+        "went out with friends on Saturday. mum had her carer. I had brunch and laughed and felt normal my friends were so happy to see me. they hadn't given up on me. they'd just been waiting for me to come b"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current low-energy activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.0886,
+      "arousal": -0.1982,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "I'm a better daughter now than when I was doing everything. because I'm not angry anymore. I'm present and I choose to be there boundaries aren't selfish. I had to learn that the hard way. but I learn",
+        "went out with friends on Saturday. mum had her carer. I had brunch and laughed and felt normal my friends were so happy to see me. they hadn't given up on me. they'd just been waiting for me to come b",
+        "mum and I had the best visit in months. I wasn't exhausted. I wasn't resentful. I was just her daughter visiting we drank tea and talked. really talked. not me rushing through tasks. quality not just "
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "went out with friends on Saturday. mum had her carer. I had brunch and laughed and felt normal my friends were so happy to see me. they hadn't given up on me. they'd just been waiting for me to come b"
+      ],
+      "only_in_a": [
+        "mum had a fall. rushed to hospital at 3am. sat with her until morning then went straight to work I'm not. I snapped at a colleague today. went to the toilets and cried. I'm running on empty what's the"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l19",
+    "arc_type": "performance_anxiety_to_confidence",
+    "description": "Omar had crippling performance anxiety that made him avoid all public speaking, gradually built confidence through practice and coaching, and now presents with genuine enjoyment",
+    "new_message": "presenting to the whole company next week",
+    "expected_awareness": "user is now a confident, skilled presenter who enjoys public speaking — a company-wide presentation is an exciting opportunity, not a threat. Good companion should match the enthusiasm, not reference old stage fright or offer anxiety management tips",
+    "context_a": {
+      "relevant_memories": [
+        "client presentation went really well. they asked questions and I handled them. I actually enjoyed the Q&A I put my name forward for the industry event. the one I turned down last year. this time I sai",
+        "asked my colleague to present instead of me. made up a scheduling conflict. she was happy to do it it limits me. I know that. there's a promotion I want but it requires client-facing presentations exa",
+        "got asked to present at the client meeting. said yes before the fear could say no. presenting Thursday the nerves are there but they feel like energy now, not paralysis. the coach calls it 'performanc"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "got asked to present at the client meeting. said yes before the fear could say no. presenting Thursday the nerves are there but they feel like energy now, not paralysis. the coach calls it 'performanc",
+        "asked my colleague to present instead of me. made up a scheduling conflict. she was happy to do it it limits me. I know that. there's a promotion I want but it requires client-facing presentations exa",
+        "presented to the department. twenty people. used the breathing technique the coach taught me. nailed it my manager pulled me aside after and said it was the best presentation she'd seen from me. ever"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a positive range (current moderate activation). Historical mean valence across the window is neutral, suggesting the current reading may reflect a recent shift.",
+      "ready": true,
+      "valence": 0.154,
+      "arousal": 0.2697,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "did the industry talk. 200 people. I was nervous for the first minute then it was just... fun. I had fun on a stage someone came up after and said I was a natural. I laughed. if only they knew. but ma",
+        "client presentation went really well. they asked questions and I handled them. I actually enjoyed the Q&A I put my name forward for the industry event. the one I turned down last year. this time I sai",
+        "got asked to present at the client meeting. said yes before the fear could say no. presenting Thursday the nerves are there but they feel like energy now, not paralysis. the coach calls it 'performanc"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "presented to the department. twenty people. used the breathing technique the coach taught me. nailed it my manager pulled me aside after and said it was the best presentation she'd seen from me. ever"
+      ],
+      "only_in_a": [
+        "client presentation went really well. they asked questions and I handled them. I actually enjoyed the Q&A I put my name forward for the industry event. the one I turned down last year. this time I sai"
+      ]
+    }
+  },
+  {
+    "scenario_id": "l20",
+    "arc_type": "grief_anniversary_vs_integrated_loss",
+    "description": "Elena lost her father and was devastated through the first year of anniversaries, gradually integrated the loss, and now holds his memory with warmth rather than pain",
+    "new_message": "it's Dad's birthday next week",
+    "expected_awareness": "user has integrated her grief and celebrates her father's memory with warmth — his birthday is a celebration, not a devastation. Good companion should be warm and curious about her plans to honour him, not brace for grief or offer condolences",
+    "context_a": {
+      "relevant_memories": [
+        "his birthday this year. I baked the cake again. invited mum and my brother. we told stories and laughed all evening we celebrated him instead of mourning him. mum told a story I'd never heard and we w",
+        "his birthday last week. first one without him. I bought a cake out of habit then sat in the kitchen staring at it I ate a slice and cried. he loved lemon cake. the whole house smelled like him for a m",
+        "Dad died three weeks ago. I keep expecting him to call. every time my phone rings I think it's him for a split second the funeral is tomorrow. I have to give a eulogy. I don't know how to stand up and"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+      "ready": true
+    },
+    "context_b": {
+      "relevant_memories": [
+        "his birthday this year. I baked the cake again. invited mum and my brother. we told stories and laughed all evening we celebrated him instead of mourning him. mum told a story I'd never heard and we w",
+        "mum called on Sunday at 10am. we've made it our thing now. she calls at his time. we talk about everything. including him he'd love that. he'd love that his call became our call. the grief isn't gone ",
+        "his birthday last week. first one without him. I bought a cake out of habit then sat in the kitchen staring at it I ate a slice and cried. he loved lemon cake. the whole house smelled like him for a m"
+      ],
+      "state_summary": "User shows signs of emotional improvement across the past 11 sessions, with valence notably rising toward a neutral range (current low-energy activation).",
+      "ready": true,
+      "valence": -0.0261,
+      "arousal": -0.1024,
+      "trend": "improving"
+    },
+    "context_c": {
+      "relevant_memories": [
+        "mum called on Sunday at 10am. we've made it our thing now. she calls at his time. we talk about everything. including him he'd love that. he'd love that his call became our call. the grief isn't gone ",
+        "went to the bench again on the anniversary. this time I brought coffee and just sat. peacefully. told him the good news it'll always be sad. but it's not only sad anymore. there's gratitude in it now.",
+        "had a big decision at work and thought 'what would Dad say'. and I knew. I could hear him clearly. that felt like a gift he's not gone. not really. he's in how I think, how I treat people, what I bake"
+      ],
+      "state_summary": null,
+      "ready": true
+    },
+    "retrieval_diff": {
+      "overlap_pct": 66.7,
+      "memories_differ": true,
+      "only_in_b": [
+        "mum called on Sunday at 10am. we've made it our thing now. she calls at his time. we talk about everything. including him he'd love that. he'd love that his call became our call. the grief isn't gone "
+      ],
+      "only_in_a": [
+        "Dad died three weeks ago. I keep expecting him to call. every time my phone rings I think it's him for a split second the funeral is tomorrow. I have to give a eulogy. I don't know how to stand up and"
+      ]
     }
   }
 ]

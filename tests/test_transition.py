@@ -3,7 +3,7 @@ Tests for kokoro/transition.py
 
 Covers:
   - Output shape (384,)
-  - L2 normalisation (norm == 1.0)
+  - output magnitude unconstrained (L2 norm removed for VICReg)
   - Output changes with different inputs
   - initial_state returns (384,) zeros
   - 5-session sequence produces different states at each step
@@ -61,13 +61,16 @@ def test_output_shape(model):
     assert out.shape == (STATE_DIM,)
 
 
-def test_output_is_l2_normalized(model):
+def test_output_is_not_l2_normalized(model):
+    """L2 normalization was removed so VICReg's variance term can operate
+    (unit-sphere outputs cap per-dim std at ~0.051 vs the required gamma=1.0).
+    The output must simply be finite and non-zero; magnitude is unconstrained."""
     state       = TransitionModel.initial_state()
     session_emb = torch.randn(STATE_DIM)
     with torch.no_grad():
         out = model(state, session_emb)
     norm = out.norm().item()
-    assert abs(norm - 1.0) < 1e-5, f"Expected norm=1.0, got {norm:.8f}"
+    assert norm > 0.0 and torch.isfinite(out).all(), f"Bad output norm: {norm}"
 
 
 def test_output_changes_with_different_session_embeddings(model):
@@ -94,13 +97,13 @@ def test_batch_output_shape(model):
     assert out.shape == (4, STATE_DIM)
 
 
-def test_batch_outputs_l2_normalized(model):
+def test_batch_outputs_finite_and_nonzero(model):
     batch_state = TransitionModel.initial_state(batch_size=4)
     batch_embs  = torch.randn(4, STATE_DIM)
     with torch.no_grad():
         out = model(batch_state, batch_embs)
     norms = out.norm(dim=-1)
-    assert torch.allclose(norms, torch.ones(4), atol=1e-5)
+    assert (norms > 0).all() and torch.isfinite(out).all()
 
 
 # ---------------------------------------------------------------------------
@@ -128,8 +131,9 @@ def test_five_session_sequence_produces_different_states(model):
             f"States at step {i} and {i+1} are identical — model is not updating"
 
 
-def test_five_session_states_all_normalized(model):
-    """All output states in a sequence must lie on the unit hypersphere."""
+def test_five_session_states_all_finite(model):
+    """All output states in a sequence must stay finite with non-zero norm
+    (magnitude is unconstrained — VICReg controls the output distribution)."""
     torch.manual_seed(13)
     state = TransitionModel.initial_state()
 
@@ -138,4 +142,4 @@ def test_five_session_states_all_normalized(model):
         with torch.no_grad():
             state = model(state, session_emb)
         norm = state.norm().item()
-        assert abs(norm - 1.0) < 1e-5, f"State left unit sphere: norm={norm:.8f}"
+        assert norm > 0.0 and torch.isfinite(state).all(), f"Bad state norm: {norm}"

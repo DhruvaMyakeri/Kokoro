@@ -106,12 +106,15 @@ class _InMemoryStore:
     def retrieve(
         self,
         user_id: str,
-        query_embedding: np.ndarray,
+        query_embedding: np.ndarray | None,
         state_vector: np.ndarray,
         top_k: int = 5,
         alpha: float = 0.6,
         current_valence: float | None = None,
         current_arousal: float | None = None,
+        recency_weight: float = 0.0,
+        recency_tau: float = 5.0,
+        adaptive: bool = False,
     ) -> list[dict]:
         user_sess = [s for s in self._sessions if s["user_id"] == user_id]
         if not user_sess:
@@ -119,6 +122,7 @@ class _InMemoryStore:
 
         stored_embs   = np.array([s["embedding"]    for s in user_sess], dtype=np.float32)
         stored_states = np.array([s["state_vector"] for s in user_sess], dtype=np.float32)
+        n = len(user_sess)
 
         def _cosine(q: np.ndarray, S: np.ndarray) -> np.ndarray:
             q = q.astype(np.float32)
@@ -127,32 +131,48 @@ class _InMemoryStore:
             norms = np.where(norms < 1e-12, 1.0, norms)
             return (S / norms) @ q_norm
 
-        # Semantic: query message embedding vs stored session embeddings (MiniLM)
-        sem = _cosine(query_embedding, stored_embs)
+        # Semantic: query message embedding vs stored session embeddings (MiniLM),
+        # rescaled from [-1, 1] to [0, 1] to be commensurable with the emotional
+        # axis (mirrors kokoro/retrieval.py). None query → axis disabled.
+        if query_embedding is not None:
+            sem = (_cosine(query_embedding, stored_embs) + 1.0) / 2.0
+        else:
+            sem = np.zeros(n, dtype=np.float64)
 
         # Emotional axis: VAD-coordinate proximity is far more discriminative than
         # state-to-state cosine (which concentrates at ~0.98 regardless of phase).
         # Priority: decoder (most accurate) > passed-in va > cosine fallback.
         if self._decoder is not None:
-            dec    = self._decoder.decode(state_vector, [], len(user_sess))
+            dec    = self._decoder.decode(state_vector, [], n)
             v, a   = dec["valence"], dec["arousal"]
         elif current_valence is not None and current_arousal is not None:
             v, a   = current_valence, current_arousal
         else:
             v, a   = None, None
 
+        va_stored = np.array([[s["valence"], s["arousal"]] for s in user_sess],
+                             dtype=np.float32)
         if v is not None:
-            va_cur    = np.array([v, a], dtype=np.float32)
-            va_stored = np.array([[s["valence"], s["arousal"]] for s in user_sess],
-                                 dtype=np.float32)
+            va_cur = np.array([v, a], dtype=np.float32)
             dists = np.linalg.norm(va_stored - va_cur, axis=1)
             emo   = 1.0 - dists / float(np.sqrt(8))
         else:
             emo = _cosine(state_vector, stored_states)
 
-        combined = alpha * sem + (1.0 - alpha) * emo
+        # Recency axis: insertion order (newest = rank_age 0), mirrors production
+        recency = np.exp(-np.arange(n - 1, -1, -1, dtype=np.float64) / max(recency_tau, 1e-6))
 
-        k       = min(top_k, len(user_sess))
+        effective_alpha = alpha
+        if adaptive:
+            from kokoro.retrieval import adaptive_alpha
+            effective_alpha = adaptive_alpha(alpha, va_stored, (v, a))
+        if query_embedding is None:
+            effective_alpha = 0.0
+
+        hybrid   = effective_alpha * sem + (1.0 - effective_alpha) * emo
+        combined = (1.0 - recency_weight) * hybrid + recency_weight * recency
+
+        k       = min(top_k, n)
         top_idx = np.argsort(-combined)[:k]
 
         return [
@@ -161,7 +181,9 @@ class _InMemoryStore:
                 "session_id":      user_sess[i]["session_id"],
                 "semantic_score":  float(sem[i]),
                 "emotional_score": float(emo[i]),
+                "recency_score":   float(recency[i]),
                 "combined_score":  float(combined[i]),
+                "effective_alpha": float(effective_alpha),
                 "valence":         user_sess[i]["valence"],
                 "arousal":         user_sess[i]["arousal"],
             }
@@ -205,6 +227,15 @@ def build_context(scenario: dict) -> dict:
         ctx_a = memory.get_context(new_message, alpha=1.0)
         ctx_b = memory.get_context(new_message, alpha=0.6)
 
+        # Condition C: recency-only baseline — the last top_k session summaries,
+        # no state summary. This is the obvious cheap competitor to emotional
+        # retrieval (a recent memory is usually emotionally current); without
+        # beating it, the "world model" mechanism is not demonstrably needed.
+        recency_memories = [
+            s["session_text"]
+            for s in memory._mem_store._sessions[-3:]
+        ][::-1]  # newest first, matching retrieval-order presentation
+
         # Compute memory-set overlap to show retrieval divergence
         mems_a = set(ctx_a["relevant_memories"])
         mems_b = set(ctx_b["relevant_memories"])
@@ -230,6 +261,11 @@ def build_context(scenario: dict) -> dict:
                 "valence":           ctx_b.get("valence", 0.0),
                 "arousal":           ctx_b.get("arousal", 0.0),
                 "trend":             ctx_b.get("trend", "unknown"),
+            },
+            "context_c": {
+                "relevant_memories": recency_memories,
+                "state_summary":     None,
+                "ready":             ctx_a.get("ready", False),
             },
             "retrieval_diff": {
                 "overlap_pct":    overlap_pct,

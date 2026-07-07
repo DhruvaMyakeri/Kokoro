@@ -35,8 +35,8 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from kokoro.transition import TransitionModel
 from kokoro.encoder import decode_parlai_artifacts
+from diagnostics.common import load_transition_model
 
 logger = logging.getLogger(__name__)
 
@@ -45,17 +45,6 @@ N_SEQUENCES  = 20
 N_STEPS      = 50
 GROWTH_FLAG  = 10.0   # norm[50] / norm[5] > this → unbounded growth
 DECAY_FLAG   = 0.1    # norm[50] / norm[5] < this → collapse to zero
-
-
-def load_model(ckpt_path: Path) -> TransitionModel:
-    ckpt = torch.load(str(ckpt_path), map_location="cpu", weights_only=False)
-    cfg  = ckpt.get("model_config", {"state_dim": 384, "hidden_dim": 512})
-    cfg  = {k: v for k, v in cfg.items() if k in ("state_dim", "hidden_dim")}
-    model = TransitionModel(**cfg)
-    model.load_state_dict(ckpt["model_state_dict"])
-    model.eval()
-    logger.info(f"Loaded: epoch {ckpt['epoch']}, val_loss={ckpt['val_loss']:.4f}")
-    return model
 
 
 def load_msc_sequences(n: int, seed: int = 42) -> list[list[dict]] | None:
@@ -125,28 +114,21 @@ def load_synthetic_sequences(
 
 
 def encode_session(turns: list[dict], encoder) -> np.ndarray:
-    texts, weights = [], []
-    for turn in turns:
-        cleaned = decode_parlai_artifacts(turn.get("content", ""))
-        if cleaned:
-            texts.append(cleaned)
-            weights.append(2.0 if turn.get("role") == "user" else 1.0)
-    if not texts:
-        return np.zeros(384, dtype=np.float32)
-    embs = encoder.model.encode(
-        texts, convert_to_numpy=True, show_progress_bar=False, normalize_embeddings=False
-    )
-    w = np.array(weights, dtype=np.float32)
-    w /= w.sum()
-    return (embs * w[:, np.newaxis]).sum(axis=0).astype(np.float32)
+    """Encode via SessionEncoder.encode() so VAD features are appended when the
+    checkpoint expects a 387-dim input (previously this hand-rolled 384-dim
+    pooling and crashed VAD checkpoints at the transition model)."""
+    try:
+        return encoder.encode(turns)
+    except ValueError:   # all-blank session
+        return np.zeros(encoder.output_dim, dtype=np.float32)
 
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     parser = argparse.ArgumentParser(description="Norm drift across long inference sequences")
-    parser.add_argument("--checkpoint", default=str(PROJECT_ROOT / "checkpoints" / "transition_v1.pt"))
-    parser.add_argument("--data",       default=str(PROJECT_ROOT / "data" / "trajectories_10k.json"))
+    parser.add_argument("--checkpoint", default=str(PROJECT_ROOT / "checkpoints" / "transition_v2.pt"))
+    parser.add_argument("--data",       default=str(PROJECT_ROOT / "data" / "trajectories_10k_v2_val.json"))
     parser.add_argument("--n-sequences", type=int, default=N_SEQUENCES)
     parser.add_argument("--n-steps",     type=int, default=N_STEPS)
     parser.add_argument("--seed",        type=int, default=42)
@@ -155,11 +137,9 @@ def main() -> None:
     if not Path(args.checkpoint).exists():
         sys.exit(f"Checkpoint not found: {args.checkpoint}")
 
-    model = load_model(Path(args.checkpoint))
-
-    from kokoro.encoder import SessionEncoder
-    encoder = SessionEncoder()
-    _ = encoder.model
+    model, cfg = load_transition_model(Path(args.checkpoint))
+    from diagnostics.common import make_encoder
+    encoder = make_encoder(cfg)
 
     # Try MSC first, fall back to synthetic
     sequences = load_msc_sequences(args.n_sequences, seed=args.seed)

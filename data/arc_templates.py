@@ -87,6 +87,13 @@ _ZONES = {
     "depressed":   CircumplexZone(valence=-0.7, arousal=-0.5, label="depressed"),
     "exhausted":   CircumplexZone(valence=-0.4, arousal=-0.6, label="exhausted"),
     "lonely":      CircumplexZone(valence=-0.6, arousal=-0.2, label="lonely"),
+
+    # Deep-deactivation zones. Only reachable when the session pool is
+    # augmented with data/low_arousal_pool.py (EmpatheticDialogues has an
+    # arousal floor of ~-0.30, so without augmentation these zones fall back
+    # to shallower sessions via the tolerance-relaxation path).
+    "shutdown":    CircumplexZone(valence=-0.6, arousal=-0.7, label="shutdown"),
+    "serene":      CircumplexZone(valence=+0.5, arousal=-0.6, label="serene"),
 }
 
 
@@ -393,6 +400,54 @@ ARC_TEMPLATES: list[ArcTemplate] = [
         ],
         typical_duration_weeks=(4, 10),
         weight=1.1,
+    ),
+
+    # ------------------------------------------------------------------
+    # Deep-deactivation arcs — require the augmented low-arousal pool
+    # (data/low_arousal_pool.py) to be sampled faithfully. They extend the
+    # arousal axis training signal below the EmpatheticDialogues floor of
+    # ~-0.30, which is the documented cause of the arousal probe ceiling.
+    # ------------------------------------------------------------------
+
+    ArcTemplate(
+        name="depressive_shutdown",
+        description=(
+            "Anxious distress that collapses into deep depressive shutdown — "
+            "arousal falls far below the ED floor while valence stays negative. "
+            "Extends anxiety_to_depression into the deep-deactivation region "
+            "(Q3 → deep Q4). Arousal-primary."
+        ),
+        sessions=[
+            _ZONES["anxious"],     # (-0.4, +0.5)
+            _ZONES["distressed"],  # (-0.6, +0.6)
+            _ZONES["anxious"],
+            _ZONES["sad"],         # (-0.5, -0.3)
+            _ZONES["exhausted"],   # (-0.4, -0.6)
+            _ZONES["shutdown"],    # (-0.6, -0.7) — deep deactivation
+            _ZONES["shutdown"],
+        ],
+        typical_duration_weeks=(4, 10),
+        weight=1.0,
+    ),
+
+    ArcTemplate(
+        name="unwinding_to_serenity",
+        description=(
+            "Positive valence throughout; arousal drops from activated joy into "
+            "deep restful calm (Q1 → deep Q2). The positive-valence twin of "
+            "depressive_shutdown — required so deep-low-arousal does not become "
+            "a proxy for negative valence. Arousal-primary."
+        ),
+        sessions=[
+            _ZONES["excited"],     # (+0.6, +0.6)
+            _ZONES["hopeful"],     # (+0.5, +0.3)
+            _ZONES["content"],     # (+0.5, -0.3)
+            _ZONES["calm"],        # (+0.3, -0.5)
+            _ZONES["serene"],      # (+0.5, -0.6) — deep rest
+            _ZONES["serene"],
+        ],
+        typical_duration_weeks=(3, 8),
+        weight=1.0,
     ),
 ]
 

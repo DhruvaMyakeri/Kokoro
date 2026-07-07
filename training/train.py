@@ -134,6 +134,104 @@ def precompute_embeddings(
 
 
 # ---------------------------------------------------------------------------
+# Vectorized batch rollout
+# ---------------------------------------------------------------------------
+
+def _pad_batch(
+    batch_embs: list[list[torch.Tensor]],
+    device: torch.device,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Stack variable-length trajectories into (B, T_max, D) + lengths (B,).
+
+    Padding slots are zeros; downstream code masks them out via lengths.
+    Vectorizing the rollout across the batch replaces ~213 tiny per-step
+    forward calls per batch with ~8 batched ones — the difference between a
+    multi-hour and a multi-minute CPU retrain.
+    """
+    lens = [len(e) for e in batch_embs]
+    B, T = len(batch_embs), max(lens)
+    D = batch_embs[0][0].shape[-1]
+    X = torch.zeros(B, T, D, device=device)
+    for i, embs in enumerate(batch_embs):
+        X[i, : len(embs)] = torch.stack(embs)
+    return X, torch.tensor(lens, device=device)
+
+
+def rollout_batch(
+    model,
+    batch_embs: list[list[torch.Tensor]],
+    device: torch.device,
+    collect_ablation: bool = False,
+):
+    """Roll a batch of trajectories through the model in parallel.
+
+    Returns a dict of flat tensors over all VALID prediction steps:
+      states   (N, state_dim)  — post-update user states h_t
+      preds    (N, state_dim)  — next-session predictions z_t = predict(h_t)
+      targets  (N, state_dim)  — normalized e_{t+1}[:state_dim]
+      warm     (N,) bool       — True for steps t >= 1 (state carries history)
+      traj_idx (N,) long       — which trajectory each step belongs to
+      abl_preds (N, state_dim) — predictions from a ZEROED state at the same
+                                 step (only when collect_ablation=True); used
+                                 by the state-utility loss.
+      vad_targets (N, 2)       — lexicon (valence, arousal) of the NEXT session
+                                 (only when embeddings carry VAD dims 384:386);
+                                 targets for the auxiliary trajectory head.
+    """
+    from kokoro.transition import predict_from_state
+
+    X, lens = _pad_batch(batch_embs, device)
+    B, T, _ = X.shape
+    Ds = model.state_dim
+
+    state = model.initial_state(batch_size=B, device=device)
+    if state.dim() == 1:                      # batch_size=1 returns (D,)
+        state = state.unsqueeze(0)
+
+    has_vad = X.shape[-1] >= Ds + 2           # lexicon (v, a) in dims 384:386
+
+    states, preds, targets, warm, traj_idx = [], [], [], [], []
+    abl_preds = [] if collect_ablation else None
+    vad_targets = [] if has_vad else None
+    zeros_state = torch.zeros_like(state)
+
+    for t in range(T - 1):
+        state = model(state, X[:, t])
+        valid = (t + 1) < lens                # target session exists
+        if not bool(valid.any()):
+            break
+        z   = predict_from_state(model, state)
+        tgt = F.normalize(X[:, t + 1, :Ds], dim=-1)
+
+        states.append(state[valid])
+        preds.append(z[valid])
+        targets.append(tgt[valid])
+        warm.append(torch.full((int(valid.sum()),), t >= 1, dtype=torch.bool, device=device))
+        traj_idx.append(valid.nonzero(as_tuple=True)[0])
+
+        if collect_ablation:
+            h0 = model(zeros_state, X[:, t])  # same session, no history
+            z0 = predict_from_state(model, h0)
+            abl_preds.append(z0[valid])
+        if has_vad:
+            vad_targets.append(X[:, t + 1, Ds : Ds + 2][valid])
+
+    out = {
+        "states":   torch.cat(states),
+        "preds":    torch.cat(preds),
+        "targets":  torch.cat(targets),
+        "warm":     torch.cat(warm),
+        "traj_idx": torch.cat(traj_idx),
+        "n_traj":   B,
+    }
+    if collect_ablation:
+        out["abl_preds"] = torch.cat(abl_preds)
+    if has_vad:
+        out["vad_targets"] = torch.cat(vad_targets)
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Loss computation
 # ---------------------------------------------------------------------------
 
@@ -170,6 +268,8 @@ def trajectory_loss(
             f"got {len(session_embeddings)}"
         )
 
+    from kokoro.transition import predict_from_state
+
     device = session_embeddings[0].device
     state = model.initial_state(device=device)
 
@@ -177,7 +277,8 @@ def trajectory_loss(
 
     for t in range(len(session_embeddings) - 1):
         state = model(state, session_embeddings[t])
-        state_normed = F.normalize(state, dim=-1)
+        z = predict_from_state(model, state)
+        state_normed = F.normalize(z, dim=-1)
         target = F.normalize(session_embeddings[t + 1][:model.state_dim], dim=-1)
         cos_sim = (state_normed * target).sum()
         total_loss = total_loss + (1.0 - cos_sim)
@@ -192,6 +293,9 @@ def vicreg_loss(
     var_weight: float = 25.0,
     cov_weight: float = 1.0,
     gamma: float = 1.0,
+    util_weight: float = 0.0,
+    util_margin: float = 0.1,
+    vad_weight: float = 0.0,
 ) -> torch.Tensor:
     """
     VICReg objective for transition model training (Bardes et al. 2022).
@@ -228,29 +332,34 @@ def vicreg_loss(
         var_weight:               μ — variance term weight (default 25.0).
         cov_weight:               ν — covariance term weight (default 1.0).
         gamma:                    Target std per dimension (default 1.0).
+        util_weight:              κ — state-utility term weight (default 0.0 = off).
+        util_margin:              Required cosine advantage of history-carrying
+                                  predictions over zero-state predictions.
+
+    State-utility term (the ablation-gap regularizer):
+        For every warm step (t >= 1), the same session is also pushed through
+        the model with a ZEROED state, giving an ablated prediction z0. The
+        term  ReLU(margin - (cos(z, e_{t+1}) - cos(z0, e_{t+1})))  is zero only
+        when the history-carrying prediction beats the history-free one by at
+        least `margin` cosine. This directly optimizes the quantity measured
+        by diagnostics/state_ablation.py — a model that ignores its recurrent
+        state cannot drive this term to zero. Cold-start steps (t = 0) are
+        excluded: there, the normal and ablated paths are identical by
+        construction.
 
     Returns:
         Scalar loss tensor.
     """
     device = batch_session_embeddings[0][0].device
+    batch = [e for e in batch_session_embeddings if len(e) >= 2]
+    if not batch:
+        raise ValueError(
+            "vicreg_loss received a batch with no trajectory of length >= 2 — "
+            "cannot compute a prediction loss."
+        )
 
-    all_states: list[torch.Tensor] = []
-    all_targets: list[torch.Tensor] = []
-
-    for session_embeddings in batch_session_embeddings:
-        if len(session_embeddings) < 2:
-            continue
-        state = model.initial_state(device=device)
-        for t in range(len(session_embeddings) - 1):
-            state = model(state, session_embeddings[t])
-            # Target is the semantic (MiniLM) portion of the next session embedding.
-            # VAD dims are input signal only — state output space is always state_dim.
-            target = F.normalize(session_embeddings[t + 1][:model.state_dim], dim=-1)
-            all_states.append(state)
-            all_targets.append(target)
-
-    Z = torch.stack(all_states)   # (N_total, 384)
-    T = torch.stack(all_targets)  # (N_total, 384)
+    ro = rollout_batch(model, batch, device, collect_ablation=util_weight > 0)
+    Z, T = ro["preds"], ro["targets"]        # (N, 384) each
     N, D = Z.shape
 
     # --- Invariance (prediction) term ---
@@ -259,7 +368,8 @@ def vicreg_loss(
     # soft unit-sphere constraint that conflicts with the variance term
     # (unit-sphere std per dimension ≈ 0.051, but gamma=1.0 requires std≥1).
     z_normed = F.normalize(Z, dim=-1)
-    sim_loss = (1.0 - (z_normed * T).sum(dim=-1)).mean()
+    cos_norm = (z_normed * T).sum(dim=-1)    # (N,)
+    sim_loss = (1.0 - cos_norm).mean()
 
     # --- Variance term ---
     Z_centered = Z - Z.mean(dim=0, keepdim=True)
@@ -271,7 +381,30 @@ def vicreg_loss(
     off_diag_sq = cov.pow(2).sum() - cov.diagonal().pow(2).sum()
     cov_loss = off_diag_sq / D
 
-    return sim_weight * sim_loss + var_weight * var_loss + cov_weight * cov_loss
+    total = sim_weight * sim_loss + var_weight * var_loss + cov_weight * cov_loss
+
+    # --- State-utility term (ablation-gap regularizer) ---
+    if util_weight > 0:
+        warm = ro["warm"]
+        if bool(warm.any()):
+            z0_normed = F.normalize(ro["abl_preds"], dim=-1)
+            cos_abl   = (z0_normed * T).sum(dim=-1)
+            gap       = cos_norm[warm] - cos_abl[warm]
+            util_loss = F.relu(util_margin - gap).mean()
+            total = total + util_weight * util_loss
+
+    # --- Auxiliary trajectory term: predict the NEXT session's (v, a) ---
+    # The next embedding is dominated by unpredictable topical content, so the
+    # invariance term alone gives history little leverage. Next-session
+    # emotional position, by contrast, follows the observed arc — this term is
+    # what makes the recurrent state worth carrying, and it directly trains
+    # the quantity the deployed system consumes (decoded v/a for retrieval).
+    if vad_weight > 0 and "vad_targets" in ro and hasattr(model, "vad_head"):
+        vad_pred = model.vad_head(ro["states"])
+        vad_loss = F.mse_loss(vad_pred, ro["vad_targets"])
+        total = total + vad_weight * vad_loss
+
+    return total
 
 
 # ---------------------------------------------------------------------------
@@ -283,18 +416,50 @@ def evaluate(
     trajectories: list[dict[str, Any]],
     emb_cache: dict[str, torch.Tensor],
     device: torch.device,
-) -> float:
-    """Return mean trajectory loss over a set of trajectories (no gradients)."""
+    batch_size: int = 128,
+    return_ablation_gap: bool = False,
+):
+    """Mean per-trajectory cosine prediction loss on a trajectory set.
+
+    Vectorized across trajectories. With return_ablation_gap=True also returns
+    the mean warm-step ablation gap (cos_normal − cos_ablated) — the same
+    quantity diagnostics/state_ablation.py measures, tracked per epoch so
+    state utility is visible during training, not just post-hoc.
+    """
     model.eval()
-    total = 0.0
+    losses: list[float] = []
+    gaps:   list[float] = []
     with torch.no_grad():
-        for traj in trajectories:
-            embs = [emb_cache[s["conv_id"]] for s in traj["sessions"]]
-            total += trajectory_loss(model, embs).item()
-    return total / len(trajectories)
+        for start in range(0, len(trajectories), batch_size):
+            chunk = trajectories[start : start + batch_size]
+            batch = [
+                [emb_cache[s["conv_id"]] for s in traj["sessions"]]
+                for traj in chunk
+            ]
+            batch = [e for e in batch if len(e) >= 2]
+            if not batch:
+                continue
+            ro = rollout_batch(model, batch, device,
+                               collect_ablation=return_ablation_gap)
+            cos = (F.normalize(ro["preds"], dim=-1) * ro["targets"]).sum(dim=-1)
+            step_loss = 1.0 - cos
+            # per-trajectory mean, matching the legacy metric definition
+            for b in range(ro["n_traj"]):
+                sel = ro["traj_idx"] == b
+                if bool(sel.any()):
+                    losses.append(step_loss[sel].mean().item())
+            if return_ablation_gap and bool(ro["warm"].any()):
+                cos_abl = (F.normalize(ro["abl_preds"], dim=-1) * ro["targets"]).sum(dim=-1)
+                gaps.append((cos[ro["warm"]] - cos_abl[ro["warm"]]).mean().item())
+
+    mean_loss = float(np.mean(losses))
+    if return_ablation_gap:
+        return mean_loss, (float(np.mean(gaps)) if gaps else 0.0)
+    return mean_loss
 
 
-def participation_ratio(model, val_trajectories, emb_cache, device) -> float:
+def participation_ratio(model, val_trajectories, emb_cache, device,
+                        batch_size: int = 128) -> float:
     """
     Compute the participation ratio of state vectors on the validation set.
 
@@ -306,13 +471,18 @@ def participation_ratio(model, val_trajectories, emb_cache, device) -> float:
     model.eval()
     states = []
     with torch.no_grad():
-        for traj in val_trajectories:
-            embs = [emb_cache[s["conv_id"]] for s in traj["sessions"]]
-            state = model.initial_state(device=device)
-            for t in range(len(embs) - 1):
-                state = model(state, embs[t])
-                states.append(state.cpu().numpy())
-    Z = np.array(states)                      # (N, 384)
+        for start in range(0, len(val_trajectories), batch_size):
+            chunk = val_trajectories[start : start + batch_size]
+            batch = [
+                [emb_cache[s["conv_id"]] for s in traj["sessions"]]
+                for traj in chunk
+            ]
+            batch = [e for e in batch if len(e) >= 2]
+            if not batch:
+                continue
+            ro = rollout_batch(model, batch, device)
+            states.append(ro["states"].cpu().numpy())
+    Z = np.concatenate(states, axis=0)        # (N, 384)
     cov = np.cov(Z.T)                         # (384, 384)
     eigvals = np.linalg.eigvalsh(cov)
     eigvals = eigvals[eigvals > 0]
@@ -334,6 +504,9 @@ def train(
     var_weight: float = 25.0,
     cov_weight: float = 1.0,
     gamma: float = 1.0,
+    util_weight: float = 0.0,
+    util_margin: float = 0.1,
+    vad_weight: float = 0.0,
     log_every_n_steps: int = 10,
     checkpoint_path: Path = Path("checkpoints/transition_v1.pt"),
 ) -> dict[str, list[float]]:
@@ -425,6 +598,9 @@ def train(
                 var_weight=var_weight,
                 cov_weight=cov_weight,
                 gamma=gamma,
+                util_weight=util_weight,
+                util_margin=util_margin,
+                vad_weight=vad_weight,
             )
 
             optimizer.zero_grad()
@@ -445,22 +621,31 @@ def train(
         scheduler.step()
         train_loss = epoch_loss / n_batches
 
-        # ----- validation (cosine prediction loss — no regularization terms) -----
-        val_loss = evaluate(model, val_trajectories, emb_cache, device)
+        # ----- validation (cosine prediction loss + ablation gap) -----
+        val_loss, abl_gap = evaluate(
+            model, val_trajectories, emb_cache, device, return_ablation_gap=True
+        )
 
         history["train_loss"].append(train_loss)
         history["val_loss"].append(val_loss)
+        history.setdefault("ablation_gap", []).append(abl_gap)
 
         elapsed = time.perf_counter() - t_start
         logger.info(
             f"Epoch {epoch+1:>3}/{epochs}  "
             f"train={train_loss:.4f}  val={val_loss:.4f}  "
-            f"elapsed={elapsed:.0f}s"
+            f"abl_gap={abl_gap:+.4f}  elapsed={elapsed:.0f}s"
         )
 
         # ----- checkpoint -----
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        # Selection: prediction loss minus ablation gap. Both are in cosine
+        # units, so this picks the epoch with the best prediction quality
+        # ATTRIBUTABLE TO STATE USE — a checkpoint that predicts marginally
+        # better while ignoring its state can no longer win the save.
+        # With util_weight=0 this reduces to plain val_loss (gap ≈ const).
+        select_score = val_loss - (abl_gap if util_weight > 0 else 0.0)
+        if select_score < best_val_loss:
+            best_val_loss = select_score
             best_epoch = epoch + 1
             torch.save(
                 {
@@ -468,12 +653,14 @@ def train(
                     "model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
                     "val_loss": val_loss,
+                    "ablation_gap": abl_gap,
                     "train_loss": train_loss,
                     "model_config": {
                         "state_dim":   model.state_dim,
                         "session_dim": model.session_dim,
                         "hidden_dim":  model.hidden_dim,
                         "l2_norm":     False,
+                        "arch":        "gru" if hasattr(model, "cell") else "mlp",
                     },
                 },
                 checkpoint_path,
@@ -496,6 +683,7 @@ def train(
             {
                 "train_loss": history["train_loss"],
                 "val_loss":   history["val_loss"],
+                "ablation_gap": history.get("ablation_gap", []),
                 "participation_ratio": pr,
                 "best_epoch": best_epoch,
                 "best_val_loss": best_val_loss,
@@ -509,6 +697,9 @@ def train(
                     "var_weight": var_weight,
                     "cov_weight": cov_weight,
                     "gamma": gamma,
+                    "util_weight": util_weight,
+                    "util_margin": util_margin,
+                    "vad_weight": vad_weight,
                 },
             },
             f,
@@ -555,6 +746,25 @@ if __name__ == "__main__":
     parser.add_argument("--var-weight", type=float, default=25.0)
     parser.add_argument("--cov-weight", type=float, default=1.0)
     parser.add_argument("--gamma", type=float, default=1.0)
+    parser.add_argument("--arch", choices=["gru", "mlp"], default="gru",
+                        help="Transition model architecture (default: gru). The GRU "
+                             "decouples the recurrent state from the prediction head; "
+                             "mlp reproduces the legacy state=prediction model.")
+    parser.add_argument("--util-weight", type=float, default=10.0,
+                        help="Weight of the state-utility (ablation-gap) loss term "
+                             "(default: 10.0; 0 disables).")
+    parser.add_argument("--vad-weight", type=float, default=10.0,
+                        help="Weight of the auxiliary next-session (v,a) prediction "
+                             "loss (default: 10.0; 0 disables). Requires VAD-featured "
+                             "embeddings (session_dim >= 386).")
+    parser.add_argument("--util-margin", type=float, default=0.1,
+                        help="Required cosine advantage of history-carrying over "
+                             "zero-state predictions (default: 0.1).")
+    parser.add_argument("--val-data", type=str, default=None,
+                        help="Optional separate validation trajectory file (e.g. the "
+                             "conversation-disjoint *_val.json emitted by "
+                             "construct_trajectories --holdout-conv-fraction). When "
+                             "given, --data is used entirely for training.")
     parser.add_argument("--log-steps", type=int, default=50,
                         help="Log step-level loss every N steps (default: 50)")
     parser.add_argument("--holdout-arcs", nargs="*", default=[],
@@ -563,6 +773,11 @@ if __name__ == "__main__":
                              "(e.g. --holdout-arcs grief_arc post_traumatic_growth). "
                              "Withheld arcs are removed from train; val keeps all arcs "
                              "so you can measure OOD performance on the withheld types.")
+    parser.add_argument("--allow-leaky-split", action="store_true",
+                        help="Reproduce the legacy trajectory-level split WITHOUT "
+                             "removing val trajectories that share source conversations "
+                             "with train. Only for comparing against old runs — val "
+                             "metrics under this flag are optimistically biased.")
     args = parser.parse_args()
 
     traj_path = Path(args.data)
@@ -580,31 +795,44 @@ if __name__ == "__main__":
         trajectories = json.load(f)
     logger.info(f"Loaded {len(trajectories)} trajectories from {traj_path.name}")
 
+    # ----- Train/val split -----
+    if args.val_data:
+        # Pre-built conversation-disjoint val file (preferred: no trajectories
+        # are wasted on post-hoc partitioning).
+        with open(args.val_data) as f:
+            val_trajs = json.load(f)
+        train_trajs = trajectories
+        from training.split import leakage_report
+        rep = leakage_report(train_trajs, val_trajs)
+        logger.info(
+            f"Using explicit val file {Path(args.val_data).name}: "
+            f"{len(train_trajs)} train / {len(val_trajs)} val | "
+            f"shared convs: {rep['n_shared_convs']}"
+        )
+        if rep["n_shared_convs"]:
+            logger.warning("Val file shares conversations with train — metrics will be biased!")
+    else:
+        # Conversation-disjoint partition of a single file (default)
+        from training.split import conv_disjoint_split
+        train_trajs, val_trajs, split_report = conv_disjoint_split(
+            trajectories,
+            val_fraction=0.2,
+            seed=42,
+            enforce_disjoint=not args.allow_leaky_split,
+        )
+
     # ----- Arc holdout (OOD experiment) -----
     holdout_arcs: set[str] = set(args.holdout_arcs)
     if holdout_arcs:
-        before = len(trajectories)
         # Val keeps ALL arcs (so we can evaluate OOD performance on withheld types)
         # Train removes withheld arcs entirely
-        random.seed(42)
-        random.shuffle(trajectories)
-        split = int(0.8 * len(trajectories))
-        train_trajs_all = trajectories[:split]
-        val_trajs = trajectories[split:]
-        train_trajs = [t for t in train_trajs_all if t.get("arc_name", "") not in holdout_arcs]
-        removed = len(train_trajs_all) - len(train_trajs)
+        before = len(train_trajs)
+        train_trajs = [t for t in train_trajs if t.get("arc_name", "") not in holdout_arcs]
         logger.info(
             f"Arc holdout OOD mode: withheld arcs = {sorted(holdout_arcs)}\n"
-            f"  Removed {removed} train trajectories covering withheld arcs\n"
+            f"  Removed {before - len(train_trajs)} train trajectories covering withheld arcs\n"
             f"  Train: {len(train_trajs)}  |  Val: {len(val_trajs)} (all arcs, for OOD eval)"
         )
-    else:
-        # ----- Train/val split (standard) -----
-        random.seed(42)
-        random.shuffle(trajectories)
-        split = int(0.8 * len(trajectories))
-        train_trajs = trajectories[:split]
-        val_trajs = trajectories[split:]
     logger.info(f"Split: {len(train_trajs)} train / {len(val_trajs)} val")
 
     # ----- Device -----
@@ -624,9 +852,10 @@ if __name__ == "__main__":
     emb_cache = precompute_embeddings(train_trajs + val_trajs, encoder, device)
 
     # ----- Model -----
-    from kokoro.transition import TransitionModel
-    model = TransitionModel(session_dim=encoder.output_dim).to(device)
-    logger.info(f"Model: {model.parameter_count():,} parameters")
+    from kokoro.transition import TransitionModel, TransitionModelGRU
+    model_cls = TransitionModelGRU if args.arch == "gru" else TransitionModel
+    model = model_cls(session_dim=encoder.output_dim).to(device)
+    logger.info(f"Model: {args.arch.upper()}, {model.parameter_count():,} parameters")
 
     # ----- Train -----
     history = train(
@@ -644,6 +873,9 @@ if __name__ == "__main__":
         var_weight=args.var_weight,
         cov_weight=args.cov_weight,
         gamma=args.gamma,
+        util_weight=args.util_weight,
+        util_margin=args.util_margin,
+        vad_weight=args.vad_weight,
         log_every_n_steps=args.log_steps,
         checkpoint_path=ckpt_path,
     )

@@ -27,7 +27,7 @@ Thresholds (tunable, calibrated from val-set probe predictions):
   slope:     > 0.02 → improving,  < -0.02 → declining,   else stable
   MIN_SESSIONS = 3   — minimum sessions to produce a summary
 
-Default probe path: checkpoints/valence_arousal_probe.pt
+Default probe path: checkpoints/valence_arousal_probe_v2.pt
   (relative to the kokoro/ package parent, i.e. the project root)
 """
 
@@ -48,15 +48,15 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 _PKG_ROOT = Path(__file__).parent.parent          # project root
-_DEFAULT_PROBE = _PKG_ROOT / "checkpoints" / "valence_arousal_probe.pt"
+_DEFAULT_PROBE = _PKG_ROOT / "checkpoints" / "valence_arousal_probe_v2.pt"
 
 _MIN_SESSIONS: int   = 3      # sessions required before summary is produced
 _MIN_TREND_ENTRIES   = 3      # arc_history entries required to compute slope
 
-_VALENCE_POS:  float = 0.007  # 67th pct of val-set predictions
-_VALENCE_NEG:  float = -0.349  # 33rd pct of val-set predictions
-_AROUSAL_HIGH: float =  0.306  # 75th pct of val-set predictions
-_AROUSAL_LOW:  float =  0.017  # 25th pct of val-set predictions
+_VALENCE_POS:  float = 0.060  # 67th pct of val-set predictions
+_VALENCE_NEG:  float = -0.429  # 33rd pct of val-set predictions
+_AROUSAL_HIGH: float =  0.328  # 75th pct of val-set predictions
+_AROUSAL_LOW:  float =  -0.019  # 25th pct of val-set predictions
 _SLOPE_IMP:    float =  0.02   # slope > this   → "improving"
 _SLOPE_DEC:    float = -0.02   # slope < this   → "declining"
 
@@ -109,20 +109,20 @@ def _classify_trend(slope: float) -> str:
     return "stable"
 
 
-def _describe_valence(v: float) -> str:
+def _describe_valence(v: float, pos: float = _VALENCE_POS, neg: float = _VALENCE_NEG) -> str:
     """Single-word valence descriptor."""
-    if v > _VALENCE_POS:
+    if v > pos:
         return "positive"
-    if v < _VALENCE_NEG:
+    if v < neg:
         return "negative"
     return "neutral"
 
 
-def _describe_arousal(a: float) -> str:
+def _describe_arousal(a: float, high: float = _AROUSAL_HIGH, low: float = _AROUSAL_LOW) -> str:
     """Single-word arousal descriptor."""
-    if a > _AROUSAL_HIGH:
+    if a > high:
         return "activated"
-    if a < _AROUSAL_LOW:
+    if a < low:
         return "low-energy"
     return "moderate"
 
@@ -136,6 +136,7 @@ def _build_summary(
     mean_arousal: float,
     session_count: int,
     n_history: int,
+    thresholds: dict[str, float] | None = None,
 ) -> str:
     """
     Produce a natural-language summary from continuous emotional coordinates.
@@ -145,9 +146,15 @@ def _build_summary(
     trend) produces a distinct sentence structure, but the wording varies with
     the continuous values so it never reads as a slot-filled template.
     """
-    v_word  = _describe_valence(valence)
-    a_word  = _describe_arousal(arousal)
-    mv_word = _describe_valence(mean_valence)
+    th = thresholds or {}
+    v_pos  = th.get("valence_pos",  _VALENCE_POS)
+    v_neg  = th.get("valence_neg",  _VALENCE_NEG)
+    a_high = th.get("arousal_high", _AROUSAL_HIGH)
+    a_low  = th.get("arousal_low",  _AROUSAL_LOW)
+
+    v_word  = _describe_valence(valence, v_pos, v_neg)
+    a_word  = _describe_arousal(arousal, a_high, a_low)
+    mv_word = _describe_valence(mean_valence, v_pos, v_neg)
 
     # Temporal reference
     n_ref = f"the past {n_history} sessions" if n_history >= 5 else "recent sessions"
@@ -234,7 +241,7 @@ def _build_summary(
             )
 
     # Append historical mean note if it differs meaningfully from current
-    mean_v_word = _describe_valence(mean_valence)
+    mean_v_word = mv_word
     if mean_v_word != v_word:
         summary += (
             f" Historical mean valence across the window is {mean_v_word}, "
@@ -262,7 +269,7 @@ class StateDecoder:
     Args:
         probe_path: Path to the linear probe checkpoint produced by
                     training/train_probe.py.  Defaults to
-                    checkpoints/valence_arousal_probe.pt relative to the
+                    checkpoints/valence_arousal_probe_v2.pt relative to the
                     project root.
     """
 
@@ -273,21 +280,33 @@ class StateDecoder:
                 f"Linear probe not found at {path}. "
                 "Run `python -m training.train_probe` to generate it."
             )
-        self._probe = self._load_probe(path)
+        self._probe, self._thresholds = self._load_probe(path)
         self._probe.eval()
-        logger.debug(f"StateDecoder: probe loaded from {path}")
+        logger.debug(
+            f"StateDecoder: probe loaded from {path} "
+            f"(thresholds: {'checkpoint' if self._thresholds else 'module defaults'})"
+        )
 
     # ------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _load_probe(path: Path) -> _ValenceArousalProbe:
+    def _load_probe(path: Path) -> tuple[_ValenceArousalProbe, dict[str, float]]:
+        """Load the probe weights and, when present, the calibration thresholds.
+
+        Thresholds travel WITH the probe checkpoint (written by
+        training/train_probe.py) so a retrain can never leave the decoder
+        classifying against a stale distribution. Older checkpoints without a
+        'thresholds' key fall back to the module-level constants.
+        """
         ckpt      = torch.load(str(path), map_location="cpu", weights_only=True)
         cfg       = ckpt.get("probe_config", {"state_dim": 384})
         probe     = _ValenceArousalProbe(state_dim=cfg.get("state_dim", 384))
         probe.load_state_dict(ckpt["model_state_dict"])
-        return probe
+        raw = ckpt.get("thresholds") or {}
+        thresholds = {k: float(v) for k, v in raw.items()} if raw else {}
+        return probe, thresholds
 
     def _run_probe(self, state_vector: np.ndarray) -> tuple[float, float]:
         """Return (valence, arousal) predicted by the linear probe, clamped to [-1.5, 1.5]."""
@@ -379,6 +398,7 @@ class StateDecoder:
                 mean_arousal   = mean_arousal,
                 session_count  = session_count,
                 n_history      = len(arc_history),
+                thresholds     = self._thresholds,
             )
         else:
             summary = None
