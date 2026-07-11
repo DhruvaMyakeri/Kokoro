@@ -1,0 +1,150 @@
+18:41:25  INFO     Loaded 10000 trajectories from trajectories_10k_v2.json
+18:41:25  INFO     Using explicit val file trajectories_10k_v2_val.json: 10000 train / 2000 val | shared convs: 0
+18:41:25  INFO     Split: 10000 train / 2000 val
+18:41:25  INFO     Device: cpu
+C:\Users\Lenovo\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\__init__.py:113: RequestsDependencyWarning: urllib3 (1.26.15) or chardet (7.4.1)/charset_normalizer (3.4.6) doesn't match a supported version!
+  warnings.warn(
+18:41:59  INFO     Loading sentence transformer: sentence-transformers/all-MiniLM-L6-v2
+18:41:59  INFO     No device provided, using cuda:0
+18:41:59  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+18:41:59  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/modules.json "HTTP/1.1 200 OK"
+18:41:59  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+18:41:59  WARNING  Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+18:41:59  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config_sentence_transformers.json "HTTP/1.1 200 OK"
+18:41:59  INFO     Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+18:42:00  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+18:42:00  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config_sentence_transformers.json "HTTP/1.1 200 OK"
+18:42:00  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+18:42:00  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/README.md "HTTP/1.1 200 OK"
+18:42:00  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+18:42:00  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/modules.json "HTTP/1.1 200 OK"
+18:42:00  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+18:42:00  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/sentence_bert_config.json "HTTP/1.1 200 OK"
+18:42:01  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+18:42:01  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+18:42:01  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json "HTTP/1.1 200 OK"
+18:42:01  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+18:42:01  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 4128.80it/s]
+18:42:02  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+18:42:02  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+18:42:02  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/video_preprocessor_config.json "HTTP/1.1 404 Not Found"
+18:42:02  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+18:42:03  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+18:42:03  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer_config.json "HTTP/1.1 200 OK"
+18:42:03  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+18:42:03  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json "HTTP/1.1 200 OK"
+18:42:03  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+18:42:03  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json "HTTP/1.1 200 OK"
+18:42:03  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+18:42:03  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer_config.json "HTTP/1.1 200 OK"
+18:42:04  INFO     HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+18:42:04  INFO     HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+18:42:04  INFO     HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+18:42:04  INFO     HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+18:42:05  INFO     HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2 "HTTP/1.1 200 OK"
+18:42:05  INFO       Model loaded. Embedding dim: 384, device: cuda:0
+18:42:05  INFO     Precomputing embeddings for 16773 unique sessions...
+18:42:18  INFO       16773 sessions encoded in 13.2s (0.8 ms/session)
+18:42:18  INFO     Model: GRU, 1,286,152 parameters
+18:42:18  INFO     Training: 10000 trajectories | Validation: 2000 trajectories
+18:42:18  INFO     Epochs: 60 | Batch size: 32 | 313 steps/epoch | LR: 0.001 \u2192 1.00e-05 (cosine) | Weight decay: 0.0001
+18:42:18  INFO     VICReg weights — sim: 25.0  var: 25.0  cov: 1.0  gamma: 1.0
+18:42:43  INFO     Epoch   1/60  train=25.9405  val=0.5289  abl_gap=+0.0940  elapsed=25s
+18:42:43  INFO       [best] New val_loss=0.5289 -- saved to checkpoints\transition_v2.pt
+18:43:04  INFO     Epoch   2/60  train=21.8824  val=0.5184  abl_gap=+0.0607  elapsed=46s
+18:43:23  INFO     Epoch   3/60  train=21.5397  val=0.5250  abl_gap=+0.0966  elapsed=65s
+18:43:23  INFO       [best] New val_loss=0.5250 -- saved to checkpoints\transition_v2.pt
+18:43:41  INFO     Epoch   4/60  train=21.3224  val=0.5232  abl_gap=+0.1005  elapsed=82s
+18:43:41  INFO       [best] New val_loss=0.5232 -- saved to checkpoints\transition_v2.pt
+18:43:59  INFO     Epoch   5/60  train=21.1736  val=0.5236  abl_gap=+0.1057  elapsed=101s
+18:43:59  INFO       [best] New val_loss=0.5236 -- saved to checkpoints\transition_v2.pt
+18:44:21  INFO     Epoch   6/60  train=21.0263  val=0.5226  abl_gap=+0.1009  elapsed=123s
+18:44:48  INFO     Epoch   7/60  train=20.8778  val=0.5290  abl_gap=+0.1441  elapsed=150s
+18:44:48  INFO       [best] New val_loss=0.5290 -- saved to checkpoints\transition_v2.pt
+18:45:14  INFO     Epoch   8/60  train=20.7413  val=0.5214  abl_gap=+0.0908  elapsed=176s
+18:45:38  INFO     Epoch   9/60  train=20.6097  val=0.5254  abl_gap=+0.1116  elapsed=200s
+18:46:02  INFO     Epoch  10/60  train=20.4760  val=0.5291  abl_gap=+0.1297  elapsed=224s
+18:46:27  INFO     Epoch  11/60  train=20.3473  val=0.5361  abl_gap=+0.1663  elapsed=249s
+18:46:27  INFO       [best] New val_loss=0.5361 -- saved to checkpoints\transition_v2.pt
+18:46:51  INFO     Epoch  12/60  train=20.2292  val=0.5329  abl_gap=+0.1388  elapsed=273s
+18:47:15  INFO     Epoch  13/60  train=20.0880  val=0.5327  abl_gap=+0.1351  elapsed=297s
+18:47:39  INFO     Epoch  14/60  train=19.9825  val=0.5252  abl_gap=+0.1026  elapsed=321s
+18:48:03  INFO     Epoch  15/60  train=19.8866  val=0.5310  abl_gap=+0.1150  elapsed=345s
+18:48:27  INFO     Epoch  16/60  train=19.7672  val=0.5317  abl_gap=+0.1256  elapsed=369s
+18:48:52  INFO     Epoch  17/60  train=19.6824  val=0.5313  abl_gap=+0.1149  elapsed=393s
+18:49:16  INFO     Epoch  18/60  train=19.5465  val=0.5334  abl_gap=+0.1188  elapsed=418s
+18:49:40  INFO     Epoch  19/60  train=19.4512  val=0.5335  abl_gap=+0.1257  elapsed=442s
+18:50:05  INFO     Epoch  20/60  train=19.3373  val=0.5364  abl_gap=+0.1286  elapsed=467s
+18:50:29  INFO     Epoch  21/60  train=19.2518  val=0.5406  abl_gap=+0.1582  elapsed=491s
+18:50:56  INFO     Epoch  22/60  train=19.1398  val=0.5458  abl_gap=+0.1644  elapsed=517s
+18:51:22  INFO     Epoch  23/60  train=19.0625  val=0.5390  abl_gap=+0.1283  elapsed=543s
+18:51:47  INFO     Epoch  24/60  train=18.9713  val=0.5447  abl_gap=+0.1600  elapsed=569s
+18:52:14  INFO     Epoch  25/60  train=18.8510  val=0.5377  abl_gap=+0.1278  elapsed=595s
+18:52:39  INFO     Epoch  26/60  train=18.7826  val=0.5486  abl_gap=+0.1770  elapsed=621s
+18:53:04  INFO     Epoch  27/60  train=18.6920  val=0.5466  abl_gap=+0.1630  elapsed=646s
+18:53:31  INFO     Epoch  28/60  train=18.6010  val=0.5436  abl_gap=+0.1459  elapsed=673s
+18:53:59  INFO     Epoch  29/60  train=18.5199  val=0.5512  abl_gap=+0.1817  elapsed=701s
+18:53:59  INFO       [best] New val_loss=0.5512 -- saved to checkpoints\transition_v2.pt
+18:54:28  INFO     Epoch  30/60  train=18.4440  val=0.5461  abl_gap=+0.1529  elapsed=730s
+18:55:01  INFO     Epoch  31/60  train=18.3540  val=0.5522  abl_gap=+0.1779  elapsed=763s
+18:55:32  INFO     Epoch  32/60  train=18.2802  val=0.5448  abl_gap=+0.1400  elapsed=794s
+18:55:57  INFO     Epoch  33/60  train=18.2114  val=0.5474  abl_gap=+0.1538  elapsed=819s
+18:56:23  INFO     Epoch  34/60  train=18.1366  val=0.5503  abl_gap=+0.1652  elapsed=845s
+18:56:52  INFO     Epoch  35/60  train=18.0604  val=0.5460  abl_gap=+0.1432  elapsed=874s
+18:57:17  INFO     Epoch  36/60  train=17.9973  val=0.5484  abl_gap=+0.1599  elapsed=899s
+18:57:43  INFO     Epoch  37/60  train=17.9514  val=0.5507  abl_gap=+0.1672  elapsed=925s
+18:58:10  INFO     Epoch  38/60  train=17.8863  val=0.5495  abl_gap=+0.1587  elapsed=952s
+18:58:36  INFO     Epoch  39/60  train=17.8145  val=0.5489  abl_gap=+0.1579  elapsed=977s
+18:59:05  INFO     Epoch  40/60  train=17.7702  val=0.5495  abl_gap=+0.1631  elapsed=1007s
+18:59:32  INFO     Epoch  41/60  train=17.7271  val=0.5536  abl_gap=+0.1794  elapsed=1034s
+18:59:56  INFO     Epoch  42/60  train=17.6784  val=0.5485  abl_gap=+0.1552  elapsed=1058s
+19:00:22  INFO     Epoch  43/60  train=17.6225  val=0.5544  abl_gap=+0.1869  elapsed=1084s
+19:00:22  INFO       [best] New val_loss=0.5544 -- saved to checkpoints\transition_v2.pt
+19:00:49  INFO     Epoch  44/60  train=17.5863  val=0.5533  abl_gap=+0.1803  elapsed=1110s
+19:01:14  INFO     Epoch  45/60  train=17.5463  val=0.5505  abl_gap=+0.1629  elapsed=1135s
+19:01:39  INFO     Epoch  46/60  train=17.5139  val=0.5507  abl_gap=+0.1651  elapsed=1161s
+19:02:08  INFO     Epoch  47/60  train=17.4816  val=0.5524  abl_gap=+0.1740  elapsed=1190s
+19:02:32  INFO     Epoch  48/60  train=17.4613  val=0.5503  abl_gap=+0.1633  elapsed=1214s
+19:02:57  INFO     Epoch  49/60  train=17.4259  val=0.5517  abl_gap=+0.1737  elapsed=1239s
+19:03:26  INFO     Epoch  50/60  train=17.4092  val=0.5530  abl_gap=+0.1826  elapsed=1267s
+19:03:51  INFO     Epoch  51/60  train=17.3735  val=0.5514  abl_gap=+0.1695  elapsed=1293s
+19:04:16  INFO     Epoch  52/60  train=17.3678  val=0.5521  abl_gap=+0.1768  elapsed=1318s
+19:04:44  INFO     Epoch  53/60  train=17.3390  val=0.5519  abl_gap=+0.1742  elapsed=1346s
+19:05:12  INFO     Epoch  54/60  train=17.3263  val=0.5516  abl_gap=+0.1720  elapsed=1374s
+19:05:44  INFO     Epoch  55/60  train=17.3225  val=0.5518  abl_gap=+0.1739  elapsed=1406s
+19:06:11  INFO     Epoch  56/60  train=17.3132  val=0.5519  abl_gap=+0.1750  elapsed=1433s
+19:06:33  INFO     Epoch  57/60  train=17.2970  val=0.5520  abl_gap=+0.1775  elapsed=1455s
+19:06:53  INFO     Epoch  58/60  train=17.3028  val=0.5524  abl_gap=+0.1775  elapsed=1475s
+19:07:12  INFO     Epoch  59/60  train=17.2914  val=0.5522  abl_gap=+0.1768  elapsed=1494s
+19:07:32  INFO     Epoch  60/60  train=17.2844  val=0.5517  abl_gap=+0.1752  elapsed=1514s
+19:07:33  INFO     
+Participation ratio: 37.8 / 384  (target > 20)
+19:07:33  INFO     Training complete. Best val_loss=0.3675 at epoch 43.
+19:07:33  INFO     History saved to checkpoints\transition_v2.history.json
+
+============================================================
+Training summary
+============================================================
+  Best val loss:        0.5184  (epoch 2)
+  Final train loss:     17.2844
+  Final val loss:       0.5517
+  Participation ratio:  37.8 / 384  (target > 20)
+  Checkpoint:           checkpoints\transition_v2.pt
+
+  Loss curve (val, every 5 epochs):
+    Epoch   1: 0.5289  ###############
+    Epoch   6: 0.5226  ###############
+    Epoch  11: 0.5361  ################
+    Epoch  16: 0.5317  ###############
+    Epoch  21: 0.5406  ################
+    Epoch  26: 0.5486  ################
+    Epoch  31: 0.5522  ################
+    Epoch  36: 0.5484  ################
+    Epoch  41: 0.5536  ################
+    Epoch  46: 0.5507  ################
+    Epoch  51: 0.5514  ################
+    Epoch  56: 0.5519  ################
+
+Smoke test complete.

@@ -1,0 +1,123 @@
+INFO: Loading transition model...
+INFO:   arch=gru, state_dim=384, session_dim=387
+INFO: Loading session encoder...
+C:\Users\Lenovo\AppData\Local\Programs\Python\Python310\lib\site-packages\requests\__init__.py:113: RequestsDependencyWarning: urllib3 (1.26.15) or chardet (7.4.1)/charset_normalizer (3.4.6) doesn't match a supported version!
+  warnings.warn(
+INFO: Loading sentence transformer: sentence-transformers/all-MiniLM-L6-v2
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/modules.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config_sentence_transformers.json "HTTP/1.1 200 OK"
+INFO: Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+WARNING: Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config_sentence_transformers.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/README.md "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/modules.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/sentence_bert_config.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 4281.51it/s]
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/processor_config.json "HTTP/1.1 404 Not Found"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/video_preprocessor_config.json "HTTP/1.1 404 Not Found"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/preprocessor_config.json "HTTP/1.1 404 Not Found"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer_config.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer_config.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+INFO: HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+INFO: HTTP Request: HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+INFO: HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/all-MiniLM-L6-v2/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+INFO: HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/all-MiniLM-L6-v2 "HTTP/1.1 200 OK"
+INFO:   Model loaded. Embedding dim: 384, device: cpu
+INFO: Loading trajectories from trajectories_10k_v2.json...
+INFO:   10,000 trajectories loaded
+INFO:   Split: 10,000 train / 2,000 val trajectories
+INFO: Precomputing session embeddings...
+INFO:   Encoding 16,773 unique sessions...
+INFO:     1,500/16,773 (9%)  [7.7s]
+INFO:     9,000/16,773 (54%)  [42.7s]
+INFO:     16,500/16,773 (98%)  [81.3s]
+INFO:     16,773/16,773 (100%)  [83.4s]
+INFO:   Embedding done in 83.4s
+INFO: Building probe datasets from state trajectories...
+INFO:   Training set...
+INFO:   Validation set...
+INFO:   Train: 75,849 samples  Val: 15,162 samples
+INFO:   Valence range: [-0.85, 0.85]  Arousal range: [-0.80, 0.80]
+INFO: Training linear probe...
+INFO:   Probe parameters: 770
+INFO:   Epoch   1/100  train_mse=0.40185  val_mse=0.23156  r_val=0.5609  r_aro=0.3585
+INFO:   Epoch  10/100  train_mse=0.09494  val_mse=0.10467  r_val=0.7566  r_aro=0.6292
+INFO:   Epoch  20/100  train_mse=0.08835  val_mse=0.09774  r_val=0.7664  r_aro=0.6624
+INFO:   Epoch  30/100  train_mse=0.08718  val_mse=0.10083  r_val=0.7685  r_aro=0.6661
+INFO:   Epoch  40/100  train_mse=0.08633  val_mse=0.09695  r_val=0.7696  r_aro=0.6709
+INFO:   Epoch  50/100  train_mse=0.08581  val_mse=0.09646  r_val=0.7694  r_aro=0.6708
+INFO:   Epoch  60/100  train_mse=0.08557  val_mse=0.09605  r_val=0.7702  r_aro=0.6722
+INFO:   Epoch  70/100  train_mse=0.08557  val_mse=0.09601  r_val=0.7694  r_aro=0.6721
+INFO:   Epoch  80/100  train_mse=0.08513  val_mse=0.09637  r_val=0.7695  r_aro=0.6719
+INFO:   Epoch  90/100  train_mse=0.08502  val_mse=0.09602  r_val=0.7695  r_aro=0.6722
+INFO:   Epoch 100/100  train_mse=0.08490  val_mse=0.09604  r_val=0.7695  r_aro=0.6722
+
+==================================================================
+  Linear Probe: Valence + Arousal from State Vectors
+==================================================================
+  Architecture                         Linear(384 -> 2), no hidden layers
+  Training samples                         75,849
+  Validation samples                       15,162
+  Best val MSE (epoch)                    0.09595  (epoch 86)
+------------------------------------------------------------------
+  Metric                    Valence       Arousal
+------------------------------------------------------------------
+  Pearson r                  0.7695        0.6722
+  MSE                       0.10934       0.08274
+  MAE                        0.2480        0.2315
+------------------------------------------------------------------
+  Overall MSE                               0.09604
+------------------------------------------------------------------
+  INTERPRETATION
+  Valence: r = 0.7695  — strong linear decodability
+  Arousal: r = 0.6722  — moderate linear decodability
+
+  Ground truth range (valence):  [-0.85, 0.85]
+  Ground truth range (arousal):  [-0.79, 0.80]
+  Prediction range  (valence):   [-0.99, 0.99]
+  Prediction range  (arousal):   [-0.87, 0.93]
+==================================================================
+INFO: Saving probe to checkpoints\valence_arousal_probe_v2.pt...
+INFO:   Saved: checkpoints\valence_arousal_probe_v2.pt (thresholds embedded: {'valence_pos': 0.059572432190179825, 'valence_neg': -0.4288036823272705, 'arousal_high': 0.32806527614593506, 'arousal_low': -0.019019443541765213})
+
+==================================================================
+  SANITY CHECK: stable_positive vs stable_negative
+==================================================================
+  stable_positive             pred_val=+0.327  pred_aro=-0.549  (gt_val=+0.523  gt_aro=-0.114)
+  stable_negative             pred_val=-0.314  pred_aro=-0.274  (gt_val=-0.552  gt_aro=-0.291)
+------------------------------------------------------------------
+  stable_positive valence (+0.327) > stable_negative valence (-0.314):  [PASS]
+==================================================================
+INFO: Recalibrating decoder fallback thresholds...
+
+==================================================================
+  Decoder threshold recalibration
+==================================================================
+  Constant               Old       New  Basis
+------------------------------------------------------------------
+  _VALENCE_POS         0.007     0.060  67th pct of val-set predictions
+  _VALENCE_NEG        -0.349    -0.429  33rd pct of val-set predictions
+  _AROUSAL_HIGH        0.306     0.328  75th pct of val-set predictions
+  _AROUSAL_LOW         0.017    -0.019  25th pct of val-set predictions
+==================================================================
+INFO:   Patched: D:\PROJECTS\Research\Worldmodel_memory\kokoro\decoder.py

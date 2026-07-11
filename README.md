@@ -2,9 +2,11 @@
 
 **Emotional trajectory memory for AI companions.**
 
-Kokoro is a memory layer that tracks how a user has been feeling across conversations, not just what they said. It gives your AI companion a sense of the person's emotional history so responses feel like they come from something that actually knows them.
+Kokoro is a memory layer that tracks how a user has been feeling across conversations, not just what they said. It maintains a learned recurrent "world model" of the user's emotional trajectory, decodes it into interpretable valence/arousal coordinates, and uses those coordinates to retrieve emotionally relevant memories and to brief the companion LLM on the user's direction of travel.
 
 Most companion systems remember facts. Kokoro remembers how someone has been doing.
+
+Full technical report: [research_report.md](research_report.md). Change history: [improvements_report.md](improvements_report.md). Codebase navigation: [codebase_map.md](codebase_map.md).
 
 ---
 
@@ -12,23 +14,30 @@ Most companion systems remember facts. Kokoro remembers how someone has been doi
 
 Every AI companion today resets emotionally at the start of each conversation. It might remember that you have a dog named Bruno or that you work in finance. It does not know that you have been grinding through burnout for three weeks, that last Tuesday felt like a turning point, or that your message today, _"still here lol"_, carries more weight than it looks like.
 
+There is a sharper version of this problem: purely semantic retrieval actively fetches the *wrong* memories after an emotional phase shift. A user who burned out over "the big sprint" and then recovered will, on mentioning "sprint" again, get their burnout-era memories back, because those match the keywords. Kokoro's hybrid retrieval is built to fetch the recovery-era ones instead.
+
 ---
 
 ## How it works
 
-**Each session gets encoded.** When a conversation ends, Kokoro encodes the full session into an embedding and runs it through a learned transition model that updates a continuous state vector, a compressed representation of the user's recent emotional trajectory.
+**Each session gets encoded.** When a conversation ends, Kokoro encodes the full session with `all-MiniLM-L6-v2` (user turns weighted 2x) plus a 3-dim valence/arousal/dominance signal from a Warriner VAD lexicon, giving a 387-dim vector.
 
-**The state is decoded into emotional coordinates.** A linear probe maps the state vector to valence and arousal (Russell's circumplex model), then generates a plain-English summary of the trajectory.
+**A GRU world model updates the user state.** The user's state is a 384-dim GRU hidden state: a gated, bounded accumulator of trajectory history, updated once per session. A separate prediction head forecasts the next session's embedding, and an auxiliary head forecasts the next session's (valence, arousal). The state and the prediction are deliberately different objects; the previous MLP design conflated them and its state provably carried no information (see Training below).
 
-**Retrieval is emotionally weighted.** When the user sends a new message, Kokoro retrieves relevant past sessions using a hybrid score:
+**The state is decoded into emotional coordinates.** A linear probe maps the state to (valence, arousal) on Russell's circumplex, a trend is fit over the recent history, and a plain-English summary is generated ("declining across the past 7 sessions, currently negative and low-energy"). Classification thresholds are calibrated percentiles stored inside the probe checkpoint, so a retrain can never leave the decoder stale.
+
+**Retrieval is emotionally weighted.** When the user sends a new message, past sessions are ranked by:
 
 ```
-score_i = (1-γ) · [α · semantic(query, session_i) + (1-α) · emotional(state, session_i)] + γ · recency_i
+score_i = (1-y) * [ a * semantic_i + (1-a) * emotional_i ] + y * recency_i
 ```
 
-The semantic axis is cosine similarity rescaled to [0, 1]; the emotional axis is VAD-coordinate L2 proximity, comparing the user's current decoded (valence, arousal) against each stored session's coordinates; the optional recency axis (γ, default 0) is an exponential decay over storage order. Default blend: α = 0.6. With `adaptive_alpha=True`, α falls back toward 1.0 when the user's stored history is emotionally homogeneous (the emotional axis then has nothing to rank).
+- `semantic_i`: cosine similarity of MiniLM embeddings, rescaled to [0, 1]
+- `emotional_i`: 1 - L2distance((v,a)_current, (v,a)_i) / sqrt(8), proximity in the decoded circumplex. This is deliberately not state-to-state cosine: all learned states sit in a tight angular cone (cos ~0.98-1.00 regardless of mood), so the interpretable 2-D space is the right metric space.
+- `recency_i`: exponential decay over storage order, weight `y` (default 0, off)
+- with `adaptive_alpha=True`, `a` falls back toward 1.0 when the stored history is emotionally homogeneous and the emotional axis has nothing to rank
 
-**The LLM receives both.** The state summary is injected into the system prompt; the retrieved memories provide session-level context.
+**The LLM receives both.** The state summary goes into the system prompt; the retrieved memories provide session-level context.
 
 ---
 
@@ -55,7 +64,6 @@ memory.update(session_turns)
 # Before each LLM reply
 context = memory.get_context(user_message)
 
-# Use it
 response = llm(
     system=context["state_summary"],
     memories=context["relevant_memories"],
@@ -63,161 +71,200 @@ response = llm(
 )
 ```
 
-`session_turns` is a list of `{"role": "user"|"assistant", "content": "..."}` dicts.
+`session_turns` is a list of `{"role": "user"|"assistant", "content": "..."}` dicts. Useful constructor options: `alpha`, `top_k`, `recency_weight`, `adaptive_alpha`, `retrieval_fn` (plug in your own vector store), `checkpoint_path`/`probe_path`.
 
----
-
-## What `get_context()` returns
+### What `get_context()` returns
 
 ```python
-context = memory.get_context("still here lol")
-
 {
     "state_summary":      "User has been trending negatively across recent sessions, "
                           "with affect noticeably declining and low energy levels.",
-    "relevant_memories":  [
-        "finished the sprint but honestly just feel empty. not relieved, just empty. "
-        "i used to love coding. now i just stare at the screen.",
-        "missed a deadline for the first time in like two years. just couldn't focus.",
-        "snapped at a junior dev today for something stupid. felt awful after.",
-    ],
-    "valence":            -0.336,
-    "arousal":            -0.118,
+    "relevant_memories":  ["finished the sprint but honestly just feel empty...",
+                           "missed a deadline for the first time in two years...",
+                           "snapped at a junior dev today. felt awful after."],
+    "valence":            -0.34,
+    "arousal":            -0.12,
     "trend":              "declining",
     "session_count":      5,
     "ready":              True,
 }
 ```
 
+There is also `memory.predict_next()`, which decodes the current state as a forecast of the next session's emotional position.
+
 ---
 
 ## Architecture
 
-| Component            | What it does                                                                                                                                                                                                                                                                     |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SessionEncoder`     | Encodes a conversation session using `all-MiniLM-L6-v2` + optional Warriner VAD lexicon features → 384 or 387-dim output                                                                                                                                                          |
-| `TransitionModelGRU` | The world model. The user state is a GRU hidden state (gated, bounded accumulation of trajectory history), decoupled from a separate prediction head. Trained with VICReg + a **state-utility margin loss** (predictions from accumulated state must beat zero-state predictions) + an auxiliary next-session (valence, arousal) prediction head. Trained on 10,000 synthetic trajectories across 16 arc types with a conversation-disjoint validation split. |
-| `StateDecoder`       | Linear probe (384→2) mapping state vector to (valence, arousal). Classification thresholds travel inside the probe checkpoint. Generates plain-English trend summary.                                                                                                             |
-| `MemoryStore`        | ChromaDB. Hybrid retrieval: normalized semantic cosine + VAD-coordinate L2 emotional distance + optional recency decay, with optional dispersion-gated adaptive alpha.                                                                                                            |
-| `WorldMemory`        | Public API. Orchestrates encode → transition → decode → store → retrieve.                                                                                                                                                                                                        |
+| Component            | What it does                                                                                                                                                                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SessionEncoder`     | Session text to 384-dim MiniLM embedding + 3 VAD lexicon dims (387 total). ParlAI artifact cleanup built in.                                                                                                                                     |
+| `TransitionModelGRU` | The world model (~1.29M params). GRUCell hidden state = user state (bounded, drift-free); MLP head predicts next-session embedding; auxiliary head predicts next-session (v, a). Arch-detecting loader keeps legacy MLP checkpoints loadable.     |
+| `StateDecoder`       | Linear probe (384 to 2) for (valence, arousal); trend slope over arc history; natural-language summary. Thresholds embedded in the probe checkpoint.                                                                                             |
+| `MemoryStore`        | ChromaDB store with the hybrid semantic + emotional + recency scoring above, per-axis score auditing, and optional adaptive alpha. Works as a plain RAG index too (state vector optional).                                                       |
+| `StateStore`         | SQLite persistence: state vector, session count, last (v, a), capped arc history.                                                                                                                                                                 |
+| `WorldMemory`        | Public API. Orchestrates encode, transition, decode, persist, retrieve.                                                                                                                                                                          |
 
 ---
 
 ## Key results
 
-All representation metrics below are computed on a **conversation-disjoint validation set** (train and val trajectories share zero source conversations). Earlier published numbers were computed on a split where 100% of validation trajectories shared source conversations with training; those legacy figures are shown for reference but are optimistically biased.
+All representation metrics are computed on a **conversation-disjoint validation set**: train and validation trajectories share zero source conversations. Earlier published numbers used a split where 100% of validation trajectories shared source conversations with training; they are shown only for contrast and are optimistically biased.
 
-| Metric                                                        | Current (GRU, honest split)              | Legacy (MLP, leaky split) |
-| ------------------------------------------------------------- | ---------------------------------------- | -------------------------- |
-| **State-ablation gap** (does the recurrent state matter?)     | **+0.158** (threshold: 0.05)             | +0.0001 (state unused)     |
-| Next-session prediction vs naive "repeat last session"        | **+0.182 cosine, better on 90.1% of steps** | not measured               |
-| Probe valence r                                               | **0.770**                                | 0.698                      |
-| Probe arousal r                                               | **0.672**                                | 0.542                      |
-| Arousal-primary vs valence-primary arc prediction loss        | **−0.017 (arousal arcs predicted better)** | flagged worse              |
-| Ground-truth arousal coverage in training data                | **down to −0.80**                        | floor at −0.30             |
-| Emotional/semantic retrieval axis correlation (topic leakage) | **0.04** (independent)                   | —                          |
-| State norm over 50-session rollouts                           | **1.00× (bounded by construction)**      | unbounded MLP output       |
-| Arc-change detection (simulated users)                        | **10/10 detected, 0.7-session lag**      | —                          |
+| Metric                                                     | Current (GRU v2, honest split)              | Legacy (MLP, leaky split) |
+| ---------------------------------------------------------- | -------------------------------------------- | -------------------------- |
+| **State-ablation gap** (does the recurrent state matter?)  | **+0.158** (threshold 0.05)                  | +0.0001 (state unused)     |
+| Next-session prediction vs "repeat last session" baseline  | **+0.182 cosine, better on 90.1% of steps**  | not measured               |
+| Probe valence Pearson r                                    | **0.770**                                    | 0.698                      |
+| Probe arousal Pearson r                                    | **0.672**                                    | 0.542                      |
+| Arousal-primary vs valence-primary arc prediction loss     | **-0.017 (arousal arcs predicted better)**   | flagged worse              |
+| Training arousal coverage                                  | **down to -0.80**                            | floor at -0.30             |
+| Emotional/semantic retrieval axis correlation              | **0.04** (independent axes)                  | n/a                        |
+| State norm over 50-session rollouts                        | **1.00x** (bounded by construction)          | unconstrained              |
+| Arc-change detection (simulated users)                     | **10/10 detected, 0.7-session lag**          | n/a                        |
 
-### Response-level evaluation (honest protocol)
+### Response-level evaluation (debiased protocol)
 
-The LLM-judge evaluation now uses a **position-counterbalanced 3-judge panel** (every judge scores each pair in both presentation orders; an order-flipped vote counts as TIE), a **recency baseline** (Condition C: just show the last k sessions), and exact sign tests with Wilson intervals. Under this protocol:
+The LLM-judge evaluation uses a position-counterbalanced 3-judge panel (every judge scores each pair in both presentation orders; an order-flipped vote counts as TIE), a recency baseline, and exact sign tests with Wilson intervals.
 
-| Comparison (40 scenarios pooled: 20 standard + 20 long-history) | Result                          |
-| ---------------------------------------------------------------- | -------------------------------- |
-| Kokoro (B) vs semantic-only (A)                                   | B 12 / A 14 / TIE 14 — no significant difference (p = 0.85) |
-| Kokoro (B) vs recency baseline (C)                                | **B 14 / C 5 / TIE 21** (p = 0.064) |
-| Standard set, scenarios where retrieval diverges (12/20)          | B 7 / A 3 / TIE 2                |
-| Position-inconsistent individual judgings (neutralized)           | **40/120 (33%)**                 |
+| Comparison (40 scenarios: 20 standard + 20 long-history)  | Result                                                       |
+| ---------------------------------------------------------- | ------------------------------------------------------------ |
+| Kokoro (B) vs semantic-only (A)                             | B 12 / A 14 / TIE 14, no significant difference (p = 0.85)   |
+| Kokoro (B) vs recency baseline (C)                          | **B 14 / C 5 / TIE 21** (p = 0.064)                          |
+| Standard set, scenarios where retrieval diverges (12/20)    | B 7 / A 3 / TIE 2                                            |
+| Position-inconsistent individual judgings (neutralized)     | **40/120 (33%)**                                             |
 
-Three things worth being direct about:
+Three things stated plainly:
 
-1. **Previously reported win rates were substantially judge-protocol artifacts.** A third of individual judgings flip with presentation order, and the earlier pipeline's verdict parser mis-read the reasoning-model judge's `<think>` output (which is why `qwen3-32b` appeared to vote for Kokoro on every scenario). With both fixed, Kokoro vs semantic-only is a statistical dead heat at this sample size.
-2. **Kokoro consistently beats the recency baseline** (14–5 with 21 ties, p = 0.064) — the emotional mechanism adds signal that neither topical matching nor "just show recent sessions" provides, which is the comparison a deployed system actually faces.
-3. **The representation-level results are now the headline**, and they are strong: the recurrent state demonstrably carries trajectory information (ablation gap 3× threshold), decodes both circumplex axes well on honest data, and tracks simulated users with sub-session detection lag. The response-level preference test needs a larger scenario set (and human raters) to resolve differences the judge panel currently scores as ties — 21/40 recency comparisons and 14/40 semantic comparisons are ties.
-
----
-
-## Evaluation
-
-Three retrieval conditions are compared:
-
-- **Condition A (baseline):** α=1.0, semantic-only retrieval, no state summary
-- **Condition B (Kokoro):** α=0.6, hybrid retrieval + emotional state summary in system prompt
-- **Condition C (recency baseline):** the last k session summaries, no state summary — the cheapest competitor to emotional retrieval
-
-**Standard set:** 20 scenarios, 4–5 sessions each. **Long-history set:** 20 scenarios, 10–11 sessions each, with explicit emotional phase shifts (the new message reuses Phase 1 topic keywords, creating retrieval tension between an emotionally outdated but topically matched memory and an emotionally current one).
-
-**Judging protocol:** three judge models (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `qwen/qwen3-32b`), each scoring every pair in **both presentation orders**. A judge that names a different winner when the order flips is recorded as position-inconsistent and votes TIE. Reasoning-model `<think>` output is stripped before verdict parsing (an earlier parser bug made `qwen3-32b` appear to vote for Kokoro on every scenario). Majority vote across the three debiased judges; exact binomial sign test and 95% Wilson interval on win rates.
-
-Reproduce: `python experiments/build_contexts.py [--long]` then `python experiments/run_llm_eval.py [--long] --with-recency-baseline` (requires `GROQ_API_KEY`).
-
-Full technical and empirical report: [`research_report.md`](research_report.md); change log: [`improvements_report.md`](improvements_report.md); paper deltas: [`paper_updates.md`](paper_updates.md).
+1. **Previously reported win rates (83.3%, then 45-54.5%) were substantially judge-protocol artifacts and are retracted.** A third of individual judgings flip with presentation order, and the earlier pipeline's verdict parser misread the reasoning-model judge's `<think>` output, which is why `qwen3-32b` appeared to vote for Kokoro on every scenario. With both fixed, Kokoro vs semantic-only is a statistical dead heat at this sample size.
+2. **Kokoro consistently beats the recency baseline** (14-5 with 21 ties), the comparison a deployed system actually faces: the emotional mechanism adds signal that neither topical matching nor "just show recent sessions" provides.
+3. **The representation-level results are the headline**: the recurrent state provably carries trajectory information, decodes both circumplex axes well on honest data, and tracks simulated users with sub-session detection lag. Resolving the response-level comparison needs a larger scenario set and human raters; ties are the modal judge outcome.
 
 ---
 
 ## Training
 
-The transition model is trained on 10,000 synthetic emotional arc trajectories with:
+### Data
+
+Source pool: EmpatheticDialogues (~19k emotion-labeled conversations), each label mapped to Russell-circumplex coordinates. Synthetic multi-session trajectories are constructed by sampling 16 arc templates (gradual decline, slow recovery, grief, burnout-style anxiety-to-depression, five arousal-primary arcs, etc.) and picking real conversations whose coordinates fall in each arc waypoint zone.
+
+Because EmpatheticDialogues has an arousal floor of about -0.30, the pool is augmented with 600 template-generated deep-low-arousal sessions in both valence polarities (exhaustion/shutdown and deep calm/serenity), extending coverage to -0.80. Dataset of record: 10,000 train / 2,000 val trajectories, 7.6 sessions each, **zero shared source conversations across splits** (validation conversations are held out before construction).
+
+### Objective
 
 ```
-L = 25·L_sim + 25·L_var + 1·L_cov + 50·L_util + 10·L_vad
+L = 25*L_sim + 25*L_var + 1*L_cov + 50*L_util + 10*L_vad
 ```
 
-- `L_sim/L_var/L_cov` — VICReg (cosine invariance + variance + covariance) on the prediction head output
-- `L_util` — **state-utility margin loss**: predictions from the accumulated state must beat predictions from a zeroed state by ≥0.2 cosine at every warm step. This directly optimizes the state-ablation gap; a model that ignores its recurrent memory cannot minimize it. (Without this term, the GRU converged to a gap of +0.005 — architecture alone does not buy state use.)
-- `L_vad` — auxiliary next-session (valence, arousal) prediction. Next-session *text* is dominated by unpredictable topical content; next-session *emotional position* follows the arc — this is the task that makes history worth carrying.
+- `L_sim`, `L_var`, `L_cov`: VICReg (cosine invariance + variance + covariance) on the prediction head output, preventing the dimensional collapse that killed the first-generation model
+- `L_util`: **state-utility margin loss.** At every warm step, predictions from the accumulated state must beat predictions from a zeroed state by at least 0.2 cosine. This directly optimizes the state-ablation gap; a model that ignores its memory cannot minimize it.
+- `L_vad`: auxiliary next-session (valence, arousal) prediction, the task where trajectory history genuinely pays
 
-Sessions are sourced from EmpatheticDialogues (Rashkin et al., 2019), augmented with a synthetic deep-low-arousal pool (`data/low_arousal_pool.py`) that extends arousal coverage from the ED floor of −0.30 down to −0.80 in both valence polarities, across 16 arc types. Train and validation trajectories share **zero source conversations** (the legacy trajectory-level split left 100% of validation trajectories sharing conversations with training).
+Checkpoints are selected by `val_loss - ablation_gap`, so an epoch cannot win the save by ignoring its state.
 
-To reproduce:
+### The decisive ablation
+
+| Run                      | util / margin | vad | State-ablation gap | Val loss |
+| ------------------------ | ------------- | --- | ------------------- | -------- |
+| MLP (legacy)             | none          | 0   | +0.0001             | 0.503*   |
+| GRU, weak incentives     | 10 / 0.1      | 0   | +0.005              | 0.503    |
+| **GRU, final**           | 50 / 0.2      | 10  | **+0.158**          | 0.554    |
+
+(*leaky split.) On near-Markovian synthetic arcs, **recurrence alone does not produce state use; the objective must demand it.** The ~0.05 higher validation loss is the explicit, quantified price of genuine trajectory dependence.
+
+### Reproduce
 
 ```bash
-python -m data.construct_trajectories 10000 --augment-low-arousal --holdout-conv-fraction 0.2 --out data/trajectories_10k_v2.json
-python -m training.train --data data/trajectories_10k_v2.json --val-data data/trajectories_10k_v2_val.json --checkpoint checkpoints/transition_v2.pt --epochs 60 --util-weight 50 --util-margin 0.2 --vad-weight 10
-python -m training.train_probe --data data/trajectories_10k_v2.json --val-data data/trajectories_10k_v2_val.json --checkpoint checkpoints/transition_v2.pt --out-probe checkpoints/valence_arousal_probe_v2.pt
+# 1. Data (leakage-free by construction, low-arousal augmented)
+python -m data.construct_trajectories 10000 --augment-low-arousal \
+    --holdout-conv-fraction 0.2 --out data/trajectories_10k_v2.json
+
+# 2. World model (~25 min on CPU; rollouts are vectorized across the batch)
+python -m training.train --data data/trajectories_10k_v2.json \
+    --val-data data/trajectories_10k_v2_val.json \
+    --checkpoint checkpoints/transition_v2.pt --epochs 60 \
+    --util-weight 50 --util-margin 0.2 --vad-weight 10
+
+# 3. Probe + threshold calibration (thresholds are written into the checkpoint)
+python -m training.train_probe --data data/trajectories_10k_v2.json \
+    --val-data data/trajectories_10k_v2_val.json \
+    --checkpoint checkpoints/transition_v2.pt \
+    --out-probe checkpoints/valence_arousal_probe_v2.pt
 ```
+
+---
+
+## Evaluation
+
+Three conditions per scenario:
+
+- **A (semantic baseline):** alpha=1.0, semantic-only retrieval, no state summary
+- **B (Kokoro):** alpha=0.6 hybrid retrieval + state summary in the system prompt
+- **C (recency baseline):** the last k session summaries, no state summary
+
+Two scenario sets: 20 standard (4-5 sessions) and 20 long-history (10-11 sessions with an explicit emotional phase shift; the new message reuses old-phase topic keywords to create maximal tension between topically matched and emotionally current memories).
+
+Judging: three models (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `qwen/qwen3-32b`), each scoring every pair in both presentation orders; order-inconsistent votes become TIE; `<think>` blocks stripped before parsing; majority vote; exact binomial sign test and Wilson interval.
+
+```bash
+python experiments/build_contexts.py            # add --long for the long set
+python experiments/run_llm_eval.py --with-recency-baseline    # add --long
+```
+
+Requires `GROQ_API_KEY` in `.env`.
 
 ---
 
 ## Diagnostics
 
+Every number in the results tables is reproducible from a diagnostic script (defaults already point at the current checkpoint and the disjoint validation file):
+
 ```bash
-python -m diagnostics.arc_separation      # arc clustering metric (current: 3.111)
-python -m diagnostics.probe_generalization # probe on naturalistic conversations
-python -m diagnostics.per_arc_val_loss    # per-arc validation loss
-python -m diagnostics.state_ablation      # state contribution check
-python -m diagnostics.norm_drift          # state vector norm stability
-python -m diagnostics.topic_leakage       # semantic/emotional axis separation
+python -m diagnostics.state_ablation        # state contribution: gap +0.158
+python -m diagnostics.eval_worldmodel       # +0.182 vs persistence baseline
+python -m diagnostics.per_arc_val_loss      # arousal arcs now predicted best
+python -m diagnostics.topic_leakage         # axis independence: r = 0.04
+python -m diagnostics.norm_drift            # state norm 1.00x over 50 sessions
+python -m diagnostics.arc_separation        # arc clustering vs shuffled control
+python -m diagnostics.probe_generalization  # probe on naturalistic conversations
+python -m diagnostics.longitudinal_sim      # tracking MAE, arc-change lag
+```
+
+---
+
+## Repository layout
+
+```
+kokoro/        core package: encoder, vad, transition (GRU world model), decoder,
+               store, retrieval, memory (public API)
+data/          EmpatheticDialogues loader, circumplex map, 16 arc templates,
+               low-arousal pool, trajectory constructor
+training/      train (VICReg + state-utility + VAD aux, vectorized), train_probe,
+               split (conversation-disjoint), validate
+diagnostics/   9 diagnostic scripts + shared arch-aware loading
+experiments/   scenario sets, two-stage evaluation pipeline
+tests/         89 unit tests
+checkpoints/   transition_v2.pt (production), valence_arousal_probe_v2.pt,
+               legacy v1 artifacts, training histories
+figures/       figure generators; demo.py is a Gradio circumplex demo
 ```
 
 ---
 
 ## Limitations
 
-- **Response-level preference is unresolved vs semantic-only.** Under the debiased judging protocol, Kokoro vs semantic-only retrieval is a statistical dead heat at 40 scenarios (12–14–14). The advantage over the recency baseline (14–5–21, p = 0.064) is the defensible response-level claim. Resolving the semantic-only comparison needs a larger scenario set and human raters.
-- **Deep-low-arousal text is synthetic.** The arousal-coverage fix uses template-generated sessions; the honest upgrade is a real low-energy corpus (fatigue/depression support text with consent, or human-annotated DailyDialog).
-- **Synthetic trajectories.** Trained on arc templates, not real multi-session user histories. The state-utility and VAD-prediction results show the model *can* carry trajectory information; whether real users follow learnable arcs is untested.
-- **State utility is trained, not emergent.** The ablation gap exists because the loss demands it (the same GRU without the utility term converged to +0.005). This is by design — it also means the cold-start (first-session) prediction is deliberately weaker than a session-only model's.
+- **The response-level comparison vs semantic-only retrieval is unresolved** (dead heat at n=40, tie-dominant). The recency-baseline margin (p=0.064) is the defensible response-level claim.
+- **Deep-low-arousal text is synthetic.** The honest upgrade is a real low-energy corpus.
+- **Synthetic trajectories.** Template arcs are simpler and more Markovian than real emotional life; real longitudinal data is the decisive test, and the state-utility objective is designed to exploit it.
+- **State utility is trained, not emergent**, with a deliberately weaker cold start as the flip side (covered in deployment by the 3-session warm-up gate).
+- **Adaptive alpha and the recency weight ship but are not in the reported eval**; they are ablation arms.
 - **Warm-up period.** State summary is `None` for the first two sessions.
-- **Emotional retrieval can backfire.** The hybrid axis sometimes surfaces an emotionally current but topically weaker session; judges sometimes prefer the semantically precise memory. Dispersion-gated adaptive alpha (`adaptive_alpha=True`) mitigates the homogeneous-history case but is not enabled in the reported eval.
-- **Evaluation scale.** 40 scenarios with high tie rates is small; results are directionally informative, not definitive.
 
 ---
 
 ## Dependencies
 
-- Python 3.10+
-- `torch >= 2.2.0`
-- `sentence-transformers >= 2.7.0`
-- `numpy >= 1.26.0`
-- `chromadb >= 0.5.0`
-- `datasets >= 2.19.0`
-- `tqdm >= 4.66.0`
-
-Optional for evaluation:
-
-- `groq >= 0.4.0`
+Python 3.10+, `torch >= 2.2`, `sentence-transformers >= 2.7`, `numpy >= 1.26`, `chromadb >= 0.5`, `datasets >= 2.19`, `tqdm`. Optional for evaluation: `groq`.
 
 ---
 
@@ -232,8 +279,6 @@ Optional for evaluation:
   url     = {https://github.com/DhruvaMyakeri/kokoro},
 }
 ```
-
----
 
 ## License
 

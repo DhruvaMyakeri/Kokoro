@@ -1,17 +1,13 @@
-# Claude Code project config
-.claude/
-
-# Project-specific excludes
-hehe.txt
-report.txt
-research_critique.txt
-
-# Secrets
+# ============================================================
+# Secrets — never commit API keys
+# ============================================================
 .env
 *.env
 .env.*
 
+# ============================================================
 # Python
+# ============================================================
 __pycache__/
 *.py[cod]
 *.pyo
@@ -30,55 +26,87 @@ venv/
 env/
 ENV/
 
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb
-
-# Testing
+# Testing / type checking
 .pytest_cache/
 .coverage
 htmlcov/
 coverage.xml
-
-# Type checking
 .mypy_cache/
 .ruff_cache/
 
-# IDE
+# Jupyter
+.ipynb_checkpoints/
+
+# ============================================================
+# IDE / OS
+# ============================================================
 .vscode/
 .idea/
 *.code-workspace
-
-# OS
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ChromaDB (local vector store — not committed)
+# Claude Code project config
+.claude/
+
+# ============================================================
+# Data — large regenerable trajectory files are NOT committed.
+# Regenerate with:
+#   python -m data.construct_trajectories 10000 --augment-low-arousal \
+#       --holdout-conv-fraction 0.2 --out data/trajectories_10k_v2.json
+# The small sample file stays tracked so tests and smoke runs work.
+# ============================================================
+data/trajectories_*.json
+!data/trajectories_sample.json
+
+# EmpatheticDialogues cache lives in ~/.cache/kokoro (outside the repo)
+
+# ============================================================
+# Checkpoints — the production .pt files ARE committed (they are
+# the artifacts of record, ~10 MB each). Ignore only the stale
+# duplicate directory and heavyweight training noise.
+# ============================================================
+kokoro/checkpoints/
+checkpoints/*_backup.pt
+
+# Training/diagnostic logs: keep the v2 evidence trail tracked,
+# ignore everything else.
+*.log
+!checkpoints/train_v2.log
+!checkpoints/probe_v2.log
+logs/
+
+# ============================================================
+# Runtime state — local databases and vector stores
+# ============================================================
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
 chroma/
 chroma_data/
 *.chroma/
 
-# SQLite databases
-*.db
-*.sqlite
-*.sqlite3
+# ============================================================
+# Evaluation — contexts and results ARE committed (they are the
+# results of record cited by research_report.md). Nothing to
+# ignore here; this section exists to prevent someone re-adding
+# the old rule that silently excluded them.
+# ============================================================
 
-# Evaluation intermediates
-experiments/contexts.json
-experiments/results.json
+# ============================================================
+# Figures — commit PNGs; PDFs are regenerable print duplicates
+# ============================================================
+figures/*.pdf
 
-# Temp files from examples / tests
+# ============================================================
+# Scratch / local notes
+# ============================================================
+hehe.txt
+report.txt
+research_critique.txt
 tmp/
 temp/
-
-# Model checkpoints — tracked via Git LFS or excluded entirely
-# Uncomment the line below if checkpoints are too large to commit:
-# checkpoints/
-
-# Figures — commit PNGs/GIFs, skip PDFs if large
-*.pdf
-
-# Logs
-*.log
-logs/
+seed_images/
